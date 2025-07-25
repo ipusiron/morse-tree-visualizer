@@ -74,7 +74,10 @@ export function initEncodeTab() {
     resultDiv.innerHTML = `
       <div class="morse-result-container">
         <p><strong>変換結果:</strong></p>
-        <div class="morse-code-display">${result}</div>
+        <div class="morse-code-display">
+          ${result}
+          <button class="copy-button" onclick="copyToClipboard('${result.replace(/'/g, "\\'")}')">📋 コピー</button>
+        </div>
         <details>
           <summary>詳細を表示</summary>
           ${table}
@@ -117,4 +120,48 @@ function animateHighlightSequence(paths) {
       highlightPath(path);
     }, index * 1000);
   });
+}
+
+// グローバル関数としてコピー機能を提供
+window.copyToClipboard = async function(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    showToast('モールス信号をクリップボードにコピーしました！');
+  } catch (err) {
+    console.error('コピーに失敗しました:', err);
+    // フォールバック：テキストエリアを使用
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+    showToast('モールス信号をクリップボードにコピーしました！');
+  }
+};
+
+// トースト通知機能
+function showToast(message) {
+  // 既存のトーストを削除
+  const existingToast = document.querySelector('.toast');
+  if (existingToast) {
+    existingToast.remove();
+  }
+
+  // トースト要素を作成
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = message;
+  
+  // bodyに追加
+  document.body.appendChild(toast);
+  
+  // アニメーション
+  setTimeout(() => toast.classList.add('show'), 100);
+  
+  // 3秒後に削除
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
 }
