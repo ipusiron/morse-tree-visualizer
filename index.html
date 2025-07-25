@@ -33,7 +33,9 @@
           <input type="text" id="textInput" placeholder="HELLO などを入力" />
           <button id="startButton">変換＆表示</button>
         </section>
-        <div id="tree-container"></div>
+        <div class="tree-scroll-wrapper">
+  <div id="tree-container"></div>
+</div>
       </div>
 
       <!-- タブ2：デコード -->
@@ -46,19 +48,22 @@
         <div id="decodeResult"></div>
       </div>
 
-      <!-- タブ3：学習モード -->
-      <div class="tab-content" id="tab-study">
-        <section>
-          <h2>学習モード</h2>
-          <button id="randomQuizBtn">ランダム出題</button>
-          <label for="manualCharSelect">文字を選ぶ：</label>
-          <select id="manualCharSelect">
-            <option value="">選択してください</option>
-            <!-- JSで A〜Z, 0〜9 自動生成予定 -->
-          </select>
-          <div id="studyResult"></div>
-        </section>
-      </div>
+<!-- タブ3：学習モード -->
+<div class="tab-content" id="tab-study">
+  <section>
+    <h2>学習モード</h2>
+    <button id="randomQuizBtn">ランダム出題</button>
+    <label for="manualCharSelect">文字を選ぶ：</label>
+    <select id="manualCharSelect">
+      <option value="">選択してください</option>
+    </select>
+    <div id="studyResult"></div>
+
+    <div class="tree-scroll-wrapper">
+  <div id="tree-container-study"></div>
+</div>
+  </section>
+</div>
 
 		<!-- タブ4：モールス表 -->
 		<div class="tab-content" id="tab-table">
@@ -69,7 +74,6 @@
     </div>
   </section>
 </div>
-
 
     <!-- ヘルプモーダル -->
     <div id="helpModal" class="modal hidden">

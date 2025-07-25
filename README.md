@@ -5,6 +5,8 @@
 ![GitHub last commit](https://img.shields.io/github/last-commit/ipusiron/morse-tree-visualizer)
 ![GitHub license](https://img.shields.io/github/license/ipusiron/morse-tree-visualizer)
 
+**Day025 - 生成AIで作るセキュリティツール100**
+
 **MorseTree Visualizer** は、モールス信号を視覚的に学べるインタラクティブなWebツールです。  
 シンプルな変換器ではなく、「モールス脳」を育てる体験を提供することを目的としています。
 
@@ -65,6 +67,46 @@ morse-tree-visualizer/
 ├── assets/
 │ └── screenshot.png
 ```
+
+---
+
+## 🚀 使い方
+
+### ✅ 方法①：デモページを開く（推奨）
+
+以下のURLから、ブラウザ上でそのままツールを使用できます。
+
+🔗 [https://ipusiron.github.io/morse-tree-visualizer/](https://ipusiron.github.io/morse-tree-visualizer/)
+
+---
+
+### ✅ 方法②：ローカルで動作確認する
+
+1. このリポジトリをダウンロード or クローンします。
+2. 以下のようにローカルでHTTPサーバーを起動してください。
+
+例（Python使用）：
+
+```bash
+cd morse-tree-visualizer
+python -m http.server 8000
+```
+
+3. ブラウザで以下を開きます。
+
+```
+http://localhost:8000/
+```
+
+---
+
+### ⚠ なぜ HTTP サーバーが必要なの？
+
+本ツールは、JavaScriptモジュール（ES Modules）を使用しています。
+
+`<script type="module" src="...">`により分割された .jsファイルを読み込んでいます。
+file:// で直接開くと、**ブラウザのセキュリティ制約（CORSポリシー）** によりエラーになります。
+そのため、必ず http:// や https:// 経由でアクセスする必要があります。
 
 ---
 

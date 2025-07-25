@@ -1,98 +1,123 @@
 export const morseTree = {
-  label: "start",
+  label: "start", x: null, y: null,
   left: {
-    label: "E",
+    label: "E", x: null, y: null,
     left: {
-      label: "I",
+      label: "I", x: null, y: null,
       left: {
-        label: "S",
+        label: "S", x: null, y: null,
         left: {
-          label: "H",
-          left: { label: "5" },
-          right: { label: "4" }
+          label: "H", x: null, y: null,
+          left: { label: "5", x: null, y: null },
+          right: { label: "4", x: null, y: null }
         },
         right: {
-          label: "V",
-          right: { label: "3" }
+          label: "V", x: null, y: null,
+          left: { label: " ", x: null, y: null },
+          right: { label: "3", x: null, y: null }
         }
       },
       right: {
-        label: "U",
+        label: "U", x: null, y: null,
         left: {
-          label: "F"
+          label: "F", x: null, y: null,
+          left: { label: " ", x: null, y: null },
+          right: { label: " ", x: null, y: null }
         },
         right: {
-          right: { label: "2" }
+          label: " ", x: null, y: null,
+          left: { label: " ", x: null, y: null },
+          right: { label: "2", x: null, y: null }
         }
       }
     },
     right: {
-      label: "A",
+      label: "A", x: null, y: null,
       left: {
-        label: "R",
+        label: "R", x: null, y: null,
         left: {
-          label: "L"
+          label: "L", x: null, y: null,
+          left: { label: " ", x: null, y: null },
+          right: { label: " ", x: null, y: null }
         },
         right: {
-          right: { label: "+" }
+          label: " ", x: null, y: null,
+          left: { label: "+", x: null, y: null },
+          right: { label: " ", x: null, y: null }
         }
       },
       right: {
-        label: "W",
+        label: "W", x: null, y: null,
         left: {
-          label: "P"
+          label: "P", x: null, y: null,
+          left: { label: " ", x: null, y: null },
+          right: { label: " ", x: null, y: null }
         },
         right: {
-          label: "J",
-          right: { label: "1" }
+          label: "J", x: null, y: null,
+          left: { label: " ", x: null, y: null },
+          right: { label: "1", x: null, y: null }
         }
       }
     }
   },
   right: {
-    label: "T",
+    label: "T", x: null, y: null,
     left: {
-      label: "N",
+      label: "N", x: null, y: null,
       left: {
-        label: "D",
+        label: "D", x: null, y: null,
         left: {
-          label: "B",
-          left: { label: "6" },
-          right: { label: "=" }
+          label: "B", x: null, y: null,
+          left: { label: "6", x: null, y: null },
+          right: { label: "=", x: null, y: null }
         },
         right: {
-          label: "X",
-          right: { label: "/" }
+          label: "X", x: null, y: null,
+          left: { label: "/", x: null, y: null },
+          right: { label: " ", x: null, y: null }
         }
       },
       right: {
-        label: "K",
+        label: "K", x: null, y: null,
         left: {
-          label: "C"
+          label: "C", x: null, y: null,
+          left: { label: " ", x: null, y: null },
+          right: { label: " ", x: null, y: null }
         },
         right: {
-          label: "Y"
+          label: "Y", x: null, y: null,
+          left: { label: " ", x: null, y: null },
+          right: { label: " ", x: null, y: null }
         }
       }
     },
     right: {
-      label: "M",
+      label: "M", x: null, y: null,
       left: {
-        label: "G",
+        label: "G", x: null, y: null,
         left: {
-          label: "Z",
-          left: { label: "7" }
+          label: "Z", x: null, y: null,
+          left: { label: "7", x: null, y: null },
+          right: { label: " ", x: null, y: null }
         },
         right: {
-          label: "Q"
+          label: "Q", x: null, y: null,
+          left: { label: " ", x: null, y: null },
+          right: { label: " ", x: null, y: null }
         }
       },
       right: {
-        label: "O",
+        label: "O", x: null, y: null,
+        left: {
+          label: " ", x: null, y: null,
+          left: { label: " ", x: null, y: null },
+          right: { label: "8", x: null, y: null }
+        },
         right: {
-          right: {
-            label: "0"
-          }
+          label: " ", x: null, y: null,
+          left: { label: "9", x: null, y: null },
+          right: { label: "0", x: null, y: null }
         }
       }
     }
