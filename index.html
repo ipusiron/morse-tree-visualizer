@@ -30,12 +30,13 @@
       <div class="tab-content active" id="tab-encode">
         <section>
           <label for="textInput">テキスト入力：</label>
-          <input type="text" id="textInput" placeholder="HELLO などを入力" />
+          <input type="text" id="inputText" placeholder="HELLO などを入力" />
           <button id="startButton">変換＆表示</button>
         </section>
         <div class="tree-scroll-wrapper">
   <div id="tree-container"></div>
 </div>
+<div id="morseResult"></div>
       </div>
 
       <!-- タブ2：デコード -->
@@ -110,10 +111,9 @@
 
     <!-- スクリプト -->
     <script type="module" src="js/script.js"></script>
-    <script type="module" src="js/encoder.js"></script>
-    <script type="module" src="js/decoder.js"></script>
+    <script type="module" src="js/encode.js"></script>
+    <!-- <script type="module" src="js/decode.js"></script> -->
     <script type="module" src="js/study.js"></script>
     <script type="module" src="js/table.js"></script>
-    <script type="module" src="js/audio.js"></script>
   </body>
 </html>

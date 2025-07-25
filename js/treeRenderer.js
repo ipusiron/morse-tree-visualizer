@@ -180,6 +180,9 @@ export function highlightPath(path) {
 }
 
 export function clearHighlights() {
+  if (!svgRoot) return;
+
   const highlightedNodes = svgRoot.querySelectorAll('.highlight');
   highlightedNodes.forEach((el) => el.classList.remove('highlight'));
 }
+
