@@ -57,7 +57,7 @@
         <!-- 🟦 サブタブボタン -->
         <div class="subtab-buttons">
           <button class="subtab-button active" data-subtab="manual">文字確認</button>
-          <button class="subtab-button" data-subtab="quiz">ランダム出題</button>
+          <button class="subtab-button" data-subtab="random">ランダム出題</button>
         </div>
 
         <!-- 🔵 文字確認モード -->
@@ -73,9 +73,13 @@
         <!-- 🟢 ランダム出題モード -->
         <div id="subtab-random" class="subtab-content">
           <button id="randomQuizBtn">ランダム出題</button>
-          <input type="text" id="quizAnswer" placeholder="1文字を入力" />
-          <button id="checkAnswerBtn">答え合わせ</button>
-          <div id="quizFeedback"></div>
+          <div id="quizContainer" style="display: none;">
+            <p>このモールス符号はどの文字？</p>
+            <div id="quizCode"></div>
+            <input type="text" id="quizAnswer" placeholder="1文字を入力" maxlength="1" />
+            <button id="checkAnswerBtn">答え合わせ</button>
+            <div id="quizFeedback"></div>
+          </div>
           <div id="studyResultRandom"></div>
         </div>
 

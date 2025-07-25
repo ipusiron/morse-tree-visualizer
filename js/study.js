@@ -13,8 +13,8 @@ export function initStudyMode() {
   alreadyInitialized = true;
 
   // --- サブタブ切り替え処理を初期化 ---
-  const subtabButtons = document.querySelectorAll('.subtab-button');
-  const subtabContents = document.querySelectorAll('.subtab-content');
+  const subtabButtons = document.querySelectorAll('#tab-study .subtab-button');
+  const subtabContents = document.querySelectorAll('#tab-study .subtab-content');
 
   subtabButtons.forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -70,8 +70,13 @@ export function initStudyMode() {
 
   // --- ランダム出題モード処理 ---
   const randomBtn = document.getElementById('randomQuizBtn');
-  const resultRandom = document.getElementById('studyResultRandom');
-  if (randomBtn && resultRandom) {
+  const quizContainer = document.getElementById('quizContainer');
+  const quizCode = document.getElementById('quizCode');
+  const checkBtn = document.getElementById('checkAnswerBtn');
+  const input = document.getElementById('quizAnswer');
+  const feedback = document.getElementById('quizFeedback');
+  
+  if (randomBtn && quizContainer) {
     randomBtn.addEventListener('click', () => {
       const randomChar = studyChars[Math.floor(Math.random() * studyChars.length)];
       const code = morseMap[randomChar];
@@ -79,20 +84,15 @@ export function initStudyMode() {
       currentQuizAnswer = randomChar;
 
       clearHighlights(); // 出題時は光らせない
-      resultRandom.innerHTML = `
-        <div id="quizContainer">
-          <p>このモールス符号はどの文字？</p>
-          <div id="quizCode">${code}</div>
-          <input type="text" id="quizAnswer" maxlength="1" />
-          <button id="checkAnswerBtn">答え合わせ</button>
-          <div id="quizFeedback"></div>
-        </div>
-      `;
+      
+      // 問題を表示
+      quizContainer.style.display = 'block';
+      quizCode.textContent = code;
+      input.value = '';
+      feedback.innerHTML = '';
+    });
 
-      const checkBtn = document.getElementById('checkAnswerBtn');
-      const input = document.getElementById('quizAnswer');
-      const feedback = document.getElementById('quizFeedback');
-
+    if (checkBtn) {
       checkBtn.addEventListener('click', () => {
         const userInput = input.value.toUpperCase();
         if (!userInput) {
@@ -106,9 +106,10 @@ export function initStudyMode() {
           feedback.innerHTML = `<span style="color: red;">❌ 不正解です。正解は「${currentQuizAnswer}」でした。</span>`;
         }
 
+        const path = getPathFromCode(morseMap[currentQuizAnswer]);
         highlightPath(path); // この時点でのみ光らせる
       });
-    });
+    }
   }
 
   // ✅ タブ表示後にモールスツリー描画
