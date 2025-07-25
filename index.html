@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>MorseTree Visualizer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>MorseTree Visualizer</h1>
+      <p>モールス信号を可視化して楽しく学ぼう！</p>
+    </header>
+
+    <main>
+      <!-- タブメニュー -->
+      <div class="tab-menu">
+        <button class="tab-button active" data-tab="encode">
+          英語 ⇒ モールス信号
+        </button>
+        <button class="tab-button" data-tab="decode">
+          モールス信号 ⇒ 英語
+        </button>
+        <button class="tab-button" data-tab="study">学習モード</button>
+        <button class="tab-button" data-tab="table">モールス信号一覧表</button>
+        <button class="help-button" id="helpBtn">ヘルプ</button>
+      </div>
+
+      <!-- タブ1：エンコード -->
+      <div class="tab-content active" id="tab-encode">
+        <section>
+          <label for="textInput">テキスト入力：</label>
+          <input type="text" id="textInput" placeholder="HELLO などを入力" />
+          <button id="startButton">変換＆表示</button>
+        </section>
+        <div id="tree-container"></div>
+      </div>
+
+      <!-- タブ2：デコード -->
+      <div class="tab-content" id="tab-decode">
+        <section>
+          <label for="morseInput">モールス入力（・−）：</label>
+          <input type="text" id="morseInput" placeholder="・−− などを入力" />
+          <button id="decodeButton">復号</button>
+        </section>
+        <div id="decodeResult"></div>
+      </div>
+
+      <!-- タブ3：学習モード -->
+      <div class="tab-content" id="tab-study">
+        <section>
+          <h2>学習モード</h2>
+          <button id="randomQuizBtn">ランダム出題</button>
+          <label for="manualCharSelect">文字を選ぶ：</label>
+          <select id="manualCharSelect">
+            <option value="">選択してください</option>
+            <!-- JSで A〜Z, 0〜9 自動生成予定 -->
+          </select>
+          <div id="studyResult"></div>
+        </section>
+      </div>
+
+		<!-- タブ4：モールス表 -->
+		<div class="tab-content" id="tab-table">
+  <section>
+    <h2>モールス信号 一覧表</h2>
+    <div class="morse-table-wrapper">
+      <!-- グループ表示は JSでここに挿入 -->
+    </div>
+  </section>
+</div>
+
+
+    <!-- ヘルプモーダル -->
+    <div id="helpModal" class="modal hidden">
+      <div class="modal-content">
+        <span class="close-button" id="closeHelp">&times;</span>
+        <h2>ヘルプ</h2>
+        <p>
+          このツールは、モールス信号の構造と音を可視化しながら学習できる教育支援ツールです。
+        </p>
+        <ul>
+          <li>タブを切り替えて、暗号化／復号／学習／符号表を利用できます。</li>
+          <li>
+            モールスツリーは左＝・（ドット）、右＝−（ダッシュ）で構成されています。
+          </li>
+          <li>
+            学習モードでは任意文字を選んだり、ランダム出題で復習が可能です。
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- フッター -->
+    <footer>
+      <div class="footer">
+        🔗 GitHubリポジトリはこちら（
+        <a
+          href="https://github.com/ipusiron/morse-tree-visualizer"
+          target="_blank"
+        >
+          ipusiron/morse-tree-visualizer </a
+        >）
+      </div>
+    </footer>
+
+    <!-- スクリプト -->
+    <script type="module" src="js/script.js"></script>
+    <script type="module" src="js/encoder.js"></script>
+    <script type="module" src="js/decoder.js"></script>
+    <script type="module" src="js/study.js"></script>
+    <script type="module" src="js/table.js"></script>
+    <script type="module" src="js/audio.js"></script>
+  </body>
+</html>
