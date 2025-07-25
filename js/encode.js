@@ -1,6 +1,11 @@
-import { highlightPath, clearHighlights } from './treeRenderer.js';
+import { highlightPath, clearHighlights, renderMorseTree } from './treeRenderer.js';
+import { morseMap } from './morseMap.js';
+import { morseTree } from './morseTree.js';
 
 export function initEncodeTab() {
+  // モールスツリーを描画
+  renderMorseTree("tree-container");
+  
   const startButton = document.getElementById('startButton');
   const inputText = document.getElementById('inputText');
   const resultDiv = document.getElementById('morseResult');
@@ -8,29 +13,74 @@ export function initEncodeTab() {
   if (!startButton || !inputText || !resultDiv) return;
 
   startButton.addEventListener('click', () => {
-    const text = inputText.value.toUpperCase();
-    const morseMap = window.morseMap || {};
-    const morseTree = window.morseTree || {};
+    const text = inputText.value.toUpperCase().trim();
+    
+    if (!text) {
+      resultDiv.innerHTML = '<p style="color: #666;">テキストを入力してください。</p>';
+      clearHighlights();
+      return;
+    }
 
     let result = '';
-    let table = '<table><tr><th>文字</th><th>モールス符号</th><th>経路</th></tr>';
-
+    let morseOutput = [];
+    let invalidChars = [];
     const pathList = [];
 
+    // 各文字を処理
     for (const char of text) {
+      if (char === ' ') {
+        morseOutput.push('/'); // スペースは / で表現
+        continue;
+      }
+      
       const code = morseMap[char];
       if (code) {
         const path = getPathFromCode(code, morseTree);
         pathList.push(path);
-        table += `<tr><td>${char}</td><td>${code}</td><td>${path.join(' > ')}</td></tr>`;
-        result += code + ' ';
+        morseOutput.push(code);
+      } else {
+        invalidChars.push(char);
       }
     }
 
-    table += '</table>';
-    resultDiv.innerHTML = `<p><strong>変換結果:</strong> ${result.trim()}</p>${table}`;
+    // 結果を表示
+    if (invalidChars.length > 0) {
+      resultDiv.innerHTML = `
+        <p style="color: #d32f2f;">⚠ 以下の文字は変換できません: ${invalidChars.join(', ')}</p>
+      `;
+      clearHighlights();
+      return;
+    }
 
-    animateHighlightSequence(pathList);
+    result = morseOutput.join(' ');
+    
+    // 詳細表を作成
+    let table = '<table class="morse-encode-table"><tr><th>文字</th><th>モールス符号</th></tr>';
+    for (const char of text) {
+      if (char === ' ') {
+        table += `<tr><td>スペース</td><td>/</td></tr>`;
+      } else {
+        const code = morseMap[char];
+        table += `<tr><td>${char}</td><td>${code}</td></tr>`;
+      }
+    }
+    table += '</table>';
+    
+    resultDiv.innerHTML = `
+      <div class="morse-result-container">
+        <p><strong>変換結果:</strong></p>
+        <div class="morse-code-display">${result}</div>
+        <details>
+          <summary>詳細を表示</summary>
+          ${table}
+        </details>
+      </div>
+    `;
+
+    // アニメーション実行
+    if (pathList.length > 0) {
+      animateHighlightSequence(pathList);
+    }
   });
 }
 
@@ -54,7 +104,8 @@ function animateHighlightSequence(paths) {
   clearHighlights();
   paths.forEach((path, index) => {
     setTimeout(() => {
+      clearHighlights();
       highlightPath(path);
-    }, index * 600);
+    }, index * 1000);
   });
 }
