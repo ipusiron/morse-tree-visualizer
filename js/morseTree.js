@@ -111,8 +111,8 @@ export const morseTree = {
         label: "O", x: null, y: null,
         left: {
           label: " ", x: null, y: null,
-          left: { label: " ", x: null, y: null },
-          right: { label: "8", x: null, y: null }
+          left: { label: "8", x: null, y: null },
+          right: { label: " ", x: null, y: null }
         },
         right: {
           label: " ", x: null, y: null,
