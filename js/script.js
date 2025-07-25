@@ -2,10 +2,12 @@ import { initStudyMode } from './study.js';
 import { initMorseTable } from './table.js';
 import { renderMorseTree } from './treeRenderer.js';
 import { initEncodeTab } from './encode.js';
+import { initDecodeTab } from './decode.js';
 
 let tableInitialized = false;
 let studyInitialized = false;
 let encodeInitialized = false;
+let decodeInitialized = false;
 
 document.addEventListener('DOMContentLoaded', () => {
   const tabButtons = document.querySelectorAll('.tab-button');
@@ -74,6 +76,11 @@ function switchTab(tabId) {
     if (!encodeInitialized) {
       initEncodeTab();
       encodeInitialized = true;
+    }
+  } else if (tabId === 'decode') {
+    if (!decodeInitialized) {
+      initDecodeTab();
+      decodeInitialized = true;
     }
   }
 }

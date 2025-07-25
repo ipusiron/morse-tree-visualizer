@@ -35,7 +35,7 @@
         <section>
           <label for="textInput">テキスト入力：</label>
           <input type="text" id="inputText" placeholder="HELLO などを入力" />
-          <button id="startButton">変換＆表示</button>
+          <button id="startButton">エンコード＆表示</button>
           <div id="encodeError"></div>
         </section>
         <div id="morseResult"></div>
@@ -47,11 +47,22 @@
       <!-- タブ2：デコード -->
       <div class="tab-content" id="tab-decode">
         <section>
-          <label for="morseInput">モールス入力（・−）：</label>
-          <input type="text" id="morseInput" placeholder="・−− などを入力" />
-          <button id="decodeButton">復号</button>
+          <label for="morseInput">モールス入力：</label>
+          <input type="text" id="morseInput" placeholder="・−− ・−・ ・・・ ・・− / ・−− ・−・・ −・ など" />
+          <div class="morse-input-buttons">
+            <button type="button" class="morse-char-btn" data-char="・">・</button>
+            <button type="button" class="morse-char-btn" data-char="−">−</button>
+            <button type="button" class="morse-char-btn" data-char=" ">スペース</button>
+            <button type="button" class="morse-char-btn" data-char="/">/</button>
+          </div>
+          <p class="input-hint">使用可能文字：・（ドット）、−（ダッシュ）、スペース（文字区切り）、/（単語区切り）</p>
+          <button id="decodeButton">デコード</button>
+          <div id="decodeError"></div>
         </section>
         <div id="decodeResult"></div>
+        <div class="tree-scroll-wrapper">
+          <div id="tree-container-decode"></div>
+        </div>
       </div>
 
     <!-- タブ3：学習モード -->
@@ -141,7 +152,7 @@
     <!-- スクリプト -->
     <script type="module" src="js/script.js"></script>
     <script type="module" src="js/encode.js"></script>
-    <!-- <script type="module" src="js/decode.js"></script> -->
+    <script type="module" src="js/decode.js"></script>
     <script type="module" src="js/study.js"></script>
     <script type="module" src="js/table.js"></script>
   </body>
