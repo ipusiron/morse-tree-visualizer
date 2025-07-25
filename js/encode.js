@@ -9,14 +9,19 @@ export function initEncodeTab() {
   const startButton = document.getElementById('startButton');
   const inputText = document.getElementById('inputText');
   const resultDiv = document.getElementById('morseResult');
+  const errorDiv = document.getElementById('encodeError');
 
-  if (!startButton || !inputText || !resultDiv) return;
+  if (!startButton || !inputText || !resultDiv || !errorDiv) return;
 
   startButton.addEventListener('click', () => {
     const text = inputText.value.toUpperCase().trim();
     
+    // エラーと結果をクリア
+    errorDiv.innerHTML = '';
+    resultDiv.innerHTML = '';
+    
     if (!text) {
-      resultDiv.innerHTML = '<p style="color: #666;">テキストを入力してください。</p>';
+      errorDiv.innerHTML = '<p class="error-message">テキストを入力してください。</p>';
       clearHighlights();
       return;
     }
@@ -35,7 +40,7 @@ export function initEncodeTab() {
       
       const code = morseMap[char];
       if (code) {
-        const path = getPathFromCode(code, morseTree);
+        const path = getPathFromCode(code);
         pathList.push(path);
         morseOutput.push(code);
       } else {
@@ -45,8 +50,8 @@ export function initEncodeTab() {
 
     // 結果を表示
     if (invalidChars.length > 0) {
-      resultDiv.innerHTML = `
-        <p style="color: #d32f2f;">⚠ 以下の文字は変換できません: ${invalidChars.join(', ')}</p>
+      errorDiv.innerHTML = `
+        <p class="error-message">⚠ 以下の文字は変換できません: ${invalidChars.join(', ')}</p>
       `;
       clearHighlights();
       return;
@@ -84,9 +89,10 @@ export function initEncodeTab() {
   });
 }
 
-function getPathFromCode(code, tree) {
+function getPathFromCode(code) {
+  console.log('Getting path for code:', code);
   const path = [];
-  let node = tree;
+  let node = morseTree;
   for (const symbol of code) {
     if (symbol === '・') {
       node = node.left;
@@ -97,13 +103,16 @@ function getPathFromCode(code, tree) {
     }
     if (!node) break;
   }
+  console.log('Generated path:', path);
   return path;
 }
 
 function animateHighlightSequence(paths) {
+  console.log('Starting animation with paths:', paths);
   clearHighlights();
   paths.forEach((path, index) => {
     setTimeout(() => {
+      console.log(`Highlighting path ${index}:`, path);
       clearHighlights();
       highlightPath(path);
     }, index * 1000);

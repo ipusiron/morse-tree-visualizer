@@ -73,7 +73,6 @@ button:hover {
 
 #tree-container {
   margin-top: 1rem;
-  min-height: 500px;
   border: 1px solid #ddd;
   border-radius: 6px;
   padding: 1rem;
@@ -309,10 +308,17 @@ body {
   stroke-width: 2;
 }
 
+#tree-container-study {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 1rem;
+  background-color: #fff;
+  overflow-x: auto;
+}
+
 #tree-container-study svg {
   display: block;
   margin: 0 auto;
-  min-width: 1000px;
 }
 
 .tree-node.highlight circle {
@@ -387,6 +393,21 @@ summary {
 
 summary:hover {
   background-color: #bbdefb;
+}
+
+/* エラーメッセージ */
+#encodeError {
+  margin-top: 0.5rem;
+}
+
+.error-message {
+  color: #d32f2f;
+  background-color: #ffebee;
+  border: 1px solid #ef5350;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  margin: 0;
+  font-size: 0.9rem;
 }
 
 /* === 学習モード用サブタブ UI === */

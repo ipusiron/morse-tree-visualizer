@@ -16,15 +16,20 @@ export function renderMorseTree(containerId = 'tree-container') {
   currentX = 0;
   layoutTree(morseTree, 0);
 
+  // ツリーの境界を取得（高さも含む）
+  const bounds = getBounds(morseTree);
+  // ラベル分の余白を考慮
+  bounds.minY -= 40; // ラベル用の余白
+  const marginX = 50;
+  const marginY = 30;
+  const viewWidth = bounds.maxX - bounds.minX + marginX * 2;
+  const viewHeight = bounds.maxY - bounds.minY + marginY * 2;
+
   // SVG構築
   svgRoot = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svgRoot.setAttribute('width', '100%');
-  svgRoot.setAttribute('height', '600');
-
-  const bounds = getXBounds(morseTree);
-  const margin = 50;
-  const viewWidth = bounds.max - bounds.min + margin * 2;
-  svgRoot.setAttribute('viewBox', `${bounds.min - margin} 0 ${viewWidth} 600`);
+  svgRoot.setAttribute('height', viewHeight);
+  svgRoot.setAttribute('viewBox', `${bounds.minX - marginX} ${bounds.minY - marginY} ${viewWidth} ${viewHeight}`);
 
   // グループ作成
   edgesGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -52,10 +57,10 @@ export function renderMorseTree(containerId = 'tree-container') {
     'text'
   );
   leftLabel.setAttribute('x', morseTree.left.x);
-  leftLabel.setAttribute('y', morseTree.left.y - 40); // ← ここを -20 から -40 に変更
+  leftLabel.setAttribute('y', bounds.minY - 20);
   leftLabel.setAttribute('text-anchor', 'middle');
-  leftLabel.setAttribute('font-size', '16'); // ← 大きめに
-  leftLabel.setAttribute('font-weight', 'bold'); // ← 太字に
+  leftLabel.setAttribute('font-size', '16');
+  leftLabel.setAttribute('font-weight', 'bold');
   leftLabel.setAttribute('fill', '#333');
   leftLabel.textContent = '← ・（ドット）';
 
@@ -65,7 +70,7 @@ export function renderMorseTree(containerId = 'tree-container') {
     'text'
   );
   rightLabel.setAttribute('x', morseTree.right.x);
-  rightLabel.setAttribute('y', morseTree.right.y - 40); // ← 同様に距離をとる
+  rightLabel.setAttribute('y', bounds.minY - 20);
   rightLabel.setAttribute('text-anchor', 'middle');
   rightLabel.setAttribute('font-size', '16');
   rightLabel.setAttribute('font-weight', 'bold');
@@ -94,12 +99,14 @@ function layoutTree(node, depth) {
   node.y = depth * 70 + 30;
 }
 
-function getXBounds(node, bounds = { min: Infinity, max: -Infinity }) {
+function getBounds(node, bounds = { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity }) {
   if (!node) return bounds;
-  if (node.x < bounds.min) bounds.min = node.x;
-  if (node.x > bounds.max) bounds.max = node.x;
-  getXBounds(node.left, bounds);
-  getXBounds(node.right, bounds);
+  if (node.x < bounds.minX) bounds.minX = node.x;
+  if (node.x > bounds.maxX) bounds.maxX = node.x;
+  if (node.y < bounds.minY) bounds.minY = node.y;
+  if (node.y > bounds.maxY) bounds.maxY = node.y;
+  getBounds(node.left, bounds);
+  getBounds(node.right, bounds);
   return bounds;
 }
 
