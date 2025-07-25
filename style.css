@@ -11,7 +11,27 @@ header {
   background-color: #1e88e5;
   color: white;
   padding: 1rem;
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-content > div {
   text-align: center;
+  flex: 1;
+}
+
+.header-content h1 {
+  margin: 0.5rem 0;
+}
+
+.header-content p {
+  margin: 0.5rem 0;
 }
 
 main {
@@ -140,10 +160,14 @@ footer {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
+  display: none;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+}
+
+.modal[style*="display: block"] {
+  display: flex !important;
 }
 
 .modal-content {
@@ -172,22 +196,34 @@ footer {
   display: none;
 }
 
-.help-button {
-  margin-left: auto;
-  padding: 0.6rem 1rem;
-  font-size: 0.9rem;
-  background-color: #888;
+.help-icon-button {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.2);
   color: white;
-  border: 1px solid #666;
-  border-bottom: none;
-  border-radius: 8px 8px 0 0;
+  border: 2px solid white;
+  font-size: 18px;
+  font-weight: bold;
   cursor: pointer;
-  margin-bottom: -2px;
-  position: relative;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0;
+  line-height: 1;
 }
 
-.help-button:hover {
-  background-color: #555;
+.help-icon-button:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.help-icon-button:active {
+  transform: scale(0.95);
 }
 
 /* Morse table layout */

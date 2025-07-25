@@ -23,10 +23,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // ヘルプモーダル開閉処理
   const helpButton = document.getElementById('helpBtn');
   const helpModal = document.getElementById('helpModal');
-  const closeModal = document.getElementById('closeModal');
+  const closeModal = document.getElementById('closeHelp');
 
   if (helpButton && helpModal && closeModal) {
-    helpButton.addEventListener('click', () => {
+    helpButton.addEventListener('click', (e) => {
+      e.preventDefault();
       helpModal.style.display = 'block';
     });
 
