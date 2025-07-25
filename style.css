@@ -262,3 +262,14 @@ body {
   margin: 0 auto;
   min-width: 1000px;
 }
+
+.tree-node.highlight circle {
+  fill: #ffecb3;
+  stroke: #f57c00;
+  stroke-width: 2;
+}
+
+line.highlight {
+  stroke: #f57c00;
+  stroke-width: 3;
+}
