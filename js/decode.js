@@ -16,8 +16,9 @@ export function initDecodeTab() {
   const morseInput = document.getElementById('morseInput');
   const resultDiv = document.getElementById('decodeResult');
   const errorDiv = document.getElementById('decodeError');
+  const sampleButton = document.getElementById('sampleButton');
 
-  if (!decodeButton || !morseInput || !resultDiv || !errorDiv) return;
+  if (!decodeButton || !morseInput || !resultDiv || !errorDiv || !sampleButton) return;
 
   // モールス文字入力ボタンのイベントリスナーを追加
   const morseCharButtons = document.querySelectorAll('.morse-char-btn');
@@ -36,6 +37,14 @@ export function initDecodeTab() {
       morseInput.focus();
       morseInput.setSelectionRange(currentPos + char.length, currentPos + char.length);
     });
+  });
+
+  // サンプルボタンのイベントリスナーを追加
+  sampleButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    const sampleMorse = '・− ・・・ −・・ ・・−・ / −−・ ・・・・ ・−−− −・−';
+    morseInput.value = sampleMorse;
+    morseInput.focus();
   });
 
   decodeButton.addEventListener('click', () => {

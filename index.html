@@ -34,7 +34,7 @@
       <div class="tab-content active" id="tab-encode">
         <section>
           <label for="textInput">テキスト入力：</label>
-          <input type="text" id="inputText" placeholder="HELLO などを入力" />
+          <textarea id="inputText" placeholder="HELLO などを入力" rows="1"></textarea>
           <button id="startButton">エンコード＆表示</button>
           <div id="encodeError"></div>
         </section>
@@ -47,17 +47,20 @@
       <!-- タブ2：デコード -->
       <div class="tab-content" id="tab-decode">
         <section>
-          <label for="morseInput">モールス入力：</label>
-          <input type="text" id="morseInput" placeholder="・−− ・−・ ・・・ ・・− / ・−− ・−・・ −・ など" />
+          <div class="input-with-button">
+            <label for="morseInput">モールス入力：</label>
+            <textarea id="morseInput" placeholder="・−− ・−・ ・・・ ・・− / ・−− ・−・・ −・ など" rows="1"></textarea>
+            <button id="decodeButton">デコード</button>
+          </div>
+          <div id="decodeError"></div>
           <div class="morse-input-buttons">
             <button type="button" class="morse-char-btn" data-char="・">・</button>
             <button type="button" class="morse-char-btn" data-char="−">−</button>
             <button type="button" class="morse-char-btn" data-char=" ">スペース</button>
             <button type="button" class="morse-char-btn" data-char="/">/</button>
+            <button type="button" class="sample-button" id="sampleButton">ASDF GHJKのモールス信号</button>
           </div>
           <p class="input-hint">使用可能文字：・（ドット）、−（ダッシュ）、スペース（文字区切り）、/（単語区切り）</p>
-          <button id="decodeButton">デコード</button>
-          <div id="decodeError"></div>
         </section>
         <div id="decodeResult"></div>
         <div class="tree-scroll-wrapper">
@@ -120,19 +123,77 @@
     <div id="helpModal" class="modal" style="display: none;">
       <div class="modal-content">
         <span class="close-button" id="closeHelp">&times;</span>
-        <h2>ヘルプ</h2>
-        <p>
-          このツールは、モールス信号の構造と音を可視化しながら学習できる教育支援ツールです。
-        </p>
-        <ul>
-          <li>タブを切り替えて、暗号化／復号／学習／符号表を利用できます。</li>
-          <li>
-            モールスツリーは左＝・（ドット）、右＝−（ダッシュ）で構成されています。
-          </li>
-          <li>
-            学習モードでは任意文字を選んだり、ランダム出題で復習が可能です。
-          </li>
-        </ul>
+        <h2>🔰 MorseTree Visualizer ヘルプ</h2>
+        <div class="help-content">
+          <h3>📖 概要</h3>
+          <p>
+            モールス信号を視覚的に学習できるインタラクティブなWebツールです。<br>
+            バイナリツリー構造で符号化プロセスを可視化し、効率的な学習をサポートします。
+          </p>
+
+          <h3>🎯 4つの主要機能</h3>
+
+          <h4>📝 英語 ⇒ モールス変換</h4>
+          <ul>
+            <li>英語テキストを入力してモールス信号に変換</li>
+            <li>変換結果をワンクリックでクリップボードにコピー</li>
+            <li>各文字の符号化経路をアニメーション表示</li>
+            <li>複数行入力対応（テキストエリアを拡張可能）</li>
+          </ul>
+
+          <h4>🔓 モールス ⇒ 英語復号</h4>
+          <ul>
+            <li>モールス信号を入力して英語に復号</li>
+            <li>入力支援ボタン（・、−、スペース、/）で簡単入力</li>
+            <li>「ASDF GHJKのモールス信号」サンプルボタンで練習</li>
+            <li>単語間は「/」で区切り（例：HELLO / WORLD）</li>
+          </ul>
+
+          <h4>📚 学習モード</h4>
+          <ul>
+            <li><strong>文字確認</strong>：文字を選択してモールス信号と経路を確認</li>
+            <li><strong>ランダム出題</strong>：モールス信号クイズで習熟度をチェック</li>
+            <li>共通のモールスツリーでリアルタイム可視化</li>
+          </ul>
+
+          <h4>📊 モールス信号一覧表</h4>
+          <ul>
+            <li>英字・数字・記号の完全対応表</li>
+            <li>3グループに分類して見やすく表示</li>
+            <li>横スクロール対応でモバイルでも快適</li>
+          </ul>
+
+          <h3>🌳 モールスツリーの見方</h3>
+          <ul>
+            <li><strong>左の枝</strong>：・（ドット）を表す</li>
+            <li><strong>右の枝</strong>：−（ダッシュ）を表す</li>
+            <li><strong>ルートから葉</strong>：符号化プロセスを表示</li>
+            <li><strong>オレンジ色</strong>：現在ハイライト中の経路</li>
+          </ul>
+
+          <h3>💡 効果的な使い方</h3>
+          <ol>
+            <li><strong>一覧表で全体把握</strong>：まずモールス信号表で文字と符号の対応を確認</li>
+            <li><strong>エンコードで練習</strong>：知っている単語をモールス信号に変換</li>
+            <li><strong>デコードで確認</strong>：変換した信号を逆変換して正確性をチェック</li>
+            <li><strong>学習モードで習熟</strong>：ランダム出題で記憶定着を図る</li>
+          </ol>
+
+          <h3>⚡ ショートカット・Tips</h3>
+          <ul>
+            <li>テキストエリアは右下をドラッグして拡張可能</li>
+            <li>エンコード結果の「📋 コピー」で他アプリに貼り付け</li>
+            <li>モールス入力は文字ボタンで楽々入力</li>
+            <li>サンプルボタンで「ASDF GHJK」を即座に入力</li>
+            <li>エラーメッセージで入力ミスを素早く確認</li>
+          </ul>
+
+          <h3>📱 動作環境</h3>
+          <p>
+            モダンブラウザ（Chrome、Firefox、Safari、Edge）で動作します。<br>
+            スマートフォンやタブレットでも快適にご利用いただけます。
+          </p>
+        </div>
       </div>
     </div>
 
