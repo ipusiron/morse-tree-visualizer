@@ -49,22 +49,42 @@
         <div id="decodeResult"></div>
       </div>
 
-<!-- タブ3：学習モード -->
-<div class="tab-content" id="tab-study">
-  <section>
-    <h2>学習モード</h2>
-    <button id="randomQuizBtn">ランダム出題</button>
-    <label for="manualCharSelect">文字を選ぶ：</label>
-    <select id="manualCharSelect">
-      <option value="">選択してください</option>
-    </select>
-    <div id="studyResult"></div>
+    <!-- タブ3：学習モード -->
+    <div class="tab-content" id="tab-study">
+      <section>
+        <h2>学習モード</h2>
 
-    <div class="tree-scroll-wrapper">
-  <div id="tree-container-study"></div>
-</div>
-  </section>
-</div>
+        <!-- 🟦 サブタブボタン -->
+        <div class="subtab-buttons">
+          <button class="subtab-button active" data-subtab="manual">文字確認</button>
+          <button class="subtab-button" data-subtab="quiz">ランダム出題</button>
+        </div>
+
+        <!-- 🔵 文字確認モード -->
+        <div id="subtab-manual" class="subtab-content active">
+          <label for="manualCharSelect">文字を選ぶ：</label>
+          <select id="manualCharSelect">
+            <option value="">選択してください</option>
+            <!-- JSで埋め込み -->
+          </select>
+          <div id="studyResultManual"></div>
+        </div>
+
+        <!-- 🟢 ランダム出題モード -->
+        <div id="subtab-random" class="subtab-content">
+          <button id="randomQuizBtn">ランダム出題</button>
+          <input type="text" id="quizAnswer" placeholder="1文字を入力" />
+          <button id="checkAnswerBtn">答え合わせ</button>
+          <div id="quizFeedback"></div>
+          <div id="studyResultRandom"></div>
+        </div>
+
+        <!-- モールスツリー共通 -->
+        <div class="tree-scroll-wrapper">
+          <div id="tree-container-study"></div>
+        </div>
+      </section>
+    </div>
 
 		<!-- タブ4：モールス表 -->
 		<div class="tab-content" id="tab-table">

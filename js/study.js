@@ -12,78 +12,106 @@ export function initStudyMode() {
   if (alreadyInitialized) return;
   alreadyInitialized = true;
 
-  const select = document.getElementById('manualCharSelect');
-  const result = document.getElementById('studyResult');
-  const randomBtn = document.getElementById('randomQuizBtn');
+  // --- サブタブ切り替え処理を初期化 ---
+  const subtabButtons = document.querySelectorAll('.subtab-button');
+  const subtabContents = document.querySelectorAll('.subtab-content');
 
-  if (!select || !result || !randomBtn) return;
+  subtabButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.subtab;
 
-  for (const char of studyChars) {
-    const opt = document.createElement('option');
-    opt.value = char;
-    opt.textContent = char;
-    select.appendChild(opt);
-  }
+      // ボタンの active クラス更新
+      subtabButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
 
-  select.addEventListener('change', () => {
-    const char = select.value;
-    if (!char) {
-      result.innerHTML = "";
-      clearHighlights();
-      return;
-    }
+      // サブタブ表示切替
+      subtabContents.forEach(content => {
+        if (content.id === `subtab-${target}`) {
+          content.classList.add('active');
+        } else {
+          content.classList.remove('active');
+        }
+      });
 
-    const code = morseMap[char];
-    const path = getPathFromCode(code);
-    highlightPath(path);
-
-    result.innerHTML = `
-      <p><strong>選択文字：</strong> ${char}</p>
-      <p><strong>モールス符号：</strong> ${code}</p>
-      <p><strong>ツリー経路：</strong> ${path.join(" > ")}</p>
-    `;
-  });
-
-  randomBtn.addEventListener('click', () => {
-    const randomChar = studyChars[Math.floor(Math.random() * studyChars.length)];
-    const code = morseMap[randomChar];
-    const path = getPathFromCode(code);
-    currentQuizAnswer = randomChar;
-    
-    clearHighlights(); // ✅ 出題時にツリーを完全にクリア
-
-    result.innerHTML = `
-      <div id="quizContainer">
-        <p>このモールス符号はどの文字？</p>
-        <div id="quizCode">${code}</div>
-        <input type="text" id="quizAnswer" maxlength="1" />
-        <button id="checkAnswerBtn">答え合わせ</button>
-        <div id="quizFeedback"></div>
-      </div>
-    `;
-
-    const checkBtn = document.getElementById('checkAnswerBtn');
-    const input = document.getElementById('quizAnswer');
-    const feedback = document.getElementById('quizFeedback');
-
-    checkBtn.addEventListener('click', () => {
-      const userInput = input.value.toUpperCase();
-      if (!userInput) {
-        feedback.textContent = "⚠ 文字を入力してください。";
-        return;
-      }
-
-      if (userInput === currentQuizAnswer) {
-        feedback.innerHTML = `<span style="color: green;">✅ 正解です！</span>`;
-      } else {
-        feedback.innerHTML = `<span style="color: red;">❌ 不正解です。正解は「${currentQuizAnswer}」でした。</span>`;
-      }
-
-      highlightPath(path); // ✅ 正解・不正解にかかわらず経路を点灯
+      clearHighlights(); // 切り替え時にツリーのハイライトをリセット
     });
   });
 
-  // ✅ タブの描画が完了した後にモールスツリーを描画（1フレーム遅らせて確実に）
+  // --- 文字確認モード処理 ---
+  const select = document.getElementById('manualCharSelect');
+  const resultManual = document.getElementById('studyResultManual');
+  if (select && resultManual) {
+    for (const char of studyChars) {
+      const opt = document.createElement('option');
+      opt.value = char;
+      opt.textContent = char;
+      select.appendChild(opt);
+    }
+
+    select.addEventListener('change', () => {
+      const char = select.value;
+      if (!char) {
+        resultManual.innerHTML = "";
+        clearHighlights();
+        return;
+      }
+
+      const code = morseMap[char];
+      const path = getPathFromCode(code);
+      highlightPath(path);
+
+      resultManual.innerHTML = `
+        <p><strong>選択文字：</strong> ${char}</p>
+        <p><strong>モールス符号：</strong> ${code}</p>
+        <p><strong>ツリー経路：</strong> ${path.join(" > ")}</p>
+      `;
+    });
+  }
+
+  // --- ランダム出題モード処理 ---
+  const randomBtn = document.getElementById('randomQuizBtn');
+  const resultRandom = document.getElementById('studyResultRandom');
+  if (randomBtn && resultRandom) {
+    randomBtn.addEventListener('click', () => {
+      const randomChar = studyChars[Math.floor(Math.random() * studyChars.length)];
+      const code = morseMap[randomChar];
+      const path = getPathFromCode(code);
+      currentQuizAnswer = randomChar;
+
+      clearHighlights(); // 出題時は光らせない
+      resultRandom.innerHTML = `
+        <div id="quizContainer">
+          <p>このモールス符号はどの文字？</p>
+          <div id="quizCode">${code}</div>
+          <input type="text" id="quizAnswer" maxlength="1" />
+          <button id="checkAnswerBtn">答え合わせ</button>
+          <div id="quizFeedback"></div>
+        </div>
+      `;
+
+      const checkBtn = document.getElementById('checkAnswerBtn');
+      const input = document.getElementById('quizAnswer');
+      const feedback = document.getElementById('quizFeedback');
+
+      checkBtn.addEventListener('click', () => {
+        const userInput = input.value.toUpperCase();
+        if (!userInput) {
+          feedback.textContent = "⚠ 文字を入力してください。";
+          return;
+        }
+
+        if (userInput === currentQuizAnswer) {
+          feedback.innerHTML = `<span style="color: green;">✅ 正解です！</span>`;
+        } else {
+          feedback.innerHTML = `<span style="color: red;">❌ 不正解です。正解は「${currentQuizAnswer}」でした。</span>`;
+        }
+
+        highlightPath(path); // この時点でのみ光らせる
+      });
+    });
+  }
+
+  // ✅ タブ表示後にモールスツリー描画
   requestAnimationFrame(() => {
     const container = document.getElementById("tree-container-study");
     if (container?.offsetParent !== null) {

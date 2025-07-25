@@ -273,3 +273,41 @@ line.highlight {
   stroke: #f57c00;
   stroke-width: 3;
 }
+
+/* === 学習モード用サブタブ UI === */
+.subtab-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.subtab-button {
+  padding: 0.45rem 1.2rem;
+  font-size: 1rem;
+  background-color: #fff;
+  border: 2px solid #aaa;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #444;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.subtab-button:hover {
+  background-color: #f2f2f2;
+  border-color: #777;
+}
+
+.subtab-button.active {
+  background-color: #007acc;
+  color: #fff;
+  border-color: #007acc;
+}
+
+.subtab-content {
+  display: none;
+}
+
+.subtab-content.active {
+  display: block;
+}
