@@ -406,7 +406,7 @@ line.highlight {
 
 .copy-button {
   position: absolute;
-  top: 0.5rem;
+  bottom: 0.5rem;
   right: 0.5rem;
   padding: 0.3rem 0.6rem;
   font-size: 0.8rem;
