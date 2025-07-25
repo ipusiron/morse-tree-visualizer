@@ -49,7 +49,8 @@ export function initStudyMode() {
     const code = morseMap[randomChar];
     const path = getPathFromCode(code);
     currentQuizAnswer = randomChar;
-    highlightPath(path);
+    
+    clearHighlights(); // ✅ 出題時にツリーを完全にクリア
 
     result.innerHTML = `
       <div id="quizContainer">
@@ -77,6 +78,8 @@ export function initStudyMode() {
       } else {
         feedback.innerHTML = `<span style="color: red;">❌ 不正解です。正解は「${currentQuizAnswer}」でした。</span>`;
       }
+
+      highlightPath(path); // ✅ 正解・不正解にかかわらず経路を点灯
     });
   });
 
