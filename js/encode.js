@@ -1,6 +1,7 @@
 import { highlightPath, clearHighlights, renderMorseTree } from './treeRenderer.js';
 import { morseMap } from './morseMap.js';
 import { morseTree } from './morseTree.js';
+import { escapeAndJoin } from './utils.js';
 
 export function initEncodeTab() {
   // モールスツリーを描画
@@ -51,7 +52,7 @@ export function initEncodeTab() {
     // 結果を表示
     if (invalidChars.length > 0) {
       errorDiv.innerHTML = `
-        <p class="error-message">⚠ 以下の文字は変換できません: ${invalidChars.join(', ')}</p>
+        <p class="error-message">⚠ 以下の文字は変換できません: ${escapeAndJoin(invalidChars)}</p>
       `;
       clearHighlights();
       return;
@@ -76,7 +77,7 @@ export function initEncodeTab() {
         <p><strong>変換結果:</strong></p>
         <div class="morse-code-display">
           ${result}
-          <button class="copy-button" onclick="copyToClipboard('${result.replace(/'/g, "\\'")}')">📋 コピー</button>
+          <button class="copy-button" data-copy-text="${result}">📋 コピー</button>
         </div>
         <details>
           <summary>詳細を表示</summary>
@@ -84,6 +85,14 @@ export function initEncodeTab() {
         </details>
       </div>
     `;
+
+    // コピーボタンにイベントリスナーを追加
+    const copyButton = resultDiv.querySelector('.copy-button');
+    if (copyButton) {
+      copyButton.addEventListener('click', () => {
+        copyToClipboard(result);
+      });
+    }
 
     // アニメーション実行
     if (pathList.length > 0) {
@@ -122,8 +131,8 @@ function animateHighlightSequence(paths) {
   });
 }
 
-// グローバル関数としてコピー機能を提供
-window.copyToClipboard = async function(text) {
+// コピー機能
+async function copyToClipboard(text) {
   try {
     await navigator.clipboard.writeText(text);
     showToast('モールス信号をクリップボードにコピーしました！');
@@ -138,7 +147,7 @@ window.copyToClipboard = async function(text) {
     document.body.removeChild(textArea);
     showToast('モールス信号をクリップボードにコピーしました！');
   }
-};
+}
 
 // トースト通知機能
 function showToast(message) {

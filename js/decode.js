@@ -1,6 +1,7 @@
 import { highlightPath, clearHighlights, renderMorseTree } from './treeRenderer.js';
 import { morseMap } from './morseMap.js';
 import { morseTree } from './morseTree.js';
+import { escapeAndJoin } from './utils.js';
 
 // 逆引き用のマップを作成
 const reverseMorseMap = {};
@@ -86,7 +87,7 @@ export function initDecodeTab() {
     // エラーチェック
     if (invalidCodes.length > 0) {
       errorDiv.innerHTML = `
-        <p class="error-message">⚠ 以下のモールス信号は認識できません: ${invalidCodes.join(', ')}</p>
+        <p class="error-message">⚠ 以下のモールス信号は認識できません: ${escapeAndJoin(invalidCodes)}</p>
       `;
       return;
     }
