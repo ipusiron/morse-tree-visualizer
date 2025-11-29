@@ -1,3 +1,39 @@
+<!--
+---
+id: day025
+slug: morse-tree-visualizer
+
+title: "MorseTree Visualizer"
+
+subtitle_ja: "モールス信号を視覚化する学習ツール"
+subtitle_en: "Interactive Morse Code Learning Tool with Binary Tree Visualization"
+
+description_ja: "モールス信号をバイナリツリー構造で視覚化し、エンコード・デコード・学習モードを通じて直感的に学べるインタラクティブなWebツール"
+description_en: "An interactive web tool that visualizes Morse code as a binary tree structure, enabling intuitive learning through encoding, decoding, and study modes"
+
+category_ja:
+  - モールス信号
+  - 符号化
+category_en:
+  - Morse Code
+  - Encoding
+
+difficulty: 2
+
+tags:
+  - binary-tree
+  - visualization
+  - education
+  - encoder
+  - decoder
+
+repo_url: "https://github.com/ipusiron/morse-tree-visualizer"
+demo_url: "https://ipusiron.github.io/morse-tree-visualizer/"
+
+hub: true
+---
+-->
+
 # MorseTree Visualizer - モールス信号を視覚化する学習ツール
 
 ![GitHub Repo stars](https://img.shields.io/github/stars/ipusiron/morse-tree-visualizer?style=social)
