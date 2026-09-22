@@ -180,19 +180,9 @@ button:hover {
   background-color: #1e88e5;
 }
 
-#tree-container {
-  margin-top: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 1rem;
-  background-color: #fff;
-  overflow-x: auto;
-}
 
-.tree-scroll-wrapper {
-  overflow-x: auto;
-  margin-top: 1rem;
-}
+
+
 
 /* footer */
 footer {
@@ -464,35 +454,15 @@ body {
   margin: 0.5rem 0;
 }
 
-.tree-node.highlight circle {
-  fill: #ffecb3;
-  stroke: #f57c00;
-  stroke-width: 2;
-}
 
-#tree-container-study {
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 1rem;
-  background-color: #fff;
-  overflow-x: auto;
-}
 
-#tree-container-study svg {
-  display: block;
-  margin: 0 auto;
-}
 
-.tree-node.highlight circle {
-  fill: #ffecb3;
-  stroke: #f57c00;
-  stroke-width: 2;
-}
 
-line.highlight {
-  stroke: #f57c00;
-  stroke-width: 3;
-}
+
+
+
+
+
 
 /* エンコード結果表示 */
 .morse-result-container {
@@ -644,13 +614,7 @@ summary:hover {
   font-size: 1.1rem;
 }
 
-#tree-container-decode {
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 1rem;
-  background-color: #fff;
-  overflow-x: auto;
-}
+
 
 /* トースト通知 */
 .toast {
@@ -735,4 +699,72 @@ summary:hover {
 
 .subtab-content.active {
   display: block;
+}
+/* 木は固定サイズの独立したSVGとして描く。 */
+:root {
+  --node-fill: #eef1f5;
+  --node-stroke: #5f6b7a;
+  --node-text: #1a1a1a;
+  --node-custom-fill: #fff8e1;
+  --node-hl-fill: #ffe082;
+  --hl-stroke: #e65100;
+}
+.tree-box {
+  background: #ffffff;
+  border: 1px solid #dddddd;
+  border-radius: 6px;
+  margin-top: 1rem;
+  min-width: 0;
+  max-width: 100%;
+}
+.tree-scroll-wrapper {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+.tree-box svg {
+  display: block;
+  max-width: none;
+  width: 1080px;
+  height: 470px;
+}
+.tree-node circle {
+  fill: var(--node-fill);
+  stroke: var(--node-stroke);
+}
+.tree-node text {
+  fill: var(--node-text);
+}
+.tree-node.empty circle {
+  fill: #ffffff;
+  stroke: #c3c9d1;
+  stroke-dasharray: 3 2;
+}
+.tree-node.custom circle {
+  fill: var(--node-custom-fill);
+  stroke: #8a6d00;
+  stroke-dasharray: 4 2;
+}
+.tree-node.highlight circle {
+  fill: var(--node-hl-fill);
+  stroke: var(--hl-stroke);
+  stroke-width: 3;
+}
+.tree-node.current circle {
+  stroke: #bf360c;
+  stroke-width: 4;
+}
+.tree-box line {
+  stroke: #b5bcc6;
+  stroke-width: 1.5;
+}
+.tree-box line.highlight {
+  stroke: var(--hl-stroke);
+  stroke-width: 4;
+}
+.direction-label {
+  fill: #333333;
+}
+.depth-label {
+  fill: #666666;
 }

@@ -1,6 +1,10 @@
+let view;
+let animator;
 import { morseMap } from './morseMap.js';
-import { morseTree } from './morseTree.js';
-import { renderMorseTree, highlightPath, clearHighlights } from './treeRenderer.js';
+
+import { createTreeView } from './treeRenderer.js';
+import { createAnimator } from './animator.js';
+import { normalizeMorse, pathFor, timeline } from './morseCodec.js';
 
 let alreadyInitialized = false;
 let currentQuizAnswer = null;
@@ -11,6 +15,9 @@ const studyChars = [...Array(26)].map((_, i) => String.fromCharCode(65 + i))
 export function initStudyMode() {
   if (alreadyInitialized) return;
   alreadyInitialized = true;
+  view = createTreeView(document.getElementById('tree-container-study'));
+  animator = createAnimator(view);
+  document.addEventListener('tab-switch', () => animator.stop());
 
   // --- サブタブ切り替え処理を初期化 ---
   const subtabButtons = document.querySelectorAll('#tab-study .subtab-button');
@@ -33,7 +40,7 @@ export function initStudyMode() {
         }
       });
 
-      clearHighlights(); // 切り替え時にツリーのハイライトをリセット
+      view.clear(); // 切り替え時にツリーのハイライトをリセット
     });
   });
 
@@ -52,13 +59,13 @@ export function initStudyMode() {
       const char = select.value;
       if (!char) {
         resultManual.innerHTML = "";
-        clearHighlights();
+        view.clear();
         return;
       }
 
       const code = morseMap[char];
       const path = getPathFromCode(code);
-      highlightPath(path);
+      view.highlight(path.map(d => d === 'left' ? '.' : '-').join(''));
 
       resultManual.innerHTML = `
         <p><strong>選択文字：</strong> ${char}</p>
@@ -83,7 +90,7 @@ export function initStudyMode() {
       const path = getPathFromCode(code);
       currentQuizAnswer = randomChar;
 
-      clearHighlights(); // 出題時は光らせない
+      view.clear(); // 出題時は光らせない
       
       // 問題を表示
       quizContainer.style.display = 'block';
@@ -107,32 +114,14 @@ export function initStudyMode() {
         }
 
         const path = getPathFromCode(morseMap[currentQuizAnswer]);
-        highlightPath(path); // この時点でのみ光らせる
+        view.highlight(path.map(d => d === 'left' ? '.' : '-').join('')); // この時点でのみ光らせる
       });
     }
   }
 
-  // ✅ タブ表示後にモールスツリー描画
-  requestAnimationFrame(() => {
-    const container = document.getElementById("tree-container-study");
-    if (container?.offsetParent !== null) {
-      renderMorseTree("tree-container-study");
-    }
-  });
+
 }
 
 function getPathFromCode(code) {
-  const path = [];
-  let node = morseTree;
-  for (const symbol of code) {
-    if (symbol === "・") {
-      node = node.left;
-      path.push("left");
-    } else if (symbol === "−") {
-      node = node.right;
-      path.push("right");
-    }
-    if (!node) break;
-  }
-  return path;
+  return pathFor(normalizeMorse(code).canonical);
 }

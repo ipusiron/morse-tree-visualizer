@@ -1,11 +1,17 @@
-import { highlightPath, clearHighlights, renderMorseTree } from './treeRenderer.js';
+let view;
+let animator;
+import { createTreeView } from './treeRenderer.js';
+import { createAnimator } from './animator.js';
+import { normalizeMorse, pathFor, timeline } from './morseCodec.js';
 import { morseMap } from './morseMap.js';
-import { morseTree } from './morseTree.js';
+
 import { escapeAndJoin } from './utils.js';
 
 export function initEncodeTab() {
   // モールスツリーを描画
-  renderMorseTree("tree-container");
+  view = createTreeView(document.getElementById('tree-container'));
+  animator = createAnimator(view);
+  document.addEventListener('tab-switch', () => animator.stop());
   
   const startButton = document.getElementById('startButton');
   const inputText = document.getElementById('inputText');
@@ -23,7 +29,7 @@ export function initEncodeTab() {
     
     if (!text) {
       errorDiv.innerHTML = '<p class="error-message">テキストを入力してください。</p>';
-      clearHighlights();
+      view.clear();
       return;
     }
 
@@ -54,7 +60,7 @@ export function initEncodeTab() {
       errorDiv.innerHTML = `
         <p class="error-message">⚠ 以下の文字は変換できません: ${escapeAndJoin(invalidChars)}</p>
       `;
-      clearHighlights();
+      view.clear();
       return;
     }
 
@@ -102,33 +108,12 @@ export function initEncodeTab() {
 }
 
 function getPathFromCode(code) {
-  console.log('Getting path for code:', code);
-  const path = [];
-  let node = morseTree;
-  for (const symbol of code) {
-    if (symbol === '・') {
-      node = node.left;
-      path.push('left');
-    } else if (symbol === '−') {
-      node = node.right;
-      path.push('right');
-    }
-    if (!node) break;
-  }
-  console.log('Generated path:', path);
-  return path;
+  return pathFor(normalizeMorse(code).canonical);
 }
 
 function animateHighlightSequence(paths) {
-  console.log('Starting animation with paths:', paths);
-  clearHighlights();
-  paths.forEach((path, index) => {
-    setTimeout(() => {
-      console.log(`Highlighting path ${index}:`, path);
-      clearHighlights();
-      highlightPath(path);
-    }, index * 1000);
-  });
+  const canonical = paths.map(path => path.map(d => d === 'left' ? '.' : '-').join('')).join(' ');
+  animator.play(timeline(canonical).events);
 }
 
 // コピー機能

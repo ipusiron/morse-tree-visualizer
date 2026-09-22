@@ -1,6 +1,10 @@
-import { highlightPath, clearHighlights, renderMorseTree } from './treeRenderer.js';
+let view;
+let animator;
+import { createTreeView } from './treeRenderer.js';
+import { createAnimator } from './animator.js';
+import { normalizeMorse, pathFor, timeline } from './morseCodec.js';
 import { morseMap } from './morseMap.js';
-import { morseTree } from './morseTree.js';
+
 import { escapeAndJoin } from './utils.js';
 
 // 逆引き用のマップを作成
@@ -11,7 +15,9 @@ for (const [char, code] of Object.entries(morseMap)) {
 
 export function initDecodeTab() {
   // モールスツリーを描画
-  renderMorseTree("tree-container-decode");
+  view = createTreeView(document.getElementById('tree-container-decode'));
+  animator = createAnimator(view);
+  document.addEventListener('tab-switch', () => animator.stop());
   
   const decodeButton = document.getElementById('decodeButton');
   const morseInput = document.getElementById('morseInput');
@@ -54,7 +60,7 @@ export function initDecodeTab() {
     // エラーと結果をクリア
     errorDiv.innerHTML = '';
     resultDiv.innerHTML = '';
-    clearHighlights();
+    view.clear();
     
     if (!input) {
       errorDiv.innerHTML = '<p class="error-message">モールス信号を入力してください。</p>';
@@ -138,31 +144,10 @@ function createDetailTable(input, decodedText) {
 }
 
 function getPathFromCode(code) {
-  console.log('Getting decode path for code:', code);
-  const path = [];
-  let node = morseTree;
-  for (const symbol of code) {
-    if (symbol === '・') {
-      node = node.left;
-      path.push('left');
-    } else if (symbol === '−') {
-      node = node.right;
-      path.push('right');
-    }
-    if (!node) break;
-  }
-  console.log('Generated decode path:', path);
-  return path;
+  return pathFor(normalizeMorse(code).canonical);
 }
 
 function animateDecodeSequence(paths) {
-  console.log('Starting decode animation with paths:', paths);
-  clearHighlights();
-  paths.forEach((path, index) => {
-    setTimeout(() => {
-      console.log(`Highlighting decode path ${index}:`, path);
-      clearHighlights();
-      highlightPath(path);
-    }, index * 1000);
-  });
+  const canonical = paths.map(path => path.map(d => d === 'left' ? '.' : '-').join('')).join(' ');
+  animator.play(timeline(canonical).events);
 }

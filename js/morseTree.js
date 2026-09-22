@@ -57,10 +57,3 @@ export function layoutTree(tree, { xStep = 30, yStep = 64, x0 = 20, y0 = 30 } = 
   const maxY = Math.max(...all.map(n => n.y));
   return { leaves, minX, maxX, maxY, width: maxX - minX, height: maxY - y0 };
 }
-
-function compatible(n) {
-  if (!n) return null;
-  return { label: n.depth === 0 ? 'start' : n.char || ' ', x: null, y: null,
-    left: compatible(n.left), right: compatible(n.right) };
-}
-export const morseTree = compatible(completeTo(buildTree(MORSE_TABLE, 5), 5).root);

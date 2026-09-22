@@ -1,6 +1,6 @@
 import { initStudyMode } from './study.js';
 import { initMorseTable } from './table.js';
-import { renderMorseTree } from './treeRenderer.js';
+
 import { initEncodeTab } from './encode.js';
 import { initDecodeTab } from './decode.js';
 
@@ -46,6 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function switchTab(tabId) {
+  document.dispatchEvent(new Event('tab-switch'));
   const tabButtons = document.querySelectorAll('.tab-button');
   const tabContents = document.querySelectorAll('.tab-content');
 
@@ -66,12 +67,7 @@ function switchTab(tabId) {
       initStudyMode();
       studyInitialized = true;
     }
-    requestAnimationFrame(() => {
-      const container = document.getElementById("tree-container-study");
-      if (container?.offsetParent !== null) {
-        renderMorseTree("tree-container-study");
-      }
-    });
+
   } else if (tabId === 'encode') {
     if (!encodeInitialized) {
       initEncodeTab();
