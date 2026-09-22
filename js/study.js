@@ -3,7 +3,7 @@ import { pathFor, normalizeMorse, timeline } from './morseCodec.js';
 import { createTreeView } from './treeRenderer.js';
 import { createAnimator } from './animator.js';
 import { t } from './messages.js';
-import { el, settings } from './utils.js';
+import { el, settings, bindPlayback } from './utils.js';
 import { bindTabKeys } from './script.js';
 
 export function initStudyMode() {
@@ -59,10 +59,7 @@ export function initStudyMode() {
     if (entry.code.length > 6) resultManual.append(el('p', {}, t('tree.outside', { n: entry.code.length })));
   }
   select.addEventListener('change', showManual);
-  document.getElementById('studyPlay').addEventListener('click', () => {
-    const entry = MORSE_TABLE.find(e => e.char === select.value);
-    if (entry) animator.play(timeline(entry.code, settings.wpm).events);
-  });
+  bindPlayback(document.getElementById('study-playback'), animator, () => MORSE_TABLE.find(e => e.char === select.value)?.code || '');
 
   // セッション内のランダム出題と成績。
   const randomBtn = document.getElementById('randomQuizBtn');

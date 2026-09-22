@@ -1,4 +1,9 @@
 export const MESSAGES = {
+  'audio.sound': '🔊 音',
+  'audio.volume': '音量（%）',
+  'audio.frequency': '周波数（Hz）',
+  'audio.overall': '全体速度（WPM）',
+  'audio.lamp': '💡 ランプ',
   'error.empty_text': 'テキストを入力してください。',
   'error.unsupported_chars': '⚠ 以下の文字は変換できません: {list}',
   'error.empty_morse': 'モールス信号を入力してください。',

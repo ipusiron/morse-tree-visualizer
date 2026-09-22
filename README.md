@@ -276,6 +276,7 @@ morse-tree-visualizer/              # モールス符号を木の経路として
 ├── index.html                      # 4タブ・ヘルプ・CSPのマークアップ
 ├── js/                             # JavaScriptのES module
 │   ├── animator.js                 # 1符号ずつの再生と一時停止・手動ステップ
+│   ├── audio.js                    # Web Audioの音の予約と打鍵側音
 │   ├── decode.js                   # 復号と入力支援・リアルタイム追従
 │   ├── encode.js                   # 英文の変換と結果・コピー・再生
 │   ├── messages.js                 # 動的な画面文言の日本語辞書

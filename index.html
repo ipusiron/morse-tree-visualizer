@@ -67,8 +67,10 @@
           <button type="button" data-action="stop">■ 停止</button>
           <button type="button" data-action="previous" aria-label="前の符号">◀</button>
           <button type="button" data-action="next" aria-label="次の符号">▶</button>
-          <label for="encode-wpm">WPM</label>
-          <select id="encode-wpm"><option>5</option><option selected>10</option><option>15</option><option>20</option></select>
+          <label for="encode-char-wpm">文字速度（WPM）</label>
+          <select id="encode-char-wpm" data-setting="charWpm">
+            <option>5</option><option>10</option><option>12</option><option selected>15</option><option>18</option><option>20</option><option>25</option>
+          </select>
         </div>
         <p class="tree-legend">点灯＝経路、破線の丸＝空き、黄色の破線＝慣用符号</p>
         <div class="tree-scroll-wrapper">
@@ -105,8 +107,10 @@
           <button type="button" data-action="stop">■ 停止</button>
           <button type="button" data-action="previous" aria-label="前の符号">◀</button>
           <button type="button" data-action="next" aria-label="次の符号">▶</button>
-          <label for="decode-wpm">WPM</label>
-          <select id="decode-wpm"><option>5</option><option selected>10</option><option>15</option><option>20</option></select>
+          <label for="decode-char-wpm">文字速度（WPM）</label>
+          <select id="decode-char-wpm" data-setting="charWpm">
+            <option>5</option><option>10</option><option>12</option><option selected>15</option><option>18</option><option>20</option><option>25</option>
+          </select>
         </div>
         <p class="tree-legend">点灯＝経路、破線の丸＝空き、黄色の破線＝慣用符号</p>
         <div class="tree-scroll-wrapper">
@@ -137,7 +141,17 @@
             <!-- JSで埋め込み -->
           </select>
           <div id="studyResultManual"></div>
-          <button type="button" id="studyPlay">▶ 再生</button>
+          <div class="playback" id="study-playback">
+            <button type="button" id="studyPlay" data-action="play">▶ 再生</button>
+            <button type="button" data-action="pause">⏸ 一時停止</button>
+            <button type="button" data-action="stop">■ 停止</button>
+            <button type="button" data-action="previous" aria-label="前の符号">◀</button>
+            <button type="button" data-action="next" aria-label="次の符号">▶</button>
+            <label for="study-char-wpm">文字速度（WPM）</label>
+            <select id="study-char-wpm" data-setting="charWpm">
+              <option>5</option><option>10</option><option>12</option><option selected>15</option><option>18</option><option>20</option><option>25</option>
+            </select>
+          </div>
         </div>
 
         <!-- 🟢 ランダム出題モード -->
@@ -234,6 +248,10 @@
             <li>ITUと慣用符号（! &amp; ; _ $）はバッジと線種で区別</li>
             <li>横スクロール対応でモバイルでも快適</li>
           </ul>
+
+          <h3>🔊 音・速度・ランプ</h3>
+          <p>文字速度は符号自体の速さ、全体速度は文字間・語間を含む速さです。全体速度を下げると、考える間隔を長くできます。</p>
+          <p>音は再生操作のあとに開始します。ランプは既定でオフです。WCAG 2.3.1の点滅への配慮として40px角に抑え、動きを減らす設定では表示しません。</p>
 
           <h3>🌳 モールスツリーの見方</h3>
           <ul>

@@ -1,4 +1,6 @@
 :root {
+  --lamp-on: #ffd54f;
+  --lamp-off: #e0e0e0;
   --primary: #1565c0;
   --primary-dark: #0d47a1;
   --paper: #ffffff;
@@ -39,6 +41,41 @@
   --details-hover: #bbdefb;
   --error-border: #ef5350;
   --subtab-text: #444;
+}
+
+.audio-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  flex-basis: 100%;
+  min-width: 0;
+}
+
+.audio-controls input[type="range"] {
+  max-width: 100%;
+  min-height: 44px;
+}
+
+.check-control {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  gap: 0.4rem;
+}
+
+.signal-lamp {
+  display: block;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid var(--text);
+  background: var(--lamp-off);
+  margin-block: 0.5rem;
+}
+
+.signal-lamp.is-on {
+  background: var(--lamp-on);
 }
 
 *, *::before, *::after {
