@@ -1,0 +1,57 @@
+export const MESSAGES = {
+  'error.empty_text': 'テキストを入力してください。',
+  'error.unsupported_chars': '⚠ 以下の文字は変換できません: {list}',
+  'error.empty_morse': 'モールス信号を入力してください。',
+  'error.unknown_symbols': '⚠ 以下の記号は認識できません: {list}',
+  'error.invalid_codes': '⚠ 以下のモールス信号は対応する文字がありません: {list}',
+  'result.morse_heading': '変換結果',
+  'result.text_heading': '復号結果',
+  'copy.button': '📋 コピー',
+  'copy.done': 'コピーしました。',
+  'copy.failed': 'コピーできませんでした。手動で選択してコピーしてください。',
+  'quiz.correct': '✅ 正解です。',
+  'quiz.wrong': '❌ 不正解です。正解は「{answer}」でした。',
+  'quiz.enter_answer': '答えを入力してください。',
+  'tree.outside': '木の外（{n}符号）',
+  'tree.dir_dot': '← ・（ドット）',
+  'tree.dir_dash': '−（ダッシュ） →',
+  'tree.depth': '{n}符号',
+  'tree.label': 'モールスの木。左はドット、右はダッシュです。',
+  'table.itu': 'ITU',
+  'table.custom': '慣用',
+  'anim.play': '▶ 再生',
+  'anim.pause': '⏸ 一時停止',
+  'anim.resume': '▶ 再開',
+  'anim.stop': '■ 停止',
+  'anim.previous': '前の符号',
+  'anim.next': '次の符号',
+  'result.details': '詳細を表示',
+  'table.char': '文字',
+  'table.code': '符号',
+  'table.kind': '種類',
+  'table.note': '備考',
+  'table.name': '英語名',
+  'table.word_gap': '（語の区切り）',
+  'table.wait': 'ITUではWait（待て）の手続き符号と同じ符号',
+  'group.letter': '英字',
+  'group.digit': '数字',
+  'group.punct': '記号',
+  'group.itu': '記号（ITU）',
+  'group.custom': '記号（慣用）',
+  'study.path': '経路',
+  'study.left': '左',
+  'study.right': '右',
+  'quiz.scope_empty': '出題範囲を1つ以上選んでください。',
+  'quiz.score': '正答 {correct}／出題 {total}（連続 {streak}）',
+  'quiz.next': '次の問題',
+  'quiz.question_char': 'この符号の文字を入力してください。',
+  'quiz.question_code': 'この文字の符号を入力してください。'
+};
+
+export function t(key, params = {}) {
+  if (!Object.hasOwn(MESSAGES, key)) throw new Error(`Unknown message: ${key}`);
+  return MESSAGES[key].replace(/\{(\w+)\}/g, (_, name) => {
+    if (!Object.hasOwn(params, name)) throw new Error(`Missing parameter: ${name}`);
+    return String(params[name]);
+  });
+}

@@ -4,106 +4,171 @@
     <meta charset="UTF-8" />
     <title>MorseTree Visualizer</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';" />
+    <meta http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+    <meta name="referrer" content="no-referrer">
+    <link rel="icon" href="data:,">
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+    <noscript>このツールを使うにはJavaScriptを有効にしてください。</noscript>
     <header>
       <div class="header-content">
         <div>
           <h1>MorseTree Visualizer</h1>
-          <p>モールス信号を可視化して楽しく学ぼう！</p>
+          <p>モールス信号を可視化して学べるツールです。</p>
         </div>
-        <button class="help-icon-button" id="helpBtn" title="ヘルプ">？</button>
+        <button class="help-icon-button" id="helpBtn" title="ヘルプ" aria-label="ヘルプを開く">？</button>
       </div>
     </header>
 
     <main>
       <!-- タブメニュー -->
-      <div class="tab-menu">
-        <button class="tab-button active" data-tab="encode">
-          英語 ⇒ モールス信号
+      <div class="tab-menu" role="tablist" aria-label="機能">
+        <button class="tab-button active" data-tab="encode" id="tab-button-encode" role="tab"
+          aria-controls="tab-encode" aria-selected="true" tabindex="0">
+          <span class="tab-long">英語 ⇒ モールス信号</span><span class="tab-short">英語 ⇒ モールス</span>
         </button>
-        <button class="tab-button" data-tab="decode">
-          モールス信号 ⇒ 英語
+        <button class="tab-button" data-tab="decode" id="tab-button-decode" role="tab"
+          aria-controls="tab-decode" aria-selected="false" tabindex="-1">
+          <span class="tab-long">モールス信号 ⇒ 英語</span><span class="tab-short">モールス ⇒ 英語</span>
         </button>
-        <button class="tab-button" data-tab="study">学習モード</button>
-        <button class="tab-button" data-tab="table">モールス信号一覧表</button>
+        <button class="tab-button" data-tab="study" id="tab-button-study" role="tab"
+          aria-controls="tab-study" aria-selected="false" tabindex="-1">
+          <span class="tab-long">学習モード</span><span class="tab-short">学習</span>
+        </button>
+        <button class="tab-button" data-tab="table" id="tab-button-table" role="tab"
+          aria-controls="tab-table" aria-selected="false" tabindex="-1">
+          <span class="tab-long">モールス信号一覧表</span><span class="tab-short">一覧表</span>
+        </button>
       </div>
 
+      <fieldset class="notation-control">
+        <legend>符号の表記</legend>
+        <label><input type="radio" name="notation" value="ja" checked>・−</label>
+        <label><input type="radio" name="notation" value="ascii">.-</label>
+      </fieldset>
+
       <!-- タブ1：エンコード -->
-      <div class="tab-content active" id="tab-encode">
+      <div class="tab-content active" id="tab-encode" role="tabpanel"
+        aria-labelledby="tab-button-encode">
         <section>
-          <label for="textInput">テキスト入力：</label>
-          <textarea id="inputText" placeholder="HELLO などを入力" rows="1"></textarea>
+          <label for="inputText">テキスト入力：</label>
+          <textarea id="inputText" placeholder="HELLO などを入力" rows="2"></textarea>
           <button id="startButton">エンコード＆表示</button>
-          <div id="encodeError"></div>
+          <div id="encodeError" class="error-message" role="alert"></div>
         </section>
         <div id="morseResult"></div>
+        <div class="playback" id="encode-playback">
+          <button type="button" data-action="play">▶ 再生</button>
+          <button type="button" data-action="pause">⏸ 一時停止</button>
+          <button type="button" data-action="stop">■ 停止</button>
+          <button type="button" data-action="previous" aria-label="前の符号">◀</button>
+          <button type="button" data-action="next" aria-label="次の符号">▶</button>
+          <label for="encode-wpm">WPM</label>
+          <select id="encode-wpm"><option>5</option><option selected>10</option><option>15</option><option>20</option></select>
+        </div>
+        <p class="tree-legend">点灯＝経路、破線の丸＝空き、黄色の破線＝慣用符号</p>
         <div class="tree-scroll-wrapper">
           <div id="tree-container"></div>
         </div>
       </div>
 
       <!-- タブ2：デコード -->
-      <div class="tab-content" id="tab-decode">
+      <div class="tab-content" id="tab-decode" role="tabpanel"
+        aria-labelledby="tab-button-decode" hidden>
         <section>
           <div class="input-with-button">
             <label for="morseInput">モールス入力：</label>
-            <textarea id="morseInput" placeholder="・−− ・−・ ・・・ ・・− / ・−− ・−・・ −・ など" rows="1"></textarea>
+            <textarea id="morseInput" placeholder=".- ... または ・− ・・・（語の区切りは / ）" rows="1"></textarea>
             <button id="decodeButton">デコード</button>
           </div>
-          <div id="decodeError"></div>
+          <div id="decodeError" class="error-message" role="alert"></div>
           <div class="morse-input-buttons">
-            <button type="button" class="morse-char-btn" data-char="・">・</button>
-            <button type="button" class="morse-char-btn" data-char="−">−</button>
+            <button type="button" class="morse-char-btn" data-char=".">・</button>
+            <button type="button" class="morse-char-btn" data-char="-">−</button>
             <button type="button" class="morse-char-btn" data-char=" ">スペース</button>
             <button type="button" class="morse-char-btn" data-char="/">/</button>
-            <button type="button" class="sample-button" id="sampleButton">ASDF GHJKのモールス信号</button>
+            <button type="button" class="sample-button" id="sampleButton" data-sample="ASDF GHJK">ASDF GHJK</button>
+            <button type="button" class="sample-button" data-sample="SOS">SOS</button>
+            <button type="button" class="sample-button" data-sample="HELLO WORLD">HELLO WORLD</button>
+            <button type="button" class="sample-button" data-sample="CQ CQ DE JA1ABC">CQ CQ DE JA1ABC</button>
           </div>
           <p class="input-hint">使用可能文字：・（ドット）、−（ダッシュ）、スペース（文字区切り）、/（単語区切り）</p>
         </section>
         <div id="decodeResult"></div>
+        <div class="playback" id="decode-playback">
+          <button type="button" data-action="play">▶ 再生</button>
+          <button type="button" data-action="pause">⏸ 一時停止</button>
+          <button type="button" data-action="stop">■ 停止</button>
+          <button type="button" data-action="previous" aria-label="前の符号">◀</button>
+          <button type="button" data-action="next" aria-label="次の符号">▶</button>
+          <label for="decode-wpm">WPM</label>
+          <select id="decode-wpm"><option>5</option><option selected>10</option><option>15</option><option>20</option></select>
+        </div>
+        <p class="tree-legend">点灯＝経路、破線の丸＝空き、黄色の破線＝慣用符号</p>
         <div class="tree-scroll-wrapper">
           <div id="tree-container-decode"></div>
         </div>
       </div>
 
     <!-- タブ3：学習モード -->
-    <div class="tab-content" id="tab-study">
+    <div class="tab-content" id="tab-study" role="tabpanel"
+        aria-labelledby="tab-button-study" hidden>
       <section>
         <h2>学習モード</h2>
 
         <!-- 🟦 サブタブボタン -->
-        <div class="subtab-buttons">
-          <button class="subtab-button active" data-subtab="manual">文字確認</button>
-          <button class="subtab-button" data-subtab="random">ランダム出題</button>
+        <div class="subtab-buttons" role="tablist" aria-label="学習方法">
+          <button class="subtab-button active" data-subtab="manual" id="subtab-button-manual" role="tab"
+            aria-controls="subtab-manual" aria-selected="true" tabindex="0">文字確認</button>
+          <button class="subtab-button" data-subtab="random" id="subtab-button-random" role="tab"
+            aria-controls="subtab-random" aria-selected="false" tabindex="-1">ランダム出題</button>
         </div>
 
         <!-- 🔵 文字確認モード -->
-        <div id="subtab-manual" class="subtab-content active">
+        <div id="subtab-manual" class="subtab-content active" role="tabpanel"
+          aria-labelledby="subtab-button-manual">
           <label for="manualCharSelect">文字を選ぶ：</label>
           <select id="manualCharSelect">
             <option value="">選択してください</option>
             <!-- JSで埋め込み -->
           </select>
           <div id="studyResultManual"></div>
+          <button type="button" id="studyPlay">▶ 再生</button>
         </div>
 
         <!-- 🟢 ランダム出題モード -->
-        <div id="subtab-random" class="subtab-content">
+        <div id="subtab-random" class="subtab-content" role="tabpanel"
+          aria-labelledby="subtab-button-random" hidden>
+          <fieldset>
+            <legend>出題の方向</legend>
+            <label><input type="radio" name="quiz-direction" value="char" checked>符号 → 文字</label>
+            <label><input type="radio" name="quiz-direction" value="code">文字 → 符号</label>
+          </fieldset>
+          <fieldset>
+            <legend>出題範囲</legend>
+            <label><input type="checkbox" name="quiz-scope" value="letter" checked>英字</label>
+            <label><input type="checkbox" name="quiz-scope" value="digit" checked>数字</label>
+            <label><input type="checkbox" name="quiz-scope" value="punct">記号</label>
+          </fieldset>
+          <p id="quizScopeStatus" role="status"></p>
           <button id="randomQuizBtn">ランダム出題</button>
-          <div id="quizContainer" style="display: none;">
-            <p>このモールス符号はどの文字？</p>
+          <div id="quizContainer" hidden>
+            <p id="quizQuestion">この符号の文字を入力してください。</p>
             <div id="quizCode"></div>
-            <input type="text" id="quizAnswer" placeholder="1文字を入力" maxlength="1" />
+            <label for="quizAnswer">回答</label>
+            <input type="text" id="quizAnswer" maxlength="1" autocomplete="off" />
             <button id="checkAnswerBtn">答え合わせ</button>
-            <div id="quizFeedback"></div>
+            <button type="button" id="nextQuizBtn">次の問題</button>
+            <div id="quizFeedback" role="status"></div>
           </div>
+          <p id="quizScore" role="status"></p>
           <div id="studyResultRandom"></div>
         </div>
 
         <!-- モールスツリー共通 -->
+        <p class="tree-legend">点灯＝経路、破線の丸＝空き、黄色の破線＝慣用符号</p>
         <div class="tree-scroll-wrapper">
           <div id="tree-container-study"></div>
         </div>
@@ -111,7 +176,8 @@
     </div>
 
 		<!-- タブ4：モールス表 -->
-		<div class="tab-content" id="tab-table">
+		<div class="tab-content" id="tab-table" role="tabpanel"
+        aria-labelledby="tab-button-table" hidden>
   <section>
     <h2>モールス信号 一覧表</h2>
     <div class="morse-table-wrapper">
@@ -121,10 +187,10 @@
 </div>
 
     <!-- ヘルプモーダル -->
-    <div id="helpModal" class="modal" style="display: none;">
+    <div id="helpModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="helpTitle" hidden>
       <div class="modal-content">
-        <span class="close-button" id="closeHelp">&times;</span>
-        <h2>🔰 MorseTree Visualizer ヘルプ</h2>
+        <button type="button" class="close-button" id="closeHelp" aria-label="ヘルプを閉じる">&times;</button>
+        <h2 id="helpTitle">MorseTree Visualizer ヘルプ</h2>
         <div class="help-content">
           <h3>📖 概要</h3>
           <p>
@@ -138,29 +204,29 @@
           <ul>
             <li>英語テキストを入力してモールス信号に変換</li>
             <li>変換結果をワンクリックでクリップボードにコピー</li>
-            <li>各文字の符号化経路をアニメーション表示</li>
-            <li>複数行入力対応（テキストエリアを拡張可能）</li>
+            <li>ITUの時間比で1符号ずつ再生。WPMは5／10／15／20から選択</li>
+            <li>再生・一時停止・停止・前後の手動ステップに対応</li>
           </ul>
 
           <h4>🔓 モールス ⇒ 英語復号</h4>
           <ul>
-            <li>モールス信号を入力して英語に復号</li>
+            <li>ASCIIの.-と・−を入力可能。表記の切り替えは結果とコピーにも反映</li>
             <li>入力支援ボタン（・、−、スペース、/）で簡単入力</li>
-            <li>「ASDF GHJKのモールス信号」サンプルボタンで練習</li>
-            <li>単語間は「/」で区切り（例：HELLO / WORLD）</li>
+            <li>ASDF GHJK・SOS・HELLO WORLD・CQ CQ DE JA1ABCのサンプルで練習</li>
+            <li>文字間は空白、語間は/・改行・空白3つ。入力中の符号を木がリアルタイムに追従</li>
           </ul>
 
           <h4>📚 学習モード</h4>
           <ul>
             <li><strong>文字確認</strong>：文字を選択してモールス信号と経路を確認</li>
-            <li><strong>ランダム出題</strong>：モールス信号クイズで習熟度をチェック</li>
-            <li>共通のモールスツリーでリアルタイム可視化</li>
+            <li><strong>ランダム出題</strong>：符号→文字／文字→符号を選び、英字・数字・記号から出題。正答数と連続正解を表示</li>
+            <li>各タブの木は独立。タブを切り替えると再生は一時停止</li>
           </ul>
 
           <h4>📊 モールス信号一覧表</h4>
           <ul>
-            <li>英字・数字・記号の完全対応表</li>
-            <li>3グループに分類して見やすく表示</li>
+            <li>英字27・数字10・記号18の55文字（ITU 50・慣用5）</li>
+            <li>ITUと慣用符号（! &amp; ; _ $）はバッジと線種で区別</li>
             <li>横スクロール対応でモバイルでも快適</li>
           </ul>
 
@@ -169,7 +235,8 @@
             <li><strong>左の枝</strong>：・（ドット）を表す</li>
             <li><strong>右の枝</strong>：−（ダッシュ）を表す</li>
             <li><strong>ルートから葉</strong>：符号化プロセスを表示</li>
-            <li><strong>オレンジ色</strong>：現在ハイライト中の経路</li>
+            <li><strong>点灯</strong>：経路。破線の丸は空き、黄色の破線は慣用符号</li>
+            <li>$は7符号で木の外。詳細表には表示されますが、木は光りません</li>
           </ul>
 
           <h3>💡 効果的な使い方</h3>
@@ -182,21 +249,23 @@
 
           <h3>⚡ ショートカット・Tips</h3>
           <ul>
-            <li>テキストエリアは右下をドラッグして拡張可能</li>
+            <li>タブは←→・Home・End、ヘルプはEscで閉じる</li>
             <li>エンコード結果の「📋 コピー」で他アプリに貼り付け</li>
             <li>モールス入力は文字ボタンで楽々入力</li>
-            <li>サンプルボタンで「ASDF GHJK」を即座に入力</li>
+            <li>デコード欄はEnterで実行、Shift+Enterで改行。クイズはEnterで回答し、再度Enterで次の問題</li>
             <li>エラーメッセージで入力ミスを素早く確認</li>
           </ul>
 
           <h3>📱 動作環境</h3>
           <p>
-            モダンブラウザ（Chrome、Firefox、Safari、Edge）で動作します。<br>
-            スマートフォンやタブレットでも快適にご利用いただけます。
+            モダンブラウザー（Chrome、Firefox、Safari、Edge）で動作します。<br>
+            HTTPで配信して開いてください。file://ではES moduleを読み込めません。
           </p>
         </div>
       </div>
     </div>
+
+    </main>
 
     <!-- フッター -->
     <footer>
@@ -204,7 +273,7 @@
         🔗 GitHubリポジトリはこちら（
         <a
           href="https://github.com/ipusiron/morse-tree-visualizer"
-          target="_blank"
+          target="_blank" rel="noopener noreferrer"
         >
           ipusiron/morse-tree-visualizer </a
         >）
@@ -213,9 +282,5 @@
 
     <!-- スクリプト -->
     <script type="module" src="js/script.js"></script>
-    <script type="module" src="js/encode.js"></script>
-    <script type="module" src="js/decode.js"></script>
-    <script type="module" src="js/study.js"></script>
-    <script type="module" src="js/table.js"></script>
   </body>
 </html>

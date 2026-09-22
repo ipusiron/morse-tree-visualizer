@@ -1,15 +1,62 @@
+:root {
+  --primary: #1565c0;
+  --primary-dark: #0d47a1;
+  --paper: #ffffff;
+  --text: #333333;
+  --tab-bg: #e0e0e0;
+  --page-bg: #f5f7fa;
+  --success: #1b5e20;
+  --success-bg: #e8f5e9;
+  --error: #b71c1c;
+  --error-bg: #ffebee;
+  --hint: #555555;
+  --custom-text: #5d4037;
+  --custom-bg: #ffe0b2;
+  --node-fill: #eef1f5;
+  --node-stroke: #5f6b7a;
+  --node-text: #1a1a1a;
+  --node-custom-fill: #fff8e1;
+  --node-hl-fill: #ffe082;
+  --hl-stroke: #e65100;
+  --node-empty-stroke: #c3c9d1;
+  --node-custom-stroke: #8a6d00;
+  --current-stroke: #bf360c;
+  --line-stroke: #b5bcc6;
+  --depth-text: #666666;
+  --border: #ccc;
+  --border-soft: #dddddd;
+  --surface: #f5f5f5;
+  --border-hover: #999;
+  --pressed: #d0d0d0;
+  --success-border: #4caf50;
+  --sample-hover: #c8e6c9;
+  --sample-border-hover: #388e3c;
+  --sample-pressed: #a5d6a7;
+  --tab-hover: #f0f0f0;
+  --details-bg: #e3f2fd;
+  --heading-text: #424242;
+  --row-border: #eee;
+  --details-hover: #bbdefb;
+  --error-border: #ef5350;
+  --subtab-text: #444;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 /* ベースレイアウト */
 body {
   font-family: sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f5f7fa;
-  color: #333;
+  background-color: var(--page-bg);
+  color: var(--text);
 }
 
 header {
-  background-color: #1e88e5;
-  color: white;
+  background-color: var(--primary);
+  color: var(--paper);
   padding: 1rem;
 }
 
@@ -36,7 +83,7 @@ header {
 
 main {
   padding: 2rem;
-  max-width: 1200px;  /* ← 900px → 1200px に拡張 */
+  max-width: 1264px;
   margin: auto;
 }
 
@@ -50,7 +97,7 @@ label {
 }
 
 /* テキスト入力とモールス入力のラベルのスタイル */
-label[for="textInput"], label[for="morseInput"] {
+label[for="inputText"], label[for="morseInput"] {
   display: inline-block;
   vertical-align: middle;
   align-self: flex-start;
@@ -94,7 +141,7 @@ textarea#morseInput, textarea#inputText {
   padding: 0.6rem;
   resize: vertical;
   min-height: 32px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border);
   border-radius: 4px;
   font-family: inherit;
   vertical-align: middle;
@@ -105,8 +152,9 @@ textarea#morseInput {
 }
 
 .input-hint {
-  font-size: 0.85rem;
-  color: #666;
+  font-size: 0.9rem;
+  color: var(--hint);
+  background-color: var(--page-bg);
   margin: 0.3rem 0 1rem 0;
   font-style: italic;
 }
@@ -121,9 +169,9 @@ textarea#morseInput {
 .morse-char-btn {
   padding: 0.4rem 0.8rem;
   font-size: 1rem;
-  background-color: #f5f5f5;
-  color: #333;
-  border: 1px solid #ccc;
+  background-color: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.2s;
@@ -132,12 +180,12 @@ textarea#morseInput {
 }
 
 .morse-char-btn:hover {
-  background-color: #e0e0e0;
-  border-color: #999;
+  background-color: var(--tab-bg);
+  border-color: var(--border-hover);
 }
 
 .morse-char-btn:active {
-  background-color: #d0d0d0;
+  background-color: var(--pressed);
   transform: translateY(1px);
 }
 
@@ -145,9 +193,9 @@ textarea#morseInput {
   margin-left: 1rem;
   padding: 0.4rem 0.8rem;
   font-size: 0.85rem;
-  background-color: #e8f5e8;
-  color: #2e7d32;
-  border: 1px solid #4caf50;
+  background-color: var(--success-bg);
+  color: var(--success);
+  border: 1px solid var(--success-border);
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.2s;
@@ -156,12 +204,12 @@ textarea#morseInput {
 }
 
 .morse-input-buttons .sample-button:hover {
-  background-color: #c8e6c9;
-  border-color: #388e3c;
+  background-color: var(--sample-hover);
+  border-color: var(--sample-border-hover);
 }
 
 .morse-input-buttons .sample-button:active {
-  background-color: #a5d6a7;
+  background-color: var(--sample-pressed);
   transform: translateY(1px);
 }
 
@@ -170,41 +218,27 @@ button {
   font-size: 1rem;
   margin-left: 0.5rem;
   cursor: pointer;
-  background-color: #42a5f5;
-  color: white;
+  background-color: var(--primary);
+  color: var(--paper);
   border: none;
   border-radius: 4px;
 }
 
 button:hover {
-  background-color: #1e88e5;
-}
-
-#tree-container {
-  margin-top: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 1rem;
-  background-color: #fff;
-  overflow-x: auto;
-}
-
-.tree-scroll-wrapper {
-  overflow-x: auto;
-  margin-top: 1rem;
+  background-color: var(--primary-dark);
 }
 
 /* footer */
 footer {
   text-align: center;
   padding: 1rem;
-  background-color: #e0e0e0;
+  background-color: var(--tab-bg);
   font-size: 0.9rem;
   margin-top: 2rem;
 }
 
 .footer a {
-  color: #1e88e5;
+  color: var(--primary-dark);
   text-decoration: none;
 }
 
@@ -218,14 +252,15 @@ footer {
   flex-wrap: wrap;
   gap: 0;
   margin-bottom: 0;
-  border-bottom: 2px solid #1e88e5;
+  border-bottom: 2px solid var(--primary);
 }
 
 
 .tab-button {
+  color: var(--text);
   padding: 0.8rem 1.5rem;
-  background-color: #e0e0e0;
-  border: 1px solid #ccc;
+  background-color: var(--tab-bg);
+  border: 1px solid var(--border);
   border-bottom: none;
   border-radius: 8px 8px 0 0;
   cursor: pointer;
@@ -235,14 +270,14 @@ footer {
 }
 
 .tab-button:hover {
-  background-color: #f0f0f0;
+  background-color: var(--tab-hover);
 }
 
 .tab-button.active {
-  background-color: #ffffff;
-  color: #1e88e5;
-  border-color: #1e88e5;
-  border-bottom: 2px solid #ffffff;
+  background-color: var(--paper);
+  color: var(--primary);
+  border-color: var(--primary);
+  border-bottom: 2px solid var(--paper);
   margin-bottom: -2px;
   z-index: 1;
   position: relative;
@@ -257,8 +292,8 @@ footer {
 
 .tab-content.active {
   display: block;
-  background-color: #ffffff;
-  border: 2px solid #1e88e5;
+  background-color: var(--paper);
+  border: 2px solid var(--primary);
   border-top: none;
   border-radius: 0 0 8px 8px;
   padding: 2rem;
@@ -281,12 +316,12 @@ footer {
   z-index: 1000;
 }
 
-.modal[style*="display: block"] {
-  display: flex !important;
+.modal:not([hidden]) {
+  display: flex;
 }
 
 .modal-content {
-  background-color: #fff;
+  background-color: var(--paper);
   padding: 0;
   border-radius: 8px;
   max-width: 800px;
@@ -299,8 +334,8 @@ footer {
 }
 
 .modal-content h2 {
-  background-color: #1e88e5;
-  color: white;
+  background-color: var(--primary);
+  color: var(--paper);
   margin: 0;
   padding: 1.5rem 2rem;
   border-radius: 8px 8px 0 0;
@@ -317,15 +352,15 @@ footer {
 }
 
 .help-content h3 {
-  color: #1e88e5;
+  color: var(--primary);
   margin-top: 2rem;
   margin-bottom: 1rem;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid #e3f2fd;
+  border-bottom: 2px solid var(--details-bg);
 }
 
 .help-content h4 {
-  color: #424242;
+  color: var(--heading-text);
   margin-top: 1.5rem;
   margin-bottom: 0.8rem;
 }
@@ -349,10 +384,9 @@ footer {
   right: 2rem;
   font-size: 1.8rem;
   font-weight: bold;
-  color: white;
+  color: var(--paper);
   cursor: pointer;
   z-index: 2;
-  opacity: 0.8;
   transition: opacity 0.2s;
 }
 
@@ -365,14 +399,14 @@ footer {
 }
 
 .help-icon-button {
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
-  min-height: 36px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.2);
-  color: white;
-  border: 2px solid white;
+  background-color: var(--primary-dark);
+  color: var(--paper);
+  border: 2px solid var(--paper);
   font-size: 18px;
   font-weight: bold;
   cursor: pointer;
@@ -386,7 +420,7 @@ footer {
 }
 
 .help-icon-button:hover {
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: var(--primary-dark);
   transform: scale(1.1);
 }
 
@@ -400,7 +434,7 @@ footer {
   flex-wrap: nowrap;
   justify-content: flex-start;
   gap: 1.5rem;
-  overflow-x: scroll;       /* 常に表示 */
+  overflow-x: auto;
   padding: 1rem 0;
   max-width: none;          /* 幅制限を解除 */
 }
@@ -409,17 +443,15 @@ footer {
   overflow-x: visible;       /* wrapperの外で切れないように */
 }
 
-body {
-  overflow-x: hidden;        /* 全体スクロールは防止（任意） */
-}
 
 .morse-table-group {
-  flex: 0 0 280px;
+  flex: 1 1 0;
+  min-width: 0;
   vertical-align: top;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border);
   border-radius: 6px;
   padding: 1rem;
-  background-color: #fff;
+  background-color: var(--paper);
 }
 
 .morse-table-group h3 {
@@ -435,9 +467,13 @@ body {
 
 .morse-table td {
   padding: 0.3rem 0.5rem;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--row-border);
   text-align: center;
-  white-space: nowrap; /* 改行禁止：記号の表示崩れ防止 */
+  overflow-wrap: anywhere;
+}
+
+.morse-table td:nth-child(-n+3), .badge {
+  white-space: nowrap;
 }
 
 @media screen and (max-width: 768px) {
@@ -449,9 +485,9 @@ body {
   }
 }
 
-#studyResult {
-  background-color: #ffffff;
-  border: 1px solid #ccc;
+#studyResultManual, #studyResultRandom {
+  background-color: var(--paper);
+  border: 1px solid var(--border);
   border-radius: 6px;
   padding: 1rem;
   margin-top: 1rem;
@@ -460,44 +496,14 @@ body {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
 
-#studyResult p {
+#studyResultManual p, #studyResultRandom p {
   margin: 0.5rem 0;
-}
-
-.tree-node.highlight circle {
-  fill: #ffecb3;
-  stroke: #f57c00;
-  stroke-width: 2;
-}
-
-#tree-container-study {
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 1rem;
-  background-color: #fff;
-  overflow-x: auto;
-}
-
-#tree-container-study svg {
-  display: block;
-  margin: 0 auto;
-}
-
-.tree-node.highlight circle {
-  fill: #ffecb3;
-  stroke: #f57c00;
-  stroke-width: 2;
-}
-
-line.highlight {
-  stroke: #f57c00;
-  stroke-width: 3;
 }
 
 /* エンコード結果表示 */
 .morse-result-container {
-  background-color: #f5f5f5;
-  border: 1px solid #ddd;
+  background-color: var(--surface);
+  border: 1px solid var(--border-soft);
   border-radius: 6px;
   padding: 1.5rem;
   margin-top: 1rem;
@@ -506,26 +512,24 @@ line.highlight {
 .morse-code-display {
   font-size: 1.5rem;
   font-family: monospace;
-  background-color: #fff;
-  border: 2px solid #1e88e5;
+  background-color: var(--paper);
+  border: 2px solid var(--primary);
   border-radius: 4px;
   padding: 1rem;
   margin: 1rem 0;
   text-align: center;
   letter-spacing: 0.3rem;
-  color: #1e88e5;
+  color: var(--primary);
   font-weight: bold;
   position: relative;
 }
 
 .copy-button {
-  position: absolute;
-  bottom: 0.5rem;
-  right: 0.5rem;
+  position: static;
   padding: 0.3rem 0.6rem;
   font-size: 0.8rem;
-  background-color: #42a5f5;
-  color: white;
+  background-color: var(--primary);
+  color: var(--paper);
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -535,11 +539,11 @@ line.highlight {
 }
 
 .copy-button:hover {
-  background-color: #1e88e5;
+  background-color: var(--primary-dark);
 }
 
 .copy-button:active {
-  background-color: #1565c0;
+  background-color: var(--primary);
   transform: translateY(1px);
 }
 
@@ -552,12 +556,12 @@ line.highlight {
 .morse-encode-table th,
 .morse-encode-table td {
   padding: 0.5rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-soft);
   text-align: center;
 }
 
 .morse-encode-table th {
-  background-color: #e3f2fd;
+  background-color: var(--details-bg);
   font-weight: bold;
 }
 
@@ -573,14 +577,14 @@ details {
 summary {
   cursor: pointer;
   padding: 0.5rem;
-  background-color: #e3f2fd;
+  background-color: var(--details-bg);
   border-radius: 4px;
   font-weight: bold;
   user-select: none;
 }
 
 summary:hover {
-  background-color: #bbdefb;
+  background-color: var(--details-hover);
 }
 
 /* エラーメッセージ */
@@ -589,9 +593,9 @@ summary:hover {
 }
 
 .error-message {
-  color: #d32f2f;
-  background-color: #ffebee;
-  border: 1px solid #ef5350;
+  color: var(--error);
+  background-color: var(--error-bg);
+  border: 1px solid var(--error-border);
   border-radius: 4px;
   padding: 0.5rem 1rem;
   margin: 0;
@@ -600,8 +604,8 @@ summary:hover {
 
 /* デコード結果表示 */
 .decode-result-container {
-  background-color: #f5f5f5;
-  border: 1px solid #ddd;
+  background-color: var(--surface);
+  border: 1px solid var(--border-soft);
   border-radius: 6px;
   padding: 1.5rem;
   margin-top: 1rem;
@@ -610,14 +614,14 @@ summary:hover {
 .decoded-text-display {
   font-size: 1.8rem;
   font-family: serif;
-  background-color: #fff;
-  border: 2px solid #2e7d32;
+  background-color: var(--paper);
+  border: 2px solid var(--success);
   border-radius: 4px;
   padding: 1rem;
   margin: 1rem 0;
   text-align: center;
   letter-spacing: 0.1rem;
-  color: #2e7d32;
+  color: var(--success);
   font-weight: bold;
 }
 
@@ -630,12 +634,12 @@ summary:hover {
 .morse-decode-table th,
 .morse-decode-table td {
   padding: 0.5rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-soft);
   text-align: center;
 }
 
 .morse-decode-table th {
-  background-color: #e8f5e8;
+  background-color: var(--success-bg);
   font-weight: bold;
 }
 
@@ -644,79 +648,37 @@ summary:hover {
   font-size: 1.1rem;
 }
 
-#tree-container-decode {
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 1rem;
-  background-color: #fff;
-  overflow-x: auto;
-}
-
-/* トースト通知 */
-.toast {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background-color: #4caf50;
-  color: white;
-  padding: 1rem 1.5rem;
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  z-index: 10000;
-  opacity: 0;
-  transform: translateX(100%);
-  transition: all 0.3s ease;
-  font-size: 0.9rem;
-  font-weight: 500;
-  max-width: 300px;
-}
-
-.toast.show {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-@media (max-width: 768px) {
-  .toast {
-    top: 10px;
-    right: 10px;
-    left: 10px;
-    max-width: none;
-    text-align: center;
-  }
-}
-
 /* === 学習モード用サブタブ UI === */
 .subtab-buttons {
   display: flex;
   gap: 0;
   margin-bottom: 0;
-  border-bottom: 1px solid #007acc;
+  border-bottom: 1px solid var(--primary);
 }
 
 .subtab-button {
   padding: 0.6rem 1.2rem;
   font-size: 0.95rem;
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
+  background-color: var(--tab-hover);
+  border: 1px solid var(--border);
   border-bottom: none;
   border-radius: 6px 6px 0 0;
   cursor: pointer;
   font-weight: bold;
-  color: #444;
+  color: var(--subtab-text);
   transition: background-color 0.2s;
   margin-right: 0.2rem;
 }
 
 .subtab-button:hover {
-  background-color: #e0e0e0;
+  background-color: var(--tab-bg);
 }
 
 .subtab-button.active {
-  background-color: #ffffff;
-  color: #007acc;
-  border-color: #007acc;
-  border-bottom: 1px solid #ffffff;
+  background-color: var(--paper);
+  color: var(--primary-dark);
+  border-color: var(--primary);
+  border-bottom: 1px solid var(--paper);
   margin-bottom: -1px;
   z-index: 1;
   position: relative;
@@ -724,8 +686,8 @@ summary:hover {
 
 .subtab-content {
   display: none;
-  background-color: #ffffff;
-  border: 1px solid #007acc;
+  background-color: var(--paper);
+  border: 1px solid var(--primary);
   border-top: none;
   border-radius: 0 0 6px 6px;
   padding: 1.5rem;
@@ -735,4 +697,217 @@ summary:hover {
 
 .subtab-content.active {
   display: block;
+}
+/* 木は固定サイズの独立したSVGとして描く。 */
+.tree-box {
+  background: var(--paper);
+  border: 1px solid var(--border-soft);
+  border-radius: 6px;
+  margin-top: 1rem;
+  min-width: 0;
+  max-width: 100%;
+}
+.tree-scroll-wrapper {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+.tree-box svg {
+  display: block;
+  max-width: none;
+  width: 1080px;
+  height: 470px;
+}
+.tree-node circle {
+  fill: var(--node-fill);
+  stroke: var(--node-stroke);
+}
+.tree-node text {
+  fill: var(--node-text);
+}
+.tree-node.empty circle {
+  fill: var(--paper);
+  stroke: var(--node-empty-stroke);
+  stroke-dasharray: 3 2;
+}
+.tree-node.custom circle {
+  fill: var(--node-custom-fill);
+  stroke: var(--node-custom-stroke);
+  stroke-dasharray: 4 2;
+}
+.tree-node.highlight circle {
+  fill: var(--node-hl-fill);
+  stroke: var(--hl-stroke);
+  stroke-width: 3;
+}
+.tree-node.current circle {
+  stroke: var(--current-stroke);
+  stroke-width: 4;
+}
+.tree-box line {
+  stroke: var(--line-stroke);
+  stroke-width: 1.5;
+}
+.tree-box line.highlight {
+  stroke: var(--hl-stroke);
+  stroke-width: 4;
+}
+.direction-label {
+  fill: var(--text);
+}
+.depth-label {
+  fill: var(--depth-text);
+}
+
+.playback {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.error-message:empty {
+  display: none;
+}
+.morse-code-display, .decoded-text-display {
+  display: block;
+  overflow-wrap: anywhere;
+}
+tr.current {
+  background: var(--node-custom-fill);
+}
+.clipboard-fallback {
+  position: fixed;
+  left: -10000px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.3rem;
+  border-radius: 4px;
+}
+.badge.itu {
+  color: var(--paper);
+  background: var(--primary);
+}
+.badge.custom {
+  color: var(--custom-text);
+  background: var(--custom-bg);
+}
+.quiz-correct {
+  color: var(--success);
+}
+.quiz-wrong {
+  color: var(--error);
+}
+
+
+/* 共通操作と狭幅での収まり。木のSVGだけは縮小しない。 */
+[hidden] {
+  display: none !important;
+}
+button, select, input[type="text"], summary {
+  min-height: 44px;
+}
+button {
+  margin-left: 0;
+}
+select, input, textarea {
+  font-size: 1rem;
+  max-width: 100%;
+}
+fieldset {
+  min-width: 0;
+}
+fieldset label {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+:focus-visible {
+  outline: 3px solid var(--primary-dark);
+  outline-offset: 2px;
+}
+.tab-short {
+  display: none;
+}
+.tab-button {
+  min-width: 0;
+}
+.close-button {
+  top: 0.25rem;
+  right: 0.25rem;
+  background: var(--primary-dark);
+}
+.modal-content h2 {
+  padding-right: 4rem;
+}
+.help-content {
+  min-height: 0;
+}
+[role="status"]:not(:empty) {
+  overflow-wrap: anywhere;
+}
+.copy-status:not(:empty) {
+  color: var(--paper);
+  background: var(--success);
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+.morse-encode-table, .morse-decode-table {
+  table-layout: fixed;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 768px) {
+  main {
+    padding: 0.5rem;
+  }
+  .tab-content.active {
+    padding: 0.75rem;
+  }
+  .input-with-button {
+    flex-wrap: wrap;
+  }
+  textarea#morseInput, textarea#inputText {
+    width: 100%;
+    max-width: none;
+    flex-basis: 100%;
+  }
+  .subtab-content {
+    padding: 0.75rem;
+  }
+  .tab-button {
+    padding: 0.65rem 0.5rem;
+    flex: 1 1 45%;
+    margin-right: 0;
+  }
+  .morse-input-buttons .sample-button {
+    margin-left: 0;
+  }
+  .morse-result-container, .decode-result-container {
+    padding: 0.75rem;
+  }
+  .header-content h1 {
+    font-size: 1.5rem;
+  }
+  .morse-table-group {
+    padding: 0.5rem;
+  }
+  .help-content {
+    padding: 1rem;
+  }
+}
+@media (max-width: 480px) {
+  .tab-long {
+    display: none;
+  }
+  .tab-short {
+    display: inline;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition: none !important;
+    transform: none !important;
+  }
 }

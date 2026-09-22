@@ -1,125 +1,59 @@
-export const morseTree = {
-  label: "start", x: null, y: null,
-  left: {
-    label: "E", x: null, y: null,
-    left: {
-      label: "I", x: null, y: null,
-      left: {
-        label: "S", x: null, y: null,
-        left: {
-          label: "H", x: null, y: null,
-          left: { label: "5", x: null, y: null },
-          right: { label: "4", x: null, y: null }
-        },
-        right: {
-          label: "V", x: null, y: null,
-          left: { label: " ", x: null, y: null },
-          right: { label: "3", x: null, y: null }
-        }
-      },
-      right: {
-        label: "U", x: null, y: null,
-        left: {
-          label: "F", x: null, y: null,
-          left: { label: " ", x: null, y: null },
-          right: { label: " ", x: null, y: null }
-        },
-        right: {
-          label: " ", x: null, y: null,
-          left: { label: " ", x: null, y: null },
-          right: { label: "2", x: null, y: null }
-        }
-      }
-    },
-    right: {
-      label: "A", x: null, y: null,
-      left: {
-        label: "R", x: null, y: null,
-        left: {
-          label: "L", x: null, y: null,
-          left: { label: " ", x: null, y: null },
-          right: { label: " ", x: null, y: null }
-        },
-        right: {
-          label: " ", x: null, y: null,
-          left: { label: "+", x: null, y: null },
-          right: { label: " ", x: null, y: null }
-        }
-      },
-      right: {
-        label: "W", x: null, y: null,
-        left: {
-          label: "P", x: null, y: null,
-          left: { label: " ", x: null, y: null },
-          right: { label: " ", x: null, y: null }
-        },
-        right: {
-          label: "J", x: null, y: null,
-          left: { label: " ", x: null, y: null },
-          right: { label: "1", x: null, y: null }
-        }
-      }
+import { MORSE_TABLE } from './morseMap.js';
+
+function node(code) {
+  return { code, char: null, depth: code.length, left: null, right: null };
+}
+
+export function buildTree(table = MORSE_TABLE, maxDepth = 6) {
+  const root = node('');
+  const nodes = new Map([['', root]]);
+  const outside = [];
+  for (const entry of table) {
+    if (entry.code.length > maxDepth) {
+      outside.push(entry);
+      continue;
     }
-  },
-  right: {
-    label: "T", x: null, y: null,
-    left: {
-      label: "N", x: null, y: null,
-      left: {
-        label: "D", x: null, y: null,
-        left: {
-          label: "B", x: null, y: null,
-          left: { label: "6", x: null, y: null },
-          right: { label: "=", x: null, y: null }
-        },
-        right: {
-          label: "X", x: null, y: null,
-          left: { label: "/", x: null, y: null },
-          right: { label: " ", x: null, y: null }
-        }
-      },
-      right: {
-        label: "K", x: null, y: null,
-        left: {
-          label: "C", x: null, y: null,
-          left: { label: " ", x: null, y: null },
-          right: { label: " ", x: null, y: null }
-        },
-        right: {
-          label: "Y", x: null, y: null,
-          left: { label: " ", x: null, y: null },
-          right: { label: " ", x: null, y: null }
-        }
+    let current = root;
+    for (const symbol of entry.code) {
+      const direction = symbol === '.' ? 'left' : 'right';
+      if (!current[direction]) {
+        current[direction] = node(current.code + symbol);
+        nodes.set(current[direction].code, current[direction]);
       }
-    },
-    right: {
-      label: "M", x: null, y: null,
-      left: {
-        label: "G", x: null, y: null,
-        left: {
-          label: "Z", x: null, y: null,
-          left: { label: "7", x: null, y: null },
-          right: { label: " ", x: null, y: null }
-        },
-        right: {
-          label: "Q", x: null, y: null,
-          left: { label: " ", x: null, y: null },
-          right: { label: " ", x: null, y: null }
-        }
-      },
-      right: {
-        label: "O", x: null, y: null,
-        left: {
-          label: " ", x: null, y: null,
-          left: { label: "8", x: null, y: null },
-          right: { label: " ", x: null, y: null }
-        },
-        right: {
-          label: " ", x: null, y: null,
-          left: { label: "9", x: null, y: null },
-          right: { label: "0", x: null, y: null }
-        }
+      current = current[direction];
+    }
+    current.char = entry.char;
+  }
+  return { root, nodes, outside };
+}
+
+export function completeTo(tree, fullDepth = 5) {
+  function visit(current) {
+    if (current.depth >= fullDepth) return;
+    for (const [direction, symbol] of [['left', '.'], ['right', '-']]) {
+      if (!current[direction]) {
+        current[direction] = node(current.code + symbol);
+        tree.nodes.set(current[direction].code, current[direction]);
       }
+      visit(current[direction]);
     }
   }
-};
+  visit(tree.root);
+  return tree;
+}
+
+export function layoutTree(tree, { xStep = 30, yStep = 64, x0 = 20, y0 = 30 } = {}) {
+  let leaves = 0;
+  function visit(current) {
+    const children = [current.left, current.right].filter(Boolean);
+    children.forEach(visit);
+    current.x = children.length ? children.reduce((sum, child) => sum + child.x, 0) / children.length : x0 + leaves++ * xStep;
+    current.y = y0 + current.depth * yStep;
+  }
+  visit(tree.root);
+  const all = [...tree.nodes.values()];
+  const minX = Math.min(...all.map(n => n.x));
+  const maxX = Math.max(...all.map(n => n.x));
+  const maxY = Math.max(...all.map(n => n.y));
+  return { leaves, minX, maxX, maxY, width: maxX - minX, height: maxY - y0 };
+}

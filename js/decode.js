@@ -1,168 +1,79 @@
-import { highlightPath, clearHighlights, renderMorseTree } from './treeRenderer.js';
-import { morseMap } from './morseMap.js';
-import { morseTree } from './morseTree.js';
-import { escapeAndJoin } from './utils.js';
-
-// 逆引き用のマップを作成
-const reverseMorseMap = {};
-for (const [char, code] of Object.entries(morseMap)) {
-  reverseMorseMap[code] = char;
-}
+import { createTreeView } from './treeRenderer.js';
+import { createAnimator } from './animator.js';
+import { decode, encode, normalizeMorse } from './morseCodec.js';
+import { NOTATIONS } from './morseMap.js';
+import { t } from './messages.js';
+import { settings, describeChars, renderResult, bindPlayback } from './utils.js';
 
 export function initDecodeTab() {
   // モールスツリーを描画
-  renderMorseTree("tree-container-decode");
-  
+  const view = createTreeView(document.getElementById('tree-container-decode'));
+  const animator = createAnimator(view);
   const decodeButton = document.getElementById('decodeButton');
   const morseInput = document.getElementById('morseInput');
   const resultDiv = document.getElementById('decodeResult');
   const errorDiv = document.getElementById('decodeError');
-  const sampleButton = document.getElementById('sampleButton');
+  let canonical = '';
+  let rows = [];
+  let rendered = false;
+  const run = bindPlayback(document.getElementById('decode-playback'), animator, () => canonical, () => rows);
 
-  if (!decodeButton || !morseInput || !resultDiv || !errorDiv || !sampleButton) return;
+  function follow() {
+    animator.stop();
+    const normalized = normalizeMorse(morseInput.value);
+    if (normalized.unknown.length || /[\s/|]$/.test(morseInput.value)) return;
+    const code = normalized.canonical.split(' ').at(-1);
+    if (code && view.highlight(code)) view.scrollToCode(code);
+  }
+  morseInput.addEventListener('input', event => { if (!event.isComposing) follow(); });
+  morseInput.addEventListener('compositionend', follow);
 
-  // モールス文字入力ボタンのイベントリスナーを追加
-  const morseCharButtons = document.querySelectorAll('.morse-char-btn');
-  morseCharButtons.forEach(button => {
-    button.addEventListener('click', (e) => {
-      e.preventDefault();
-      const char = button.dataset.char;
-      const currentPos = morseInput.selectionStart;
-      const currentValue = morseInput.value;
-      
-      // カーソル位置に文字を挿入
-      const newValue = currentValue.slice(0, currentPos) + char + currentValue.slice(currentPos);
-      morseInput.value = newValue;
-      
-      // カーソル位置を調整
+  // カーソル位置に符号を挿入
+  document.querySelectorAll('.morse-char-btn').forEach(button => {
+    button.addEventListener('click', () => {
+      const symbol = button.dataset.char;
+      const char = symbol === '.' ? NOTATIONS[settings.notation].dot : symbol === '-' ? NOTATIONS[settings.notation].dash : symbol;
+      morseInput.setRangeText(char, morseInput.selectionStart, morseInput.selectionEnd, 'end');
       morseInput.focus();
-      morseInput.setSelectionRange(currentPos + char.length, currentPos + char.length);
+      follow();
     });
   });
-
-  // サンプルボタンのイベントリスナーを追加
-  sampleButton.addEventListener('click', (e) => {
-    e.preventDefault();
-    const sampleMorse = '・− ・・・ −・・ ・・−・ / −−・ ・・・・ ・−−− −・−';
-    morseInput.value = sampleMorse;
+  document.querySelectorAll('[data-sample]').forEach(button => button.addEventListener('click', () => {
+    morseInput.value = encode(button.dataset.sample, settings.notation).morse;
     morseInput.focus();
-  });
+    follow();
+  }));
 
-  decodeButton.addEventListener('click', () => {
-    const input = morseInput.value.trim();
-    
-    // エラーと結果をクリア
-    errorDiv.innerHTML = '';
-    resultDiv.innerHTML = '';
-    clearHighlights();
-    
-    if (!input) {
-      errorDiv.innerHTML = '<p class="error-message">モールス信号を入力してください。</p>';
+  function convert() {
+    animator.stop();
+    rendered = true;
+    canonical = '';
+    errorDiv.textContent = '';
+    resultDiv.replaceChildren();
+    const result = decode(morseInput.value);
+    if (!result.ok) {
+      errorDiv.textContent = result.unknown ? t('error.unknown_symbols', { list: describeChars(result.unknown) })
+        : result.empty ? t('error.empty_morse') : t('error.invalid_codes', { list: result.invalid.join(', ') });
       return;
     }
-
-    // 入力を単語と文字に分割
-    const words = input.split('/').map(word => word.trim()).filter(word => word);
-    let decodedText = '';
-    let invalidCodes = [];
-    const allPaths = [];
-
-    for (let wordIndex = 0; wordIndex < words.length; wordIndex++) {
-      if (wordIndex > 0) decodedText += ' ';
-      
-      const codes = words[wordIndex].split(/\s+/).filter(code => code);
-      
-      for (const code of codes) {
-        const char = reverseMorseMap[code];
-        if (char) {
-          decodedText += char;
-          const path = getPathFromCode(code);
-          allPaths.push(path);
-        } else {
-          invalidCodes.push(code);
-        }
-      }
-    }
-
-    // エラーチェック
-    if (invalidCodes.length > 0) {
-      errorDiv.innerHTML = `
-        <p class="error-message">⚠ 以下のモールス信号は認識できません: ${escapeAndJoin(invalidCodes)}</p>
-      `;
-      return;
-    }
-
-    if (!decodedText) {
-      errorDiv.innerHTML = '<p class="error-message">有効なモールス信号が見つかりません。</p>';
-      return;
-    }
-
-    // 結果を表示
-    const detailTable = createDetailTable(input, decodedText);
-    
-    resultDiv.innerHTML = `
-      <div class="decode-result-container">
-        <p><strong>復号結果:</strong></p>
-        <div class="decoded-text-display">${decodedText}</div>
-        <details>
-          <summary>詳細を表示</summary>
-          ${detailTable}
-        </details>
-      </div>
-    `;
-
-    // アニメーション実行
-    if (allPaths.length > 0) {
-      animateDecodeSequence(allPaths);
-    }
-  });
-}
-
-function createDetailTable(input, decodedText) {
-  const words = input.split('/').map(word => word.trim()).filter(word => word);
-  let table = '<table class="morse-decode-table"><tr><th>モールス信号</th><th>文字</th></tr>';
-  
-  for (const word of words) {
-    const codes = word.split(/\s+/).filter(code => code);
-    for (const code of codes) {
-      const char = reverseMorseMap[code];
-      table += `<tr><td>${code}</td><td>${char || '?'}</td></tr>`;
-    }
-    if (words.length > 1) {
-      table += '<tr><td>/</td><td>スペース</td></tr>';
-    }
+    canonical = result.canonical;
+    rows = renderResult(resultDiv, result.words, result.text, 'decode');
+    run();
   }
-  
-  table += '</table>';
-  return table;
-}
-
-function getPathFromCode(code) {
-  console.log('Getting decode path for code:', code);
-  const path = [];
-  let node = morseTree;
-  for (const symbol of code) {
-    if (symbol === '・') {
-      node = node.left;
-      path.push('left');
-    } else if (symbol === '−') {
-      node = node.right;
-      path.push('right');
+  decodeButton.addEventListener('click', convert);
+  morseInput.addEventListener('keydown', event => {
+    if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
+      event.preventDefault();
+      convert();
     }
-    if (!node) break;
-  }
-  console.log('Generated decode path:', path);
-  return path;
-}
-
-function animateDecodeSequence(paths) {
-  console.log('Starting decode animation with paths:', paths);
-  clearHighlights();
-  paths.forEach((path, index) => {
-    setTimeout(() => {
-      console.log(`Highlighting decode path ${index}:`, path);
-      clearHighlights();
-      highlightPath(path);
-    }, index * 1000);
   });
+  function updateNotation() {
+    for (const button of document.querySelectorAll('.morse-char-btn')) {
+      if (button.dataset.char === '.') button.textContent = NOTATIONS[settings.notation].dot;
+      if (button.dataset.char === '-') button.textContent = NOTATIONS[settings.notation].dash;
+    }
+    if (rendered) convert();
+  }
+  document.addEventListener('notation-change', updateNotation);
+  updateNotation();
 }
