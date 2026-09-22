@@ -1,7 +1,23 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { MORSE_TABLE } from '../js/morseMap.js';
+import { MORSE_TABLE, PROSIGNS } from '../js/morseMap.js';
 import { buildTree, completeTo, layoutTree } from '../js/morseTree.js';
+
+test('procedural tree adds SK without moving existing coordinates', () => {
+  const old = completeTo(buildTree());
+  const tree = completeTo(buildTree(MORSE_TABLE, 6, PROSIGNS));
+  layoutTree(old);
+  assert.equal(layoutTree(tree).leaves, 34);
+  assert.equal(tree.nodes.size, 76);
+  assert.equal([...tree.nodes.values()].filter(n => n.depth === 6).length, 13);
+  assert.deepEqual([tree.nodes.get('...-.-').x, tree.nodes.get('...-.-').y], [80, 414]);
+  assert.equal(tree.nodes.get('...-.').x, 80);
+  for (const [code, n] of old.nodes) assert.deepEqual([tree.nodes.get(code).x, tree.nodes.get(code).y], [n.x, n.y]);
+  assert.deepEqual(tree.outside.map(e => e.char ?? e.label), ['$', 'HH', 'SOS']);
+  for (const [code, char] of [['.-.-.', '+'], ['-...-', '='], ['.-...', '&'], ['-.-', 'K']]) {
+    assert.equal(tree.nodes.get(code).char, char);
+  }
+});
 
 test('75 nodes, depth distribution, empty and asymmetric nodes', () => {
   const tree = completeTo(buildTree());

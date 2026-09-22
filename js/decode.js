@@ -3,7 +3,7 @@ import { createAnimator } from './animator.js';
 import { decode, encode, normalizeMorse } from './morseCodec.js';
 import { NOTATIONS } from './morseMap.js';
 import { t } from './messages.js';
-import { settings, describeChars, renderResult, bindPlayback } from './utils.js';
+import { settings, describeChars, renderResult, bindPlayback, bindShareButton } from './utils.js';
 
 export function initDecodeTab() {
   // モールスツリーを描画
@@ -17,6 +17,7 @@ export function initDecodeTab() {
   let rows = [];
   let rendered = false;
   const run = bindPlayback(document.getElementById('decode-playback'), animator, () => canonical, () => rows);
+  bindShareButton(document.getElementById('decodeShare'), morseInput, 'morse');
 
   function follow() {
     animator.stop();
@@ -35,13 +36,13 @@ export function initDecodeTab() {
       const char = symbol === '.' ? NOTATIONS[settings.notation].dot : symbol === '-' ? NOTATIONS[settings.notation].dash : symbol;
       morseInput.setRangeText(char, morseInput.selectionStart, morseInput.selectionEnd, 'end');
       morseInput.focus();
-      follow();
+      morseInput.dispatchEvent(new Event('input'));
     });
   });
   document.querySelectorAll('[data-sample]').forEach(button => button.addEventListener('click', () => {
     morseInput.value = encode(button.dataset.sample, settings.notation).morse;
     morseInput.focus();
-    follow();
+    morseInput.dispatchEvent(new Event('input'));
   }));
 
   function convert() {

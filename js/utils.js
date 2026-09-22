@@ -1,6 +1,8 @@
-import { MORSE_TABLE, formatCode } from './morseMap.js';
+import { MORSE_TABLE, PROSIGN_BY_LABEL, PROSIGN_BY_CODE, formatCode } from './morseMap.js';
 import { timeline } from './morseCodec.js';
 import { t } from './messages.js';
+import { createMorseAudio } from './audio.js';
+import { formatShare } from './share.js';
 
 export function el(tag, attrs = {}, children = []) {
   const node = document.createElement(tag);
@@ -9,7 +11,7 @@ export function el(tag, attrs = {}, children = []) {
   return node;
 }
 
-export const settings = { notation: 'ja', wpm: 10 };
+export const settings = { notation: 'ja', charWpm: 15, overallWpm: 10, frequency: 700, volume: 50, sound: true, lamp: false };
 
 export function bindSettings() {
   document.querySelectorAll('input[name="notation"]').forEach(input => input.addEventListener('change', () => {
@@ -20,6 +22,18 @@ export function bindSettings() {
 
 export function describeChars(items) {
   return items.map(({ char, cp }) => `${char}(${cp})`).join(', ');
+}
+
+export function bindShareButton(button, input, kind) {
+  const status = document.getElementById('shareStatus');
+  const update = () => { button.disabled = !input.value; };
+  input.addEventListener('input', update);
+  document.addEventListener('share-loaded', update);
+  button.addEventListener('click', () => {
+    if (input.value.length > 1000) { status.textContent = t('share.too_long'); return; }
+    copyText(location.origin + location.pathname + formatShare(kind, input.value), status);
+  });
+  update();
 }
 
 export async function copyText(text, status) {
@@ -59,11 +73,13 @@ export function renderResult(container, words, output, mode) {
   const rows = [];
   words.forEach((word, wi) => {
     if (wi) body.append(el('tr', { class: 'word-gap' }, [el('td', {}, t('table.word_gap')), el('td', { colspan: 3 }, '/')]));
-    word.forEach(({ char, code }) => {
-      const entry = MORSE_TABLE.find(e => e.char === char);
+    word.forEach(({ char, code, prosign }) => {
+      const entry = prosign ? PROSIGN_BY_LABEL.get(prosign) : MORSE_TABLE.find(e => e.char === char);
+      const alias = PROSIGN_BY_CODE.get(code);
+      const note = prosign ? t(entry.ja) : alias ? t('prosign.alias', { label: alias.label }) : '';
       const row = el('tr', { 'data-char': char }, [el('td', {}, char), el('td', {}, formatCode(code, settings.notation)),
-        el('td', {}, t(entry.itu ? 'table.itu' : 'table.custom')),
-        el('td', {}, code.length > 6 ? t('tree.outside', { n: code.length }) : '')]);
+        el('td', {}, t(prosign ? 'group.prosign' : entry.itu ? 'table.itu' : 'table.custom')),
+        el('td', {}, [note, code.length > 6 ? t('tree.outside', { n: code.length }) : ''].filter(Boolean).join(' / '))]);
       if (mode === 'decode') row.prepend(row.children[1]);
       body.append(row);
       rows.push(row);
@@ -113,22 +129,62 @@ function bindSpeedHelp(host, speed) {
 
 export function bindPlayback(host, animator, getCanonical, getRows = () => []) {
   let paused = false;
+  let generation = 0;
+  const audio = createMorseAudio();
+  const prefix = host.id.replace('-playback', '');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const controls = el('div', { class: 'audio-controls' });
+  const lamp = el('span', { id: prefix + '-lamp', class: 'signal-lamp', role: 'img', 'aria-label': t('audio.lamp'), hidden: '' });
+  host.after(lamp);
+  for (const [key, label, choices] of [
+    ['overallWpm', 'audio.overall', [5, 8, 10, 12, 15, 18, 20, 25]],
+    ['frequency', 'audio.frequency', [500, 600, 700, 800, 900]]
+  ]) {
+    const id = prefix + (key === 'overallWpm' ? '-overall-wpm' : '-frequency');
+    controls.append(el('label', { for: id }, t(label)), el('select', { id, 'data-setting': key },
+      choices.map(n => el('option', { value: n }, n))));
+  }
+  for (const [key, label] of [['sound', 'audio.sound'], ['lamp', 'audio.lamp']]) {
+    controls.append(el('label', { class: 'check-control' }, [
+      el('input', { type: 'checkbox', 'data-setting': key, id: prefix + '-' + key + '-enabled' }), t(label)
+    ]));
+  }
+  controls.append(el('label', { for: prefix + '-volume' }, t('audio.volume')),
+    el('input', { id: prefix + '-volume', type: 'range', min: 0, max: 100, 'data-setting': 'volume', 'aria-label': t('audio.volume') }));
+  host.append(controls);
   const play = host.querySelector('[data-action="play"]');
   const pause = host.querySelector('[data-action="pause"]');
-  function run() {
+  async function run() {
+    const ticket = ++generation;
+    animator.stop();
     paused = false;
     pause.textContent = t('anim.pause');
     const rows = getRows();
     rows.forEach(row => { row.classList.remove('current'); row.removeAttribute('aria-current'); });
     let charIndex = 0;
-    animator.play(timeline(getCanonical(), settings.wpm).events, { onStep(event) {
+    const plan = timeline(getCanonical(), settings);
+    const ready = settings.sound && navigator.userActivation.isActive && await audio.ensureContext();
+    if (ticket !== generation) return;
+    const tones = plan.events.filter(e => e.on).map(e => ({ startMs: e.startMs, endMs: e.startMs + e.ms, code: e.code }));
+    let origin;
+    function reserve(offset = 0) {
+      origin = audio.currentTime - offset / 1000;
+      const remaining = tones.filter(e => e.endMs > offset).map(e => ({ ...e,
+        startMs: Math.max(0, e.startMs - offset), endMs: e.endMs - offset }));
+      audio.schedule(remaining, { startAt: audio.currentTime, frequency: settings.frequency, volume: settings.volume });
+    }
+    const clock = ready ? { now: () => (audio.currentTime - origin) * 1000,
+      pause: () => audio.stop(), stop: () => audio.stop(), resume: reserve } : undefined;
+    if (ready) reserve();
+    animator.play(plan.events, { onStep(event) {
+      lamp.classList.toggle('is-on', Boolean(settings.lamp && event.on && !reduced.matches));
       if (event.type === 'letterGap' || event.type === 'wordGap') charIndex++;
       rows.forEach((row, i) => {
         row.classList.toggle('current', i === charIndex);
         if (i === charIndex) row.setAttribute('aria-current', 'true');
         else row.removeAttribute('aria-current');
       });
-    } });
+    }, onPause() { lamp.classList.remove('is-on'); }, onDone() { lamp.classList.remove('is-on'); } }, clock);
   }
   play.addEventListener('click', run);
   pause.addEventListener('click', () => {
@@ -138,6 +194,7 @@ export function bindPlayback(host, animator, getCanonical, getRows = () => []) {
     pause.textContent = t(paused ? 'anim.resume' : 'anim.pause');
   });
   host.querySelector('[data-action="stop"]').addEventListener('click', () => {
+    generation++;
     animator.stop();
     paused = false;
     pause.textContent = t('anim.pause');
@@ -145,14 +202,28 @@ export function bindPlayback(host, animator, getCanonical, getRows = () => []) {
   });
   host.querySelector('[data-action="previous"]').addEventListener('click', () => animator.step(-1));
   host.querySelector('[data-action="next"]').addEventListener('click', () => animator.step(1));
-  const speed = host.querySelector('select');
+  const speed = host.querySelector('[data-setting="charWpm"]');
   bindSpeedHelp(host, speed);
-  speed.value = settings.wpm;
-  speed.addEventListener('change', () => {
-    settings.wpm = Number(speed.value);
-    document.querySelectorAll('.playback select').forEach(select => { select.value = settings.wpm; });
-  });
+  function sync() {
+    for (const input of host.querySelectorAll('[data-setting]')) {
+      const key = input.dataset.setting;
+      if (input.type === 'checkbox') input.checked = settings[key]; else input.value = settings[key];
+      if (key === 'overallWpm') for (const option of input.options) option.disabled = Number(option.value) > settings.charWpm;
+      if (key === 'lamp') { input.disabled = reduced.matches; if (reduced.matches) input.checked = false; }
+    }
+    audio.setMuted(!settings.sound);
+    lamp.hidden = !settings.lamp || reduced.matches;
+  }
+  host.querySelectorAll('[data-setting]').forEach(input => input.addEventListener('change', () => {
+    settings[input.dataset.setting] = input.type === 'checkbox' ? input.checked : Number(input.value);
+    settings.overallWpm = Math.min(settings.overallWpm, settings.charWpm);
+    document.dispatchEvent(new Event('playback-settings'));
+  }));
+  document.addEventListener('playback-settings', sync);
+  reduced.addEventListener('change', sync);
+  sync();
   document.addEventListener('tab-switch', () => {
+    generation++;
     if (animator.isPlaying) {
       animator.pause();
       paused = true;

@@ -1,5 +1,9 @@
 import { initStudyMode } from './study.js';
 import { initMorseTable } from './table.js';
+import { initKeying } from './keying.js';
+import { parseShare } from './share.js';
+import { t } from './messages.js';
+import { initTheme } from './theme.js';
 
 import { initEncodeTab } from './encode.js';
 import { initDecodeTab } from './decode.js';
@@ -8,8 +12,10 @@ let tableInitialized = false;
 let studyInitialized = false;
 let encodeInitialized = false;
 let decodeInitialized = false;
+let keyingInitialized = false;
 
 document.addEventListener('DOMContentLoaded', () => {
+  initTheme();
   const tabButtons = document.querySelectorAll('.tab-button');
 
   switchTab('encode');
@@ -21,6 +27,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
   bindTabKeys(tabButtons);
+  const share = parseShare(location.search);
+  if (share.ok) {
+    const encoded = share.kind === 'text';
+    switchTab(encoded ? 'encode' : 'decode');
+    document.getElementById(encoded ? 'inputText' : 'morseInput').value = share.value;
+    document.getElementById(encoded ? 'startButton' : 'decodeButton').click();
+    document.dispatchEvent(new Event('share-loaded'));
+  } else if (share.errorKey !== 'share.none') document.getElementById('shareStatus').textContent = t(share.errorKey);
 
   // ヘルプモーダル開閉処理
   const helpButton = document.getElementById('helpBtn');
@@ -62,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-function switchTab(tabId) {
+export function switchTab(tabId) {
   document.dispatchEvent(new Event('tab-switch'));
   const tabButtons = document.querySelectorAll('.tab-button');
   const tabContents = document.querySelectorAll('.tab-content');
@@ -84,7 +98,10 @@ function switchTab(tabId) {
   if (targetTab) targetTab.classList.add('active');
   if (activeButton) activeButton.classList.add('active');
 
-  if (tabId === 'table' && !tableInitialized) {
+  if (tabId === 'keying' && !keyingInitialized) {
+    initKeying();
+    keyingInitialized = true;
+  } else if (tabId === 'table' && !tableInitialized) {
     initMorseTable();
     tableInitialized = true;
   } else if (tabId === 'study') {

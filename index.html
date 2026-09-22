@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <title>MorseTree Visualizer</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark">
     <meta http-equiv="Content-Security-Policy"
       content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
     <meta name="referrer" content="no-referrer">
@@ -19,6 +20,7 @@
           <p>モールス信号を可視化して学べるツールです。</p>
         </div>
         <button class="help-icon-button" id="helpBtn" title="ヘルプ" aria-label="ヘルプを開く">？</button>
+        <button type="button" id="themeToggle" aria-label="配色: システム連動">🖥</button>
       </div>
     </header>
 
@@ -41,6 +43,8 @@
           aria-controls="tab-table" aria-selected="false" tabindex="-1">
           <span class="tab-long">モールス信号一覧表</span><span class="tab-short">一覧表</span>
         </button>
+        <button class="tab-button" data-tab="keying" id="tab-button-keying" role="tab"
+          aria-controls="tab-keying" aria-selected="false" tabindex="-1">⌨ 打鍵</button>
       </div>
 
       <fieldset class="notation-control">
@@ -48,6 +52,25 @@
         <label><input type="radio" name="notation" value="ja" checked>・−</label>
         <label><input type="radio" name="notation" value="ascii">.-</label>
       </fieldset>
+      <p id="shareStatus" role="status"></p>
+
+      <div class="tab-content" id="tab-keying" role="tabpanel" aria-labelledby="tab-button-keying" hidden>
+        <h2>⌨ 打鍵で覚える</h2>
+        <p>キーを押すかSpaceを押して打ちます。短く押すとドット、長く押すとダッシュです。</p>
+        <label for="keying-wpm">打鍵の速さ（WPM）</label>
+        <select id="keying-wpm"><option>5</option><option>8</option><option selected>10</option><option>12</option><option>15</option><option>20</option></select>
+        <label class="check-control"><input type="checkbox" id="keying-sidetone" checked>側音</label>
+        <p>音量・周波数・音のオン／オフは再生タブの設定と共通です。</p>
+        <button type="button" id="keyButton" aria-label="キー（押している間が信号）">キー／Space</button>
+        <p>確定待ち <output id="keyingPending"></output></p>
+        <p>符号 <output id="keyingMorse"></output></p>
+        <p>文字 <output id="keyingText" aria-live="polite"></output></p>
+        <p>押した長さ（直近10回、中央の線は2unitの境界）</p>
+        <div id="keyingBars" class="keying-bars"></div>
+        <button type="button" id="keyingClear">クリア</button>
+        <button type="button" id="keyingToDecode" disabled>デコードへ送る</button>
+        <div class="tree-scroll-wrapper"><div id="tree-container-keying"></div></div>
+      </div>
 
       <!-- タブ1：エンコード -->
       <div class="tab-content active" id="tab-encode" role="tabpanel"
@@ -61,14 +84,17 @@
           <div id="encodeError" class="error-message" role="alert"></div>
         </section>
         <div id="morseResult"></div>
+        <button type="button" id="encodeShare" disabled>共有URLをコピー</button>
         <div class="playback" id="encode-playback">
           <button type="button" data-action="play">▶ 再生</button>
           <button type="button" data-action="pause">⏸ 一時停止</button>
           <button type="button" data-action="stop">■ 停止</button>
           <button type="button" data-action="previous" aria-label="前の符号">◀</button>
           <button type="button" data-action="next" aria-label="次の符号">▶</button>
-          <label for="encode-wpm">WPM</label>
-          <select id="encode-wpm"><option>5</option><option selected>10</option><option>15</option><option>20</option></select>
+          <label for="encode-char-wpm">文字速度（WPM）</label>
+          <select id="encode-char-wpm" data-setting="charWpm">
+            <option>5</option><option>10</option><option>12</option><option selected>15</option><option>18</option><option>20</option><option>25</option>
+          </select>
         </div>
         <p class="tree-legend">点灯＝経路、破線の丸＝空き、黄色の破線＝慣用符号</p>
         <div class="tree-scroll-wrapper">
@@ -99,14 +125,17 @@
           <p class="input-hint">使用可能文字：・（ドット）、−（ダッシュ）、スペース（文字区切り）、/（単語区切り）</p>
         </section>
         <div id="decodeResult"></div>
+        <button type="button" id="decodeShare" disabled>共有URLをコピー</button>
         <div class="playback" id="decode-playback">
           <button type="button" data-action="play">▶ 再生</button>
           <button type="button" data-action="pause">⏸ 一時停止</button>
           <button type="button" data-action="stop">■ 停止</button>
           <button type="button" data-action="previous" aria-label="前の符号">◀</button>
           <button type="button" data-action="next" aria-label="次の符号">▶</button>
-          <label for="decode-wpm">WPM</label>
-          <select id="decode-wpm"><option>5</option><option selected>10</option><option>15</option><option>20</option></select>
+          <label for="decode-char-wpm">文字速度（WPM）</label>
+          <select id="decode-char-wpm" data-setting="charWpm">
+            <option>5</option><option>10</option><option>12</option><option selected>15</option><option>18</option><option>20</option><option>25</option>
+          </select>
         </div>
         <p class="tree-legend">点灯＝経路、破線の丸＝空き、黄色の破線＝慣用符号</p>
         <div class="tree-scroll-wrapper">
@@ -137,7 +166,17 @@
             <!-- JSで埋め込み -->
           </select>
           <div id="studyResultManual"></div>
-          <button type="button" id="studyPlay">▶ 再生</button>
+          <div class="playback" id="study-playback">
+            <button type="button" id="studyPlay" data-action="play">▶ 再生</button>
+            <button type="button" data-action="pause">⏸ 一時停止</button>
+            <button type="button" data-action="stop">■ 停止</button>
+            <button type="button" data-action="previous" aria-label="前の符号">◀</button>
+            <button type="button" data-action="next" aria-label="次の符号">▶</button>
+            <label for="study-char-wpm">文字速度（WPM）</label>
+            <select id="study-char-wpm" data-setting="charWpm">
+              <option>5</option><option>10</option><option>12</option><option selected>15</option><option>18</option><option>20</option><option>25</option>
+            </select>
+          </div>
         </div>
 
         <!-- 🟢 ランダム出題モード -->
@@ -182,6 +221,7 @@
         aria-labelledby="tab-button-table" hidden>
   <section>
     <h2>モールス信号 一覧表</h2>
+    <button type="button" id="printTable">🖨 印刷（PDFに保存）</button>
     <div class="morse-table-wrapper">
       <!-- グループ表示は JSでここに挿入 -->
     </div>
@@ -200,13 +240,13 @@
             バイナリツリー構造で符号化プロセスを可視化し、効率的な学習をサポートします。
           </p>
 
-          <h3>🎯 4つの主要機能</h3>
+          <h3>🎯 5つの主要機能</h3>
 
           <h4>📝 英語 ⇒ モールス変換</h4>
           <ul>
             <li>英語テキストを入力してモールス信号に変換</li>
             <li>変換結果をワンクリックでクリップボードにコピー</li>
-            <li>ITUの時間比で1符号ずつ再生。WPMは5／10／15／20から選択</li>
+            <li>文字速度は5／10／12／15／18／20／25WPM。全体速度を下げるとFarnsworth方式で文字間・語間が延びます</li>
             <li>WPMは数値が小さいほどゆっくり、大きいほど速く再生します。20 WPMは10 WPMの2倍の速さです。</li>
             <li>木の経路をゆっくり確認したいときは、5 WPMから試してください。変更後は「再生」で最初から再生します。</li>
             <li>WPMの隣の「?」は、マウスを重ねる・タップ・キーボードのフォーカスで説明を表示します。Escで閉じられます。</li>
@@ -231,9 +271,23 @@
           <h4>📊 モールス信号一覧表</h4>
           <ul>
             <li>英字27・数字10・記号18の55文字（ITU 50・慣用5）</li>
+            <li>手続き符号9件（ITU 8・慣用1）を加えた64行を印刷可能</li>
             <li>ITUと慣用符号（! &amp; ; _ $）はバッジと線種で区別</li>
             <li>横スクロール対応でモバイルでも快適</li>
           </ul>
+
+          <h4>⌨ 打鍵</h4>
+          <p>キーのボタンかSpaceキーを短く押すとドット、長く押すとダッシュです。入力欄やセレクト上のSpaceは打鍵に使いません。</p>
+          <p>1unitの2倍がドットとダッシュの境界です。離して2unit後に確定待ちを表示し、5unit後に文字、10unit後に語の区切りを確定します。</p>
+          <p>文字確定時に木は消灯します。「デコードへ送る」で入力した符号を移せます。側音は音量・周波数・音のオン／オフを再生設定と共有します。</p>
+
+          <h3>📡 手続き符号と共有</h3>
+          <p>&lt;AR&gt;や&lt;SK&gt;の形で入力できます。木の「手続き符号を表示」で別名を確認できます。HHとSOSは木の外で、SOSは慣用です。</p>
+          <p>共有URLには入力した平文・符号が含まれます。共有したい場合だけ使ってください。上限は1,000字です。</p>
+
+          <h3>🔊 音・速度・ランプ</h3>
+          <p>文字速度は符号自体の速さ、全体速度は文字間・語間を含む速さです。全体速度を下げると、考える間隔を長くできます。</p>
+          <p>音は再生操作のあとに開始します。ランプは既定でオフです。WCAG 2.3.1の点滅への配慮として40px角に抑え、動きを減らす設定では表示しません。</p>
 
           <h3>🌳 モールスツリーの見方</h3>
           <ul>
@@ -261,6 +315,9 @@
             <li>エラーメッセージで入力ミスを素早く確認</li>
           </ul>
 
+          <h3>🎨 配色と印刷</h3>
+          <p>ヘッダーの配色ボタンはライト→ダーク→システム連動の順に切り替わります。一覧表の印刷ボタンから、ブラウザーの印刷ダイアログで「PDFに保存」を選べます。</p>
+
           <h3>📱 動作環境</h3>
           <p>
             モダンブラウザー（Chrome、Firefox、Safari、Edge）で動作します。<br>
@@ -271,6 +328,7 @@
     </div>
 
     </main>
+    <section id="printSheet" hidden aria-label="印刷用の符号表"></section>
 
     <!-- フッター -->
     <footer>

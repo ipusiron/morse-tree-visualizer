@@ -24,6 +24,21 @@ export const MORSE_TABLE = [
 ];
 export const CHAR_TO_CODE = new Map(MORSE_TABLE.map(({ char, code }) => [char, code]));
 export const CODE_TO_CHAR = new Map(MORSE_TABLE.map(({ char, code }) => [code, char]));
+export const PROSIGNS = [
+  ['AR', '.-.-.', 'Cross / End of message', '+'],
+  ['SK', '...-.-', 'End of work'],
+  ['BT', '-...-', 'Double hyphen / Separator', '='],
+  ['KA', '-.-.-', 'Starting signal'],
+  ['SN', '...-.', 'Understood'],
+  ['HH', '........', 'Error (eight dots)'],
+  ['K', '-.-', 'Invitation to transmit', 'K'],
+  ['AS', '.-...', 'Wait', '&'],
+  ['SOS', '...---...', 'Distress signal (customary as one sign)']
+].map(([label, code, name, sameAs]) => ({
+  label, code, name, ja: 'prosign.' + label, itu: label !== 'SOS', ...(sameAs ? { sameAs } : {})
+}));
+export const PROSIGN_BY_LABEL = new Map(PROSIGNS.map(p => [p.label, p]));
+export const PROSIGN_BY_CODE = new Map(PROSIGNS.map(p => [p.code, p]));
 export const NOTATIONS = {
   ja: { dot: '\u30fb', dash: '\u2212', letterGap: ' ', wordGap: ' / ' },
   ascii: { dot: '.', dash: '-', letterGap: ' ', wordGap: ' / ' }

@@ -1,9 +1,9 @@
-import { MORSE_TABLE, formatCode } from './morseMap.js';
+import { MORSE_TABLE, PROSIGNS, formatCode } from './morseMap.js';
 import { pathFor, normalizeMorse, timeline } from './morseCodec.js';
 import { createTreeView } from './treeRenderer.js';
 import { createAnimator } from './animator.js';
 import { t } from './messages.js';
-import { el, settings } from './utils.js';
+import { el, settings, bindPlayback } from './utils.js';
 import { bindTabKeys } from './script.js';
 
 export function initStudyMode() {
@@ -36,6 +36,7 @@ export function initStudyMode() {
   // 文字確認。文字表と同じ順を保つ。
   const select = document.getElementById('manualCharSelect');
   const resultManual = document.getElementById('studyResultManual');
+  const manualEntries = [...MORSE_TABLE, ...PROSIGNS.map(p => ({ ...p, char: `<${p.label}>` }))];
   for (const [key, predicate] of [
     ['group.letter', e => e.kind === 'letter'], ['group.digit', e => e.kind === 'digit'],
     ['group.itu', e => e.kind === 'punct' && e.itu], ['group.custom', e => !e.itu]
@@ -44,10 +45,13 @@ export function initStudyMode() {
     MORSE_TABLE.filter(predicate).forEach(e => group.append(el('option', { value: e.char }, e.char)));
     select.append(group);
   }
+  const prosignGroup = el('optgroup', { label: t('group.prosign') });
+  PROSIGNS.forEach(p => prosignGroup.append(el('option', { value: `<${p.label}>` }, `<${p.label}>`)));
+  select.append(prosignGroup);
   function showManual() {
     animator.stop();
     resultManual.replaceChildren();
-    const entry = MORSE_TABLE.find(e => e.char === select.value);
+    const entry = manualEntries.find(e => e.char === select.value);
     if (!entry) return;
     view.highlight(entry.code);
     view.scrollToCode(entry.code);
@@ -59,10 +63,7 @@ export function initStudyMode() {
     if (entry.code.length > 6) resultManual.append(el('p', {}, t('tree.outside', { n: entry.code.length })));
   }
   select.addEventListener('change', showManual);
-  document.getElementById('studyPlay').addEventListener('click', () => {
-    const entry = MORSE_TABLE.find(e => e.char === select.value);
-    if (entry) animator.play(timeline(entry.code, settings.wpm).events);
-  });
+  bindPlayback(document.getElementById('study-playback'), animator, () => manualEntries.find(e => e.char === select.value)?.code || '');
 
   // セッション内のランダム出題と成績。
   const randomBtn = document.getElementById('randomQuizBtn');
