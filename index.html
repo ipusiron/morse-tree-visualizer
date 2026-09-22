@@ -41,6 +41,8 @@
           aria-controls="tab-table" aria-selected="false" tabindex="-1">
           <span class="tab-long">モールス信号一覧表</span><span class="tab-short">一覧表</span>
         </button>
+        <button class="tab-button" data-tab="keying" id="tab-button-keying" role="tab"
+          aria-controls="tab-keying" aria-selected="false" tabindex="-1">⌨ 打鍵</button>
       </div>
 
       <fieldset class="notation-control">
@@ -48,6 +50,24 @@
         <label><input type="radio" name="notation" value="ja" checked>・−</label>
         <label><input type="radio" name="notation" value="ascii">.-</label>
       </fieldset>
+
+      <div class="tab-content" id="tab-keying" role="tabpanel" aria-labelledby="tab-button-keying" hidden>
+        <h2>⌨ 打鍵で覚える</h2>
+        <p>キーを押すかSpaceを押して打ちます。短く押すとドット、長く押すとダッシュです。</p>
+        <label for="keying-wpm">打鍵の速さ（WPM）</label>
+        <select id="keying-wpm"><option>5</option><option>8</option><option selected>10</option><option>12</option><option>15</option><option>20</option></select>
+        <label class="check-control"><input type="checkbox" id="keying-sidetone" checked>側音</label>
+        <p>音量・周波数・音のオン／オフは再生タブの設定と共通です。</p>
+        <button type="button" id="keyButton" aria-label="キー（押している間が信号）">キー／Space</button>
+        <p>確定待ち <output id="keyingPending"></output></p>
+        <p>符号 <output id="keyingMorse"></output></p>
+        <p>文字 <output id="keyingText" aria-live="polite"></output></p>
+        <p>押した長さ（直近10回、中央の線は2unitの境界）</p>
+        <div id="keyingBars" class="keying-bars"></div>
+        <button type="button" id="keyingClear">クリア</button>
+        <button type="button" id="keyingToDecode" disabled>デコードへ送る</button>
+        <div class="tree-scroll-wrapper"><div id="tree-container-keying"></div></div>
+      </div>
 
       <!-- タブ1：エンコード -->
       <div class="tab-content active" id="tab-encode" role="tabpanel"

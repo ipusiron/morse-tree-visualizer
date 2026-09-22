@@ -1,4 +1,5 @@
 export const MESSAGES = {
+  'keying.duration': '押した長さ {ms}ms（2unitでドットとダッシュを区別）',
   'audio.sound': '🔊 音',
   'audio.volume': '音量（%）',
   'audio.frequency': '周波数（Hz）',

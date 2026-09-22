@@ -1,5 +1,6 @@
 import { initStudyMode } from './study.js';
 import { initMorseTable } from './table.js';
+import { initKeying } from './keying.js';
 
 import { initEncodeTab } from './encode.js';
 import { initDecodeTab } from './decode.js';
@@ -8,6 +9,7 @@ let tableInitialized = false;
 let studyInitialized = false;
 let encodeInitialized = false;
 let decodeInitialized = false;
+let keyingInitialized = false;
 
 document.addEventListener('DOMContentLoaded', () => {
   const tabButtons = document.querySelectorAll('.tab-button');
@@ -62,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-function switchTab(tabId) {
+export function switchTab(tabId) {
   document.dispatchEvent(new Event('tab-switch'));
   const tabButtons = document.querySelectorAll('.tab-button');
   const tabContents = document.querySelectorAll('.tab-content');
@@ -84,7 +86,10 @@ function switchTab(tabId) {
   if (targetTab) targetTab.classList.add('active');
   if (activeButton) activeButton.classList.add('active');
 
-  if (tabId === 'table' && !tableInitialized) {
+  if (tabId === 'keying' && !keyingInitialized) {
+    initKeying();
+    keyingInitialized = true;
+  } else if (tabId === 'table' && !tableInitialized) {
     initMorseTable();
     tableInitialized = true;
   } else if (tabId === 'study') {

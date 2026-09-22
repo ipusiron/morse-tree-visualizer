@@ -279,6 +279,7 @@ morse-tree-visualizer/              # モールス符号を木の経路として
 │   ├── audio.js                    # Web Audioの音の予約と打鍵側音
 │   ├── decode.js                   # 復号と入力支援・リアルタイム追従
 │   ├── encode.js                   # 英文の変換と結果・コピー・再生
+│   ├── keying.js                   # 押し離しから符号と文字を確定する打鍵タブ
 │   ├── messages.js                 # 動的な画面文言の日本語辞書
 │   ├── morseCodec.js               # 入力正規化・変換・経路・ITUタイミング
 │   ├── morseMap.js                 # 55文字の定義とASCII・日本語表記

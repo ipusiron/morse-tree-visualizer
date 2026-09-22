@@ -52,6 +52,51 @@
   min-width: 0;
 }
 
+#keyButton {
+  min-width: 120px;
+  min-height: 72px;
+  touch-action: none;
+  user-select: none;
+}
+
+#keyButton.is-down {
+  background: var(--primary-dark);
+}
+
+#tab-keying output {
+  overflow-wrap: anywhere;
+}
+
+.keying-bars {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-block: 1rem;
+}
+
+.press-bar {
+  position: relative;
+  width: 100px;
+}
+
+.press-bar::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  height: 100%;
+  border-left: 2px solid var(--text);
+}
+
+.press-bar meter {
+  width: 100%;
+  height: 24px;
+}
+
+.keying-invalid {
+  color: var(--error);
+  text-decoration: underline;
+}
+
 .audio-controls input[type="range"] {
   max-width: 100%;
   min-height: 44px;
