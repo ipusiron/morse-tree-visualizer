@@ -117,22 +117,39 @@
             <!-- JSで埋め込み -->
           </select>
           <div id="studyResultManual"></div>
+          <button type="button" id="studyPlay">▶ 再生</button>
         </div>
 
         <!-- 🟢 ランダム出題モード -->
         <div id="subtab-random" class="subtab-content">
+          <fieldset>
+            <legend>出題の方向</legend>
+            <label><input type="radio" name="quiz-direction" value="char" checked>符号 → 文字</label>
+            <label><input type="radio" name="quiz-direction" value="code">文字 → 符号</label>
+          </fieldset>
+          <fieldset>
+            <legend>出題範囲</legend>
+            <label><input type="checkbox" name="quiz-scope" value="letter" checked>英字</label>
+            <label><input type="checkbox" name="quiz-scope" value="digit" checked>数字</label>
+            <label><input type="checkbox" name="quiz-scope" value="punct">記号</label>
+          </fieldset>
+          <p id="quizScopeStatus" role="status"></p>
           <button id="randomQuizBtn">ランダム出題</button>
-          <div id="quizContainer" style="display: none;">
-            <p>このモールス符号はどの文字？</p>
+          <div id="quizContainer" hidden>
+            <p id="quizQuestion">この符号の文字を入力してください。</p>
             <div id="quizCode"></div>
-            <input type="text" id="quizAnswer" placeholder="1文字を入力" maxlength="1" />
+            <label for="quizAnswer">回答</label>
+            <input type="text" id="quizAnswer" maxlength="1" autocomplete="off" />
             <button id="checkAnswerBtn">答え合わせ</button>
-            <div id="quizFeedback"></div>
+            <button type="button" id="nextQuizBtn">次の問題</button>
+            <div id="quizFeedback" role="status"></div>
           </div>
+          <p id="quizScore" role="status"></p>
           <div id="studyResultRandom"></div>
         </div>
 
         <!-- モールスツリー共通 -->
+        <p class="tree-legend">点灯＝経路、破線の丸＝空き、黄色の破線＝慣用符号</p>
         <div class="tree-scroll-wrapper">
           <div id="tree-container-study"></div>
         </div>

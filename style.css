@@ -390,7 +390,7 @@ footer {
   flex-wrap: nowrap;
   justify-content: flex-start;
   gap: 1.5rem;
-  overflow-x: scroll;       /* 常に表示 */
+  overflow-x: auto;
   padding: 1rem 0;
   max-width: none;          /* 幅制限を解除 */
 }
@@ -404,7 +404,8 @@ body {
 }
 
 .morse-table-group {
-  flex: 0 0 280px;
+  flex: 1 1 0;
+  min-width: 0;
   vertical-align: top;
   border: 1px solid #ccc;
   border-radius: 6px;
@@ -427,7 +428,7 @@ body {
   padding: 0.3rem 0.5rem;
   border-bottom: 1px solid #eee;
   text-align: center;
-  white-space: nowrap; /* 改行禁止：記号の表示崩れ防止 */
+  overflow-wrap: anywhere;
 }
 
 @media screen and (max-width: 768px) {
@@ -439,7 +440,7 @@ body {
   }
 }
 
-#studyResult {
+#studyResultManual, #studyResultRandom {
   background-color: #ffffff;
   border: 1px solid #ccc;
   border-radius: 6px;
@@ -450,7 +451,7 @@ body {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
 
-#studyResult p {
+#studyResultManual p, #studyResultRandom p {
   margin: 0.5rem 0;
 }
 
@@ -787,4 +788,24 @@ tr.current {
 .clipboard-fallback {
   position: fixed;
   left: -10000px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.3rem;
+  border-radius: 4px;
+}
+.badge.itu {
+  color: #ffffff;
+  background: #1565c0;
+}
+.badge.custom {
+  color: #5d4037;
+  background: #ffe0b2;
+}
+.quiz-correct {
+  color: #1b5e20;
+}
+.quiz-wrong {
+  color: #b71c1c;
 }

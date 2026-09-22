@@ -1,68 +1,37 @@
-import { morseMap } from './morseMap.js';
-
-let alreadyInitialized = false;
+import { MORSE_TABLE, formatCode } from './morseMap.js';
+import { el, settings } from './utils.js';
+import { t } from './messages.js';
 
 export function initMorseTable() {
-  if (alreadyInitialized) return;
-  alreadyInitialized = true;
+  const container = document.getElementById('tab-table');
+  const wrapper = container.querySelector('.morse-table-wrapper');
 
-  const container = document.getElementById("tab-table");
-  if (!container) return;
-
-  const wrapper = container.querySelector(".morse-table-wrapper");
-  if (!wrapper) return;
-
-  // グループ分け
-  const groups = {
-    英字: [],
-    数字: [],
-    記号: []
-  };
-
-  for (const [char, code] of Object.entries(morseMap)) {
-    if (/^[A-Z]$/.test(char)) {
-      groups["英字"].push([char, code]);
-    } else if (/^[0-9]$/.test(char)) {
-      groups["数字"].push([char, code]);
-    } else {
-      groups["記号"].push([char, code]);
+  function render() {
+    wrapper.replaceChildren();
+    // 各グループを文字表の順に描画する。
+    for (const kind of ['letter', 'digit', 'punct']) {
+      const entries = MORSE_TABLE.filter(e => e.kind === kind);
+      const groupDiv = el('div', { class: 'morse-table-group' });
+      const heading = el('h3', {}, t('group.' + kind) + ' (' + entries.length + ')');
+      groupDiv.appendChild(heading);
+      const table = el('table', { class: 'morse-table' });
+      const header = el('tr');
+      for (const key of ['table.char', 'table.code', 'table.kind', 'table.name']) header.append(el('th', { scope: 'col' }, t(key)));
+      table.append(el('thead', {}, header));
+      const tbody = el('tbody');
+      for (const entry of entries) {
+        const row = el('tr', { 'data-char': entry.char });
+        row.append(el('td', {}, entry.char), el('td', {}, formatCode(entry.code, settings.notation)),
+          el('td', {}, el('span', { class: entry.itu ? 'badge itu' : 'badge custom' }, t(entry.itu ? 'table.itu' : 'table.custom'))),
+          el('td', {}, entry.name));
+        if (entry.char === '&') row.lastChild.append(el('p', {}, t('table.wait')));
+        tbody.append(row);
+      }
+      table.append(tbody);
+      groupDiv.append(table);
+      wrapper.append(groupDiv);
     }
   }
-
-  // 並び順を調整（記号はそのまま、英字・数字は昇順）
-  groups["英字"].sort(([a], [b]) => a.localeCompare(b));
-  groups["数字"].sort(([a], [b]) => a.localeCompare(b));
-
-  // 各グループを描画
-  for (const [title, entries] of Object.entries(groups)) {
-    const groupDiv = document.createElement("div");
-    groupDiv.className = "morse-table-group";
-
-    const heading = document.createElement("h3");
-    heading.textContent = title;
-    groupDiv.appendChild(heading);
-
-    const table = document.createElement("table");
-    table.className = "morse-table";
-
-    const tbody = document.createElement("tbody");
-
-    for (const [char, code] of entries) {
-      const row = document.createElement("tr");
-
-      const tdChar = document.createElement("td");
-      tdChar.textContent = char;
-
-      const tdCode = document.createElement("td");
-      tdCode.textContent = code;
-
-      row.appendChild(tdChar);
-      row.appendChild(tdCode);
-      tbody.appendChild(row);
-    }
-
-    table.appendChild(tbody);
-    groupDiv.appendChild(table);
-    wrapper.appendChild(groupDiv);
-  }
+  render();
+  document.addEventListener('notation-change', render);
 }
