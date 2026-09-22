@@ -1,4 +1,11 @@
 export const MESSAGES = {
+  'layout.legend': '木の見た目',
+  'layout.tree': '二分木',
+  'layout.chart': 'チャート',
+  'chart.legend': '丸＝ドット、長方形＝ダッシュ、下＝反対の符号',
+  'chart.dir_dash': '← − ダッシュ',
+  'chart.dir_dot': '・ ドット →',
+  'chart.label': 'モールスのチャート。左はダッシュ側、右はドット側、下は反対の符号です。',
   'theme.label': '配色: {theme}（押すと切り替え）',
   'theme.light': 'ライト',
   'theme.dark': 'ダーク',

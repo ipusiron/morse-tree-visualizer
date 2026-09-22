@@ -389,6 +389,7 @@ morse-tree-visualizer/              # モールス符号を木の経路として
 │   ├── encode.js                   # 英文の変換と結果・コピー・再生
 │   ├── frequency.js                # Day018由来の英字出現頻度
 │   ├── keying.js                   # 押し離しから符号と文字を確定する打鍵タブ
+│   ├── layout.js                   # 木の見た目の保存と4か所の同期
 │   ├── messages.js                 # 動的な画面文言の日本語辞書
 │   ├── morseCodec.js               # 入力正規化・変換・経路・ITUタイミング
 │   ├── morseMap.js                 # 55文字と手続き符号9件の定義・表記

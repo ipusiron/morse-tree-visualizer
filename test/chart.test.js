@@ -2,6 +2,26 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { MORSE_TABLE, PROSIGNS } from '../js/morseMap.js';
 import { buildTree, completeTo, layoutChart } from '../js/morseTree.js';
+import { readLayout, writeLayout } from '../js/layout.js';
+
+test('layout choice accepts only known values and survives blocked storage in the same session', () => {
+  const original = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
+  try {
+    globalThis.localStorage = { getItem: () => 'invalid', setItem() {} };
+    assert.equal(readLayout(), 'tree');
+    globalThis.localStorage.getItem = () => 'chart';
+    assert.equal(readLayout(), 'chart');
+    Object.defineProperty(globalThis, 'localStorage', { configurable: true, get() { throw new Error('blocked'); } });
+    assert.equal(readLayout(), 'tree');
+    writeLayout('chart');
+    assert.equal(readLayout(), 'chart');
+    writeLayout('invalid');
+    assert.equal(readLayout(), 'tree');
+  } finally {
+    if (original) Object.defineProperty(globalThis, 'localStorage', original);
+    else delete globalThis.localStorage;
+  }
+});
 
 const expected = `
 ROOT 0 0 root

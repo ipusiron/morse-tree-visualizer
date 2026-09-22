@@ -69,6 +69,13 @@
         <div id="keyingBars" class="keying-bars"></div>
         <button type="button" id="keyingClear">クリア</button>
         <button type="button" id="keyingToDecode" disabled>デコードへ送る</button>
+        <div class="tree-controls">
+          <fieldset class="layout-control">
+            <legend>木の見た目</legend>
+            <label><input type="radio" name="layout-keying" value="tree" checked><span>二分木</span></label>
+            <label><input type="radio" name="layout-keying" value="chart"><span>チャート</span></label>
+          </fieldset>
+        </div>
         <div class="tree-scroll-wrapper"><div id="tree-container-keying"></div></div>
       </div>
 
@@ -97,6 +104,13 @@
           </select>
         </div>
         <p class="tree-legend">点灯＝経路、破線の丸＝空き、黄色の破線＝慣用符号</p>
+        <div class="tree-controls">
+          <fieldset class="layout-control">
+            <legend>木の見た目</legend>
+            <label><input type="radio" name="layout-encode" value="tree" checked><span>二分木</span></label>
+            <label><input type="radio" name="layout-encode" value="chart"><span>チャート</span></label>
+          </fieldset>
+        </div>
         <div class="tree-scroll-wrapper">
           <div id="tree-container"></div>
         </div>
@@ -138,6 +152,13 @@
           </select>
         </div>
         <p class="tree-legend">点灯＝経路、破線の丸＝空き、黄色の破線＝慣用符号</p>
+        <div class="tree-controls">
+          <fieldset class="layout-control">
+            <legend>木の見た目</legend>
+            <label><input type="radio" name="layout-decode" value="tree" checked><span>二分木</span></label>
+            <label><input type="radio" name="layout-decode" value="chart"><span>チャート</span></label>
+          </fieldset>
+        </div>
         <div class="tree-scroll-wrapper">
           <div id="tree-container-decode"></div>
         </div>
@@ -210,6 +231,13 @@
 
         <!-- モールスツリー共通 -->
         <p class="tree-legend">点灯＝経路、破線の丸＝空き、黄色の破線＝慣用符号</p>
+        <div class="tree-controls">
+          <fieldset class="layout-control">
+            <legend>木の見た目</legend>
+            <label><input type="radio" name="layout-study" value="tree" checked><span>二分木</span></label>
+            <label><input type="radio" name="layout-study" value="chart"><span>チャート</span></label>
+          </fieldset>
+        </div>
         <div class="tree-scroll-wrapper">
           <div id="tree-container-study"></div>
         </div>

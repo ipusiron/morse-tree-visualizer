@@ -2,6 +2,21 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
+test('four independently named layout controls have legends and both modes', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const controls = [...html.matchAll(/<fieldset class="layout-control">([\s\S]*?)<\/fieldset>/g)].map(m => m[1]);
+  assert.equal(controls.length, 4);
+  const names = new Set();
+  for (const control of controls) {
+    assert.match(control, /<legend>木の見た目<\/legend>/);
+    const inputs = [...control.matchAll(/<input type="radio" name="([^"]+)" value="([^"]+)"/g)];
+    assert.deepEqual(inputs.map(m => m[2]), ['tree', 'chart']);
+    assert.equal(inputs[0][1], inputs[1][1]);
+    names.add(inputs[0][1]);
+  }
+  assert.equal(names.size, 4);
+});
+
 test('secure markup, main and nested tabs, dialog and real label targets', () => {
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
   assert.match(html, /http-equiv="Content-Security-Policy"/);

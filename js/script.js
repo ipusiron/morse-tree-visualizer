@@ -4,6 +4,7 @@ import { initKeying } from './keying.js';
 import { parseShare } from './share.js';
 import { t } from './messages.js';
 import { initTheme } from './theme.js';
+import { initLayout } from './layout.js';
 
 import { initEncodeTab } from './encode.js';
 import { initDecodeTab } from './decode.js';
@@ -16,6 +17,7 @@ let keyingInitialized = false;
 
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
+  initLayout();
   const tabButtons = document.querySelectorAll('.tab-button');
 
   switchTab('encode');
