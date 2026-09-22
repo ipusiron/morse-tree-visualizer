@@ -702,13 +702,11 @@ footer {
 
 /* Morse table layout */
 .morse-table-wrapper {
-  display: flex;
-  flex-wrap: nowrap;
-  justify-content: flex-start;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 32rem), 1fr));
+  align-items: start;
   gap: 1.5rem;
-  overflow-x: auto;
   padding: 1rem 0;
-  max-width: none;          /* 幅制限を解除 */
 }
 
 .tab-content#tab-table {
@@ -717,9 +715,8 @@ footer {
 
 
 .morse-table-group {
-  flex: 1 1 0;
   min-width: 0;
-  vertical-align: top;
+  overflow-x: auto;
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 1rem;
@@ -734,27 +731,23 @@ footer {
 
 .morse-table {
   width: 100%;
+  min-width: 28rem;
   border-collapse: collapse;
+}
+
+.morse-table th {
+  white-space: nowrap;
 }
 
 .morse-table td {
   padding: 0.3rem 0.5rem;
   border-bottom: 1px solid var(--row-border);
   text-align: center;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
 }
 
 .morse-table td:nth-child(-n+3), .badge {
   white-space: nowrap;
-}
-
-@media screen and (max-width: 768px) {
-  .morse-table-wrapper {
-    flex-wrap: wrap;
-  }
-  .morse-table-group {
-    flex: 1 1 100%;
-  }
 }
 
 #studyResultManual, #studyResultRandom {

@@ -155,6 +155,7 @@ export function bindPlayback(host, animator, getCanonical, getRows = () => []) {
   const play = host.querySelector('[data-action="play"]');
   const pause = host.querySelector('[data-action="pause"]');
   async function run() {
+    if (host.closest('[hidden]')) return;
     const ticket = ++generation;
     animator.stop();
     paused = false;
@@ -164,7 +165,7 @@ export function bindPlayback(host, animator, getCanonical, getRows = () => []) {
     let charIndex = 0;
     const plan = timeline(getCanonical(), settings);
     const ready = settings.sound && navigator.userActivation.isActive && await audio.ensureContext();
-    if (ticket !== generation) return;
+    if (ticket !== generation || host.closest('[hidden]')) return;
     const tones = plan.events.filter(e => e.on).map(e => ({ startMs: e.startMs, endMs: e.startMs + e.ms, code: e.code }));
     let origin;
     function reserve(offset = 0) {
@@ -193,13 +194,15 @@ export function bindPlayback(host, animator, getCanonical, getRows = () => []) {
     paused = !paused;
     pause.textContent = t(paused ? 'anim.resume' : 'anim.pause');
   });
-  host.querySelector('[data-action="stop"]').addEventListener('click', () => {
+  function stopPlayback() {
     generation++;
     animator.stop();
     paused = false;
     pause.textContent = t('anim.pause');
     getRows().forEach(row => { row.classList.remove('current'); row.removeAttribute('aria-current'); });
-  });
+  }
+  host.querySelector('[data-action="stop"]').addEventListener('click', stopPlayback);
+  document.addEventListener('notation-change', stopPlayback);
   host.querySelector('[data-action="previous"]').addEventListener('click', () => animator.step(-1));
   host.querySelector('[data-action="next"]').addEventListener('click', () => animator.step(1));
   const speed = host.querySelector('[data-setting="charWpm"]');
