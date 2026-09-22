@@ -283,6 +283,7 @@ morse-tree-visualizer/              # モールス符号を木の経路として
 │   ├── morseMap.js                 # 55文字の定義とASCII・日本語表記
 │   ├── morseTree.js                # 文字表から木を生成し座標を決定
 │   ├── script.js                   # 起動・タブ・ヘルプの操作
+│   ├── share.js                    # 共有URLの入力解析と生成
 │   ├── study.js                    # 文字確認・クイズ・成績
 │   ├── table.js                    # ITUと慣用を区別する一覧表
 │   ├── treeRenderer.js             # 木ごとのSVG描画と点灯・追従
@@ -294,8 +295,11 @@ morse-tree-visualizer/              # モールス符号を木の経路として
     ├── contrast.test.js            # 文字と面の4.5:1以上
     ├── format.test.js              # 行長と行数
     ├── html.test.js                # CSP・ARIA・属性とラベル
+    ├── keying.test.js              # 打鍵の時間境界と符号・文字の確定
     ├── messages.test.js            # 辞書と日本語リテラルの集約
+    ├── prosign.test.js             # 手続き符号9件と変換・復号
     ├── readme.test.js              # 表・例・画像・ツリー・YAML
+    ├── share.test.js               # 共有URLの解析と長さ制限
     ├── table.test.js               # 文字表の件数・順序・符号
     ├── timing.test.js              # ITU時間比とPARIS・SOS
     └── tree.test.js                # 75ノード・葉34・座標

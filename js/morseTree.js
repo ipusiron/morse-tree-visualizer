@@ -4,11 +4,11 @@ function node(code) {
   return { code, char: null, depth: code.length, left: null, right: null };
 }
 
-export function buildTree(table = MORSE_TABLE, maxDepth = 6) {
+export function buildTree(table = MORSE_TABLE, maxDepth = 6, prosigns = []) {
   const root = node('');
   const nodes = new Map([['', root]]);
   const outside = [];
-  for (const entry of table) {
+  for (const entry of [...table, ...prosigns]) {
     if (entry.code.length > maxDepth) {
       outside.push(entry);
       continue;
@@ -22,7 +22,8 @@ export function buildTree(table = MORSE_TABLE, maxDepth = 6) {
       }
       current = current[direction];
     }
-    current.char = entry.char;
+    if (entry.char !== undefined) current.char = entry.char;
+    if (entry.label) current.prosign = entry.label;
   }
   return { root, nodes, outside };
 }

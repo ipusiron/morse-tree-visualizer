@@ -43,7 +43,7 @@ for (const [input, canonical, text] of decodings) {
 test('errors, normalization and boundaries', () => {
   assert.deepEqual(encode('A😀B').unsupported, [{ char: '😀', cp: 'U+1F600' }]);
   assert.deepEqual(encode('\u3042').unsupported, [{ char: '\u3042', cp: 'U+3042' }]);
-  for (const code of ['........', '...---...', '.-.-.-.-']) {
+  for (const code of ['.........', '...----...', '.-.-.-.-']) {
     assert.deepEqual(decode(code).invalid, [code]);
   }
   assert.deepEqual(decode('.- .-.-.-.-').invalid, ['.-.-.-.-']);
