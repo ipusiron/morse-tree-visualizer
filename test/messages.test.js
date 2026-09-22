@@ -2,9 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { MESSAGES, t } from '../js/messages.js';
+import { PROSIGNS } from '../js/morseMap.js';
 
 test('dictionary keys, substitution and pure logic source', () => {
   assert.ok(t('error.empty_text'));
+  PROSIGNS.forEach(p => assert.ok(t(p.ja)));
   assert.throws(() => t('missing.key'));
   for (const value of Object.values(MESSAGES)) assert.ok(value.length > 0);
   assert.ok(!t('tree.outside', { n: 7 }).includes('{'));

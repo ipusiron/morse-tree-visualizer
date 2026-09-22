@@ -3,6 +3,7 @@ import { createAnimator } from './animator.js';
 import { encode } from './morseCodec.js';
 import { t } from './messages.js';
 import { settings, bindSettings, describeChars, renderResult, bindPlayback } from './utils.js';
+import { bindShareButton } from './utils.js';
 
 export function initEncodeTab() {
   // モールスツリーを描画
@@ -17,6 +18,7 @@ export function initEncodeTab() {
   let rendered = false;
   const run = bindPlayback(document.getElementById('encode-playback'), animator, () => canonical, () => rows);
   bindSettings();
+  bindShareButton(document.getElementById('encodeShare'), inputText, 'text');
 
   function convert() {
     animator.stop();
@@ -26,7 +28,8 @@ export function initEncodeTab() {
     canonical = '';
     const result = encode(inputText.value, settings.notation);
     if (!result.ok) {
-      errorDiv.textContent = t('error.unsupported_chars', { list: describeChars(result.unsupported) });
+      errorDiv.textContent = result.unknownProsign ? t('prosign.unknown', { label: result.unknownProsign })
+        : t('error.unsupported_chars', { list: describeChars(result.unsupported) });
       return;
     }
     if (!result.items.length) {

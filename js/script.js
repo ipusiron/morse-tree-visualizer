@@ -1,6 +1,8 @@
 import { initStudyMode } from './study.js';
 import { initMorseTable } from './table.js';
 import { initKeying } from './keying.js';
+import { parseShare } from './share.js';
+import { t } from './messages.js';
 
 import { initEncodeTab } from './encode.js';
 import { initDecodeTab } from './decode.js';
@@ -23,6 +25,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
   bindTabKeys(tabButtons);
+  const share = parseShare(location.search);
+  if (share.ok) {
+    const encoded = share.kind === 'text';
+    switchTab(encoded ? 'encode' : 'decode');
+    document.getElementById(encoded ? 'inputText' : 'morseInput').value = share.value;
+    document.getElementById(encoded ? 'startButton' : 'decodeButton').click();
+    document.dispatchEvent(new Event('share-loaded'));
+  } else if (share.errorKey !== 'share.none') document.getElementById('shareStatus').textContent = t(share.errorKey);
 
   // ヘルプモーダル開閉処理
   const helpButton = document.getElementById('helpBtn');

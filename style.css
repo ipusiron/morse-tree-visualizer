@@ -97,6 +97,15 @@
   text-decoration: underline;
 }
 
+.prosign-label {
+  display: none;
+  fill: var(--node-text);
+}
+
+.show-prosigns .prosign-label {
+  display: block;
+}
+
 .audio-controls input[type="range"] {
   max-width: 100%;
   min-height: 44px;

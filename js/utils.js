@@ -1,7 +1,8 @@
-import { MORSE_TABLE, formatCode } from './morseMap.js';
+import { MORSE_TABLE, PROSIGN_BY_LABEL, PROSIGN_BY_CODE, formatCode } from './morseMap.js';
 import { timeline } from './morseCodec.js';
 import { t } from './messages.js';
 import { createMorseAudio } from './audio.js';
+import { formatShare } from './share.js';
 
 export function el(tag, attrs = {}, children = []) {
   const node = document.createElement(tag);
@@ -21,6 +22,18 @@ export function bindSettings() {
 
 export function describeChars(items) {
   return items.map(({ char, cp }) => `${char}(${cp})`).join(', ');
+}
+
+export function bindShareButton(button, input, kind) {
+  const status = document.getElementById('shareStatus');
+  const update = () => { button.disabled = !input.value; };
+  input.addEventListener('input', update);
+  document.addEventListener('share-loaded', update);
+  button.addEventListener('click', () => {
+    if (input.value.length > 1000) { status.textContent = t('share.too_long'); return; }
+    copyText(location.origin + location.pathname + formatShare(kind, input.value), status);
+  });
+  update();
 }
 
 export async function copyText(text, status) {
@@ -60,11 +73,13 @@ export function renderResult(container, words, output, mode) {
   const rows = [];
   words.forEach((word, wi) => {
     if (wi) body.append(el('tr', { class: 'word-gap' }, [el('td', {}, t('table.word_gap')), el('td', { colspan: 3 }, '/')]));
-    word.forEach(({ char, code }) => {
-      const entry = MORSE_TABLE.find(e => e.char === char);
+    word.forEach(({ char, code, prosign }) => {
+      const entry = prosign ? PROSIGN_BY_LABEL.get(prosign) : MORSE_TABLE.find(e => e.char === char);
+      const alias = PROSIGN_BY_CODE.get(code);
+      const note = prosign ? t(entry.ja) : alias ? t('prosign.alias', { label: alias.label }) : '';
       const row = el('tr', { 'data-char': char }, [el('td', {}, char), el('td', {}, formatCode(code, settings.notation)),
-        el('td', {}, t(entry.itu ? 'table.itu' : 'table.custom')),
-        el('td', {}, code.length > 6 ? t('tree.outside', { n: code.length }) : '')]);
+        el('td', {}, t(prosign ? 'group.prosign' : entry.itu ? 'table.itu' : 'table.custom')),
+        el('td', {}, [note, code.length > 6 ? t('tree.outside', { n: code.length }) : ''].filter(Boolean).join(' / '))]);
       if (mode === 'decode') row.prepend(row.children[1]);
       body.append(row);
       rows.push(row);
@@ -148,7 +163,7 @@ export function bindPlayback(host, animator, getCanonical, getRows = () => []) {
     rows.forEach(row => { row.classList.remove('current'); row.removeAttribute('aria-current'); });
     let charIndex = 0;
     const plan = timeline(getCanonical(), settings);
-    const ready = settings.sound && await audio.ensureContext();
+    const ready = settings.sound && navigator.userActivation.isActive && await audio.ensureContext();
     if (ticket !== generation) return;
     const tones = plan.events.filter(e => e.on).map(e => ({ startMs: e.startMs, endMs: e.startMs + e.ms, code: e.code }));
     let origin;
