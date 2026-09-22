@@ -1080,6 +1080,66 @@ svg:not(.show-prosigns) .chart-prosign {
   line-height: 1.5;
 }
 
+.trivia-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.trivia-filters .chip {
+  margin: 0;
+  min-height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 1.5rem;
+  background: var(--surface);
+  color: var(--text);
+}
+.trivia-filters .chip[aria-pressed="true"] {
+  background: var(--primary);
+  color: var(--on-primary);
+  border-color: var(--primary);
+}
+.trivia-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+.trivia-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--surface);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.trivia-card[hidden] {
+  display: none;
+}
+.trivia-card h3, .trivia-card p {
+  margin: 0;
+}
+.trivia-field, .trivia-source {
+  font-size: 0.875rem;
+}
+.trivia-source a {
+  color: var(--link);
+}
+.trivia-try {
+  align-self: start;
+  min-height: 44px;
+  margin: 0;
+}
+@media (min-width: 768px) {
+  .trivia-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .playback {
   position: relative;
   display: flex;

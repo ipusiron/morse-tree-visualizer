@@ -62,6 +62,7 @@ export function initDecodeTab() {
     if (autoplay) run();
   }
   decodeButton.addEventListener('click', () => convert());
+  decodeButton.addEventListener('convert-input', () => convert(false));
   morseInput.addEventListener('keydown', event => {
     if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
       event.preventDefault();

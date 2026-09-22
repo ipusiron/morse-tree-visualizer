@@ -28,12 +28,16 @@ test('secure markup, main and nested tabs, dialog and real label targets', () =>
     assert.ok(html.includes(`id="${id}"`));
   }
   assert.deepEqual([...html.matchAll(/<script[^>]*>/g)].map(m => m[0]), ['<script type="module" src="js/script.js">']);
-  // Five main tabs plus two nested study tabs.
+  // Six main tabs plus two nested study tabs.
   assert.equal([...html.matchAll(/role="tablist"/g)].length, 2);
-  assert.equal([...html.matchAll(/class="tab-button[^>]+role="tab"/g)].length, 5);
-  assert.equal([...html.matchAll(/class="tab-content[^>]+role="tabpanel"/g)].length, 5);
-  assert.equal([...html.matchAll(/role="tab"/g)].length, 7);
-  assert.equal([...html.matchAll(/role="tabpanel"/g)].length, 7);
+  assert.equal([...html.matchAll(/class="tab-button[^>]+role="tab"/g)].length, 6);
+  assert.equal([...html.matchAll(/class="tab-content[^>]+role="tabpanel"/g)].length, 6);
+  assert.equal([...html.matchAll(/role="tab"/g)].length, 8);
+  assert.equal([...html.matchAll(/role="tabpanel"/g)].length, 8);
+  const trivia = html.slice(html.indexOf('id="tab-trivia"'), html.indexOf('<!-- ヘルプモーダル -->'));
+  assert.match(trivia, /role="tabpanel" aria-labelledby="tab-button-trivia"/);
+  assert.equal([...trivia.matchAll(/class="chip"[^>]+aria-pressed="(?:true|false)"/g)].length, 8);
+  assert.match(trivia, /id="triviaCount" aria-live="polite"/);
   assert.match(html, /id="helpModal"[^>]+role="dialog"[^>]+aria-modal="true"/);
   const ids = new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(m => m[1]));
   for (const match of html.matchAll(/\bfor="([^"]+)"/g)) assert.ok(ids.has(match[1]), match[1]);

@@ -45,6 +45,8 @@
         </button>
         <button class="tab-button" data-tab="keying" id="tab-button-keying" role="tab"
           aria-controls="tab-keying" aria-selected="false" tabindex="-1">⌨ 打鍵</button>
+        <button class="tab-button" data-tab="trivia" id="tab-button-trivia" role="tab"
+          aria-controls="tab-trivia" aria-selected="false" tabindex="-1" data-message="trivia.tab">🔍 雑学</button>
       </div>
 
       <fieldset class="notation-control">
@@ -256,6 +258,23 @@
   </section>
 </div>
 
+    <div class="tab-content" id="tab-trivia" role="tabpanel" aria-labelledby="tab-button-trivia" hidden>
+      <h2 data-message="trivia.heading">🔍 雑学 — 他の分野とのつながり</h2>
+      <p data-message="trivia.description">出所つき。数値はこのツールが実行時に計算しています。</p>
+      <div class="trivia-filters" role="group" aria-label="分野の絞り込み">
+        <button type="button" class="chip" data-field="all" aria-pressed="true" data-message="trivia.all">すべて</button>
+        <button type="button" class="chip" data-field="math" aria-pressed="false" data-message="trivia.math">数学</button>
+        <button type="button" class="chip" data-field="code" aria-pressed="false" data-message="trivia.code">符号・情報</button>
+        <button type="button" class="chip" data-field="crypto" aria-pressed="false" data-message="trivia.crypto">暗号</button>
+        <button type="button" class="chip" data-field="computer" aria-pressed="false" data-message="trivia.computer">コンピューター</button>
+        <button type="button" class="chip" data-field="network" aria-pressed="false" data-message="trivia.network">ネットワーク・通信</button>
+        <button type="button" class="chip" data-field="history" aria-pressed="false" data-message="trivia.history">歴史</button>
+        <button type="button" class="chip" data-field="survival" aria-pressed="false" data-message="trivia.survival">サバイバル</button>
+      </div>
+      <p id="triviaCount" aria-live="polite" role="status"></p>
+      <div class="trivia-grid"></div>
+    </div>
+
     <!-- ヘルプモーダル -->
     <div id="helpModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="helpTitle" hidden>
       <div class="modal-content">
@@ -268,7 +287,7 @@
             バイナリツリー構造で符号化プロセスを可視化し、効率的な学習をサポートします。
           </p>
 
-          <h3>🎯 5つの主要機能</h3>
+          <h3>🎯 6つの主要機能</h3>
 
           <h4>📝 英語 ⇒ モールス変換</h4>
           <ul>
@@ -308,6 +327,10 @@
           <p>キーのボタンかSpaceキーを短く押すとドット、長く押すとダッシュです。入力欄やセレクト上のSpaceは打鍵に使いません。</p>
           <p>1unitの2倍がドットとダッシュの境界です。離して2unit後に確定待ちを表示し、5unit後に文字、10unit後に語の区切りを確定します。</p>
           <p>文字確定時に木は消灯します。「デコードへ送る」で入力した符号を移せます。側音は音量・周波数・音のオン／オフを再生設定と共有します。</p>
+
+          <h4>🔍 雑学</h4>
+          <p>数学・符号・暗号など7分野の16枚のカードを、分野のボタンで絞り込めます。各カードの「出所」から資料を開けます。</p>
+          <p>平均符号長や組み合わせの数は、文字表と文字頻度から実行時に計算します。「ツールで試す」は入力と変換まで行い、再生は始めません。</p>
 
           <h3>📡 手続き符号と共有</h3>
           <p>&lt;AR&gt;や&lt;SK&gt;の形で入力できます。木の「手続き符号を表示」で別名を確認できます。HHとSOSは木の外で、SOSは慣用です。</p>

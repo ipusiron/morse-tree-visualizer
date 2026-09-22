@@ -4,7 +4,9 @@ import { initKeying } from './keying.js';
 import { parseShare } from './share.js';
 import { t } from './messages.js';
 import { initTheme } from './theme.js';
-import { initLayout } from './layout.js';
+import { initLayout, changeLayout } from './layout.js';
+import { TRIVIA_CARDS, formatTrivia, fillTriviaBody } from './trivia.js';
+import { el, settings } from './utils.js';
 
 import { initEncodeTab } from './encode.js';
 import { initDecodeTab } from './decode.js';
@@ -14,10 +16,12 @@ let studyInitialized = false;
 let encodeInitialized = false;
 let decodeInitialized = false;
 let keyingInitialized = false;
+let triviaInitialized = false;
 
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   initLayout();
+  document.querySelectorAll('[data-message]').forEach(node => { node.textContent = t(node.dataset.message); });
   const tabButtons = document.querySelectorAll('.tab-button');
 
   switchTab('encode');
@@ -31,11 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
   bindTabKeys(tabButtons);
   const share = parseShare(location.search);
   if (share.ok) {
-    const encoded = share.kind === 'text';
-    switchTab(encoded ? 'encode' : 'decode');
-    document.getElementById(encoded ? 'inputText' : 'morseInput').value = share.value;
-    document.getElementById(encoded ? 'startButton' : 'decodeButton').click();
-    document.dispatchEvent(new Event('share-loaded'));
+    applyInput(share.kind, share.value);
   } else if (share.errorKey !== 'share.none') document.getElementById('shareStatus').textContent = t(share.errorKey);
 
   // ヘルプモーダル開閉処理
@@ -100,7 +100,10 @@ export function switchTab(tabId) {
   if (targetTab) targetTab.classList.add('active');
   if (activeButton) activeButton.classList.add('active');
 
-  if (tabId === 'keying' && !keyingInitialized) {
+  if (tabId === 'trivia' && !triviaInitialized) {
+    initTriviaTab();
+    triviaInitialized = true;
+  } else if (tabId === 'keying' && !keyingInitialized) {
     initKeying();
     keyingInitialized = true;
   } else if (tabId === 'table' && !tableInitialized) {
@@ -123,6 +126,60 @@ export function switchTab(tabId) {
       decodeInitialized = true;
     }
   }
+}
+
+function applyInput(kind, value) {
+  const encoded = kind === 'text';
+  switchTab(encoded ? 'encode' : 'decode');
+  document.getElementById(encoded ? 'inputText' : 'morseInput').value = value;
+  document.getElementById(encoded ? 'startButton' : 'decodeButton').dispatchEvent(new Event('convert-input'));
+  document.dispatchEvent(new Event('share-loaded'));
+}
+
+function tryTrivia(action) {
+  if (action.layout) changeLayout(action.layout);
+  if (action.lamp && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    settings.lamp = true;
+    document.dispatchEvent(new Event('playback-settings'));
+  }
+  if (action.text !== undefined) applyInput('text', action.text);
+  else if (action.morse !== undefined) applyInput('morse', action.morse);
+  else switchTab(action.tab);
+  document.getElementById('tab-button-' + action.tab).focus();
+}
+
+function initTriviaTab() {
+  const panel = document.getElementById('tab-trivia');
+  const grid = panel.querySelector('.trivia-grid');
+  const count = document.getElementById('triviaCount');
+  const values = formatTrivia();
+  const cards = TRIVIA_CARDS.map(card => {
+    const article = el('article', { class: 'trivia-card', 'data-field': card.field, 'data-id': card.id }, [
+      el('span', { class: 'trivia-field' }, t('trivia.' + card.field)), el('h3', {}, card.title),
+      ...fillTriviaBody(card, values).map(paragraph => el('p', {}, paragraph))
+    ]);
+    const source = el('p', { class: 'trivia-source' }, t('trivia.source'));
+    [card.source, card.source.secondary].filter(Boolean).forEach((entry, index) => {
+      if (index) source.append(document.createTextNode(' / '));
+      source.append(el('a', { href: entry.url, target: '_blank', rel: 'noopener noreferrer' }, entry.label));
+    });
+    article.append(source);
+    if (card.action) {
+      const button = el('button', { type: 'button', class: 'trivia-try' }, t('trivia.try'));
+      button.addEventListener('click', () => tryTrivia(card.action));
+      article.append(button);
+    }
+    grid.append(article);
+    return article;
+  });
+  const chips = [...panel.querySelectorAll('.chip')];
+  function filter(field) {
+    for (const chip of chips) chip.setAttribute('aria-pressed', String(chip.dataset.field === field));
+    for (const article of cards) article.hidden = field !== 'all' && article.dataset.field !== field;
+    count.textContent = t('trivia.count', { field: t('trivia.' + field), count: cards.filter(card => !card.hidden).length });
+  }
+  chips.forEach(chip => chip.addEventListener('click', () => filter(chip.dataset.field)));
+  filter('all');
 }
 
 // 同じキーボード規則をメインタブとサブタブに適用する。
