@@ -30,3 +30,22 @@ test('secure markup, main and nested tabs, dialog and real label targets', () =>
   const workflow = readFileSync(new URL('../.github/workflows/test.yml', import.meta.url), 'utf8');
   for (const pattern of [/push/, /pull_request/, /node-version: 22/, /npm test/]) assert.match(workflow, pattern);
 });
+
+test('conversion forms share a stacked layout and tree border belongs to the scroll viewport', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const css = readFileSync(new URL('../style.css', import.meta.url), 'utf8');
+  const forms = [...html.matchAll(/<div class="input-with-button">([\s\S]*?)<\/div>/g)].map(m => m[1]);
+  assert.equal(forms.length, 2);
+  for (const [i, id] of ['inputText', 'morseInput'].entries()) {
+    assert.ok(forms[i].indexOf('<label') < forms[i].indexOf('<textarea'));
+    assert.ok(forms[i].indexOf('<textarea') < forms[i].indexOf('<button'));
+    assert.ok(forms[i].includes(`id="${id}"`));
+  }
+  const box = css.match(/\.tree-box\s*\{([^}]+)\}/)[1];
+  const wrapper = css.match(/\.tree-scroll-wrapper\s*\{([^}]+)\}/)[1];
+  assert.doesNotMatch(box, /border:/);
+  assert.match(box, /width: 1080px/);
+  assert.match(box, /margin-inline: auto/);
+  assert.match(wrapper, /border: 1px solid/);
+  assert.match(wrapper, /overflow-x: auto/);
+});

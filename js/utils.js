@@ -75,6 +75,42 @@ export function renderResult(container, words, output, mode) {
   return rows;
 }
 
+function bindSpeedHelp(host, speed) {
+  const id = speed.id + '-help';
+  const button = el('button', { type: 'button', class: 'wpm-help-button',
+    'aria-label': t('wpm.help_label'), 'aria-describedby': id, 'aria-controls': id, 'aria-expanded': 'false' }, '?');
+  const tooltip = el('span', { id, class: 'wpm-tooltip', role: 'tooltip', hidden: '' }, [
+    el('strong', {}, t('wpm.help_title')),
+    ...['wpm.help_speed', 'wpm.help_example', 'wpm.help_start', 'wpm.help_apply'].map(key => el('span', {}, t(key)))
+  ]);
+  const wrapper = el('span', { class: 'wpm-help' }, [button, tooltip]);
+  const control = el('span', { class: 'wpm-control' });
+  const label = host.querySelector(`label[for="${speed.id}"]`);
+  label.before(control);
+  control.append(label, wrapper, speed);
+  let pinned = false;
+  function show(visible) {
+    tooltip.hidden = !visible;
+    button.setAttribute('aria-expanded', String(visible));
+  }
+  wrapper.addEventListener('pointerenter', event => {
+    if (event.pointerType === 'mouse') show(true);
+  });
+  wrapper.addEventListener('pointerleave', () => {
+    if (!pinned && document.activeElement !== button) show(false);
+  });
+  button.addEventListener('focus', () => show(true));
+  button.addEventListener('blur', () => { pinned = false; show(false); });
+  button.addEventListener('click', () => { pinned = !pinned; show(pinned); });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') { pinned = false; show(false); }
+  });
+  document.addEventListener('pointerdown', event => {
+    if (!wrapper.contains(event.target)) { pinned = false; show(false); }
+  });
+  document.addEventListener('tab-switch', () => { pinned = false; show(false); });
+}
+
 export function bindPlayback(host, animator, getCanonical, getRows = () => []) {
   let paused = false;
   const play = host.querySelector('[data-action="play"]');
@@ -110,6 +146,7 @@ export function bindPlayback(host, animator, getCanonical, getRows = () => []) {
   host.querySelector('[data-action="previous"]').addEventListener('click', () => animator.step(-1));
   host.querySelector('[data-action="next"]').addEventListener('click', () => animator.step(1));
   const speed = host.querySelector('select');
+  bindSpeedHelp(host, speed);
   speed.value = settings.wpm;
   speed.addEventListener('change', () => {
     settings.wpm = Number(speed.value);
