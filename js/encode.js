@@ -20,7 +20,7 @@ export function initEncodeTab() {
   bindSettings();
   bindShareButton(document.getElementById('encodeShare'), inputText, 'text');
 
-  function convert() {
+  function convert(autoplay = true) {
     animator.stop();
     rendered = true;
     errorDiv.textContent = '';
@@ -38,8 +38,8 @@ export function initEncodeTab() {
     }
     canonical = encode(inputText.value, 'ascii').morse;
     rows = renderResult(resultDiv, result.items, result.morse, 'encode');
-    run();
+    if (autoplay) run();
   }
-  startButton.addEventListener('click', convert);
-  document.addEventListener('notation-change', () => { if (rendered) convert(); });
+  startButton.addEventListener('click', () => convert());
+  document.addEventListener('notation-change', () => { if (rendered) convert(false); });
 }

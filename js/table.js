@@ -11,8 +11,9 @@ export function initMorseTable() {
     // 各グループを文字表の順に描画する。
     for (const kind of ['letter', 'digit', 'punct', 'prosign']) {
       const entries = kind === 'prosign' ? PROSIGNS.map(p => ({ ...p, char: `<${p.label}>` })) : MORSE_TABLE.filter(e => e.kind === kind);
-      const groupDiv = el('div', { class: 'morse-table-group' });
-      const heading = el('h3', {}, t('group.' + kind) + ' (' + entries.length + ')');
+      const headingId = 'table-heading-' + kind;
+      const groupDiv = el('div', { class: 'morse-table-group', tabindex: 0, role: 'region', 'aria-labelledby': headingId });
+      const heading = el('h3', { id: headingId }, t('group.' + kind) + ' (' + entries.length + ')');
       groupDiv.appendChild(heading);
       const table = el('table', { class: 'morse-table' });
       const header = el('tr');

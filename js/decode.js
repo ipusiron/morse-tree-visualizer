@@ -45,7 +45,7 @@ export function initDecodeTab() {
     morseInput.dispatchEvent(new Event('input'));
   }));
 
-  function convert() {
+  function convert(autoplay = true) {
     animator.stop();
     rendered = true;
     canonical = '';
@@ -59,9 +59,9 @@ export function initDecodeTab() {
     }
     canonical = result.canonical;
     rows = renderResult(resultDiv, result.words, result.text, 'decode');
-    run();
+    if (autoplay) run();
   }
-  decodeButton.addEventListener('click', convert);
+  decodeButton.addEventListener('click', () => convert());
   morseInput.addEventListener('keydown', event => {
     if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
       event.preventDefault();
@@ -73,7 +73,7 @@ export function initDecodeTab() {
       if (button.dataset.char === '.') button.textContent = NOTATIONS[settings.notation].dot;
       if (button.dataset.char === '-') button.textContent = NOTATIONS[settings.notation].dash;
     }
-    if (rendered) convert();
+    if (rendered) convert(false);
   }
   document.addEventListener('notation-change', updateNotation);
   updateNotation();
