@@ -387,6 +387,7 @@ morse-tree-visualizer/              # モールス符号を木の経路として
 │   ├── audio.js                    # Web Audioの音の予約と打鍵側音
 │   ├── decode.js                   # 復号と入力支援・リアルタイム追従
 │   ├── encode.js                   # 英文の変換と結果・コピー・再生
+│   ├── frequency.js                # Day018由来の英字出現頻度
 │   ├── keying.js                   # 押し離しから符号と文字を確定する打鍵タブ
 │   ├── messages.js                 # 動的な画面文言の日本語辞書
 │   ├── morseCodec.js               # 入力正規化・変換・経路・ITUタイミング
@@ -398,13 +399,16 @@ morse-tree-visualizer/              # モールス符号を木の経路として
 │   ├── table.js                    # ITUと慣用を区別する一覧表
 │   ├── theme.js                    # ライト・ダーク・システム連動と保存
 │   ├── treeRenderer.js             # 木ごとのSVG描画と点灯・追従
+│   ├── trivia.js                   # 雑学タブで使う計算ロジック
 │   └── utils.js                    # 安全なDOM生成と共通制御
 ├── package.json                    # 依存なしのnpm test定義
 ├── style.css                       # 配色変数とモバイル・木の表示
 └── test/                           # 依存なしの自動テスト
+    ├── chart.test.js               # チャート型の66ノード座標と衝突
     ├── codec.test.js               # 変換例・往復・正規化・境界
     ├── contrast.test.js            # 文字と面の4.5:1以上
     ├── format.test.js              # 行長と行数
+    ├── frequency.test.js           # 英字出現頻度の正規化と順位
     ├── html.test.js                # CSP・ARIA・属性とラベル
     ├── keying.test.js              # 打鍵の時間境界と符号・文字の確定
     ├── messages.test.js            # 辞書と日本語リテラルの集約
@@ -415,7 +419,8 @@ morse-tree-visualizer/              # モールス符号を木の経路として
     ├── table.test.js               # 文字表の件数・順序・符号
     ├── theme.test.js               # テーマの保存と変数集合の検証
     ├── timing.test.js              # ITU時間比とPARIS・SOS
-    └── tree.test.js                # 文字表75・手続き符号込み76ノード・葉34・座標
+    ├── tree.test.js                # 文字表75・手続き符号込み76ノード・葉34・座標
+    └── trivia.test.js              # 実行時に計算する雑学の数値
 ```
 
 ## 💻 動作環境
