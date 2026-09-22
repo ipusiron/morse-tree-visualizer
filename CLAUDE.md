@@ -67,7 +67,9 @@ The application uses ES6 modules with the following architecture:
 4. **SVG Tree Rendering**: Each view uses ASCII `data-code` attributes. Depth five is complete;
    depth six includes valid table and prosign paths. There are 76 nodes, 34 leaves and 13 depth-six nodes.
    The character-only tree remains 75 nodes for compatibility. `$`, HH and SOS are outside the tree.
-   Prosign labels can be toggled; SK adds one node without moving existing coordinates. The SVG stays 1080 by 470 pixels;
+   Prosign labels can be toggled; SK adds one node without moving existing coordinates.
+   When off, SN/KA retain the old empty-node appearance and SK plus its edge are hidden (all 76 groups remain in the DOM).
+   The SVG stays 1080 by 470 pixels;
    only the tree wrapper scrolls horizontally. Empty/customary nodes have distinct dashed borders.
 
 5. **Security**: Render text with textContent and elements with createElement, never innerHTML.
@@ -105,7 +107,8 @@ The application uses ES6 modules with the following architecture:
 10. **Theme and print**: `morse-tree-theme` stores light/dark/system with try/catch around storage access.
     Use semantic foreground colors (on-primary and node-hl-text), not paper or ordinary node-text on highlighted surfaces.
     PrintSheet is a separate body child, hidden on screen, with 64 rows (27+10+18+9) in two columns.
-    Print CSS always restores light colors; the browser print dialog provides PDF output.
+    Print CSS always restores light colors; compact cells fit A4 portrait on one page in Chromium.
+    The browser print dialog provides PDF output.
 
 ### Development Notes
 

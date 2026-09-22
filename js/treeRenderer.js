@@ -33,6 +33,7 @@ export function createTreeView(container) {
   for (const n of tree.nodes.values()) {
     for (const child of [n.left, n.right].filter(Boolean)) {
       const line = make('line', { x1: n.x, y1: n.y, x2: child.x, y2: child.y, 'data-code': child.code });
+      if (child.prosign && !child.char && child.depth > 5) line.classList.add('prosign-extension');
       edges.set(child.code, line);
       lines.append(line);
     }
@@ -40,6 +41,10 @@ export function createTreeView(container) {
     const empty = !n.char && !n.prosign && n.depth !== 0;
     const group = make('g', { class: 'tree-node' + (empty ? ' empty' : '') + (entry && !entry.itu ? ' custom' : ''),
       'data-code': n.code });
+    if (n.prosign && !n.char) {
+      group.classList.add('prosign-only');
+      if (n.depth > 5) group.classList.add('prosign-extension');
+    }
     group.append(make('circle', { cx: n.x, cy: n.y, r: empty ? 8 : 13 }));
     group.append(make('text', { x: n.x, y: n.y + 4, 'text-anchor': 'middle', 'font-size': n.depth ? 13 : 10 },
       n.depth ? n.char || '' : 'start'));
