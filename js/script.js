@@ -11,7 +11,6 @@ let decodeInitialized = false;
 
 document.addEventListener('DOMContentLoaded', () => {
   const tabButtons = document.querySelectorAll('.tab-button');
-  const tabContents = document.querySelectorAll('.tab-content');
 
   switchTab('encode');
 
@@ -21,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
       switchTab(tabId);
     });
   });
+  bindTabKeys(tabButtons);
 
   // ヘルプモーダル開閉処理
   const helpButton = document.getElementById('helpBtn');
@@ -30,16 +30,33 @@ document.addEventListener('DOMContentLoaded', () => {
   if (helpButton && helpModal && closeModal) {
     helpButton.addEventListener('click', (e) => {
       e.preventDefault();
-      helpModal.style.display = 'block';
+      helpModal.hidden = false;
+      closeModal.focus();
     });
 
-    closeModal.addEventListener('click', () => {
-      helpModal.style.display = 'none';
-    });
+    const close = () => {
+      helpModal.hidden = true;
+      helpButton.focus();
+    };
+    closeModal.addEventListener('click', close);
 
     window.addEventListener('click', (event) => {
       if (event.target === helpModal) {
-        helpModal.style.display = 'none';
+        close();
+      }
+    });
+    helpModal.addEventListener('keydown', event => {
+      if (event.key === 'Escape') close();
+      if (event.key !== 'Tab') return;
+      const focusable = [...helpModal.querySelectorAll('button, a[href], [tabindex="0"]')];
+      const first = focusable[0];
+      const last = focusable.at(-1);
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
       }
     });
   }
@@ -50,8 +67,16 @@ function switchTab(tabId) {
   const tabButtons = document.querySelectorAll('.tab-button');
   const tabContents = document.querySelectorAll('.tab-content');
 
-  tabButtons.forEach(btn => btn.classList.remove('active'));
-  tabContents.forEach(tab => tab.classList.remove('active'));
+  tabButtons.forEach(btn => {
+    const selected = btn.dataset.tab === tabId;
+    btn.classList.toggle('active', selected);
+    btn.setAttribute('aria-selected', String(selected));
+    btn.tabIndex = selected ? 0 : -1;
+  });
+  tabContents.forEach(tab => {
+    tab.classList.remove('active');
+    tab.hidden = tab.id !== `tab-${tabId}`;
+  });
 
   const targetTab = document.getElementById(`tab-${tabId}`);
   const activeButton = document.querySelector(`.tab-button[data-tab="${tabId}"]`);
@@ -79,4 +104,20 @@ function switchTab(tabId) {
       decodeInitialized = true;
     }
   }
+}
+
+// 同じキーボード規則をメインタブとサブタブに適用する。
+export function bindTabKeys(buttons) {
+  buttons = [...buttons];
+  buttons.forEach((button, index) => button.addEventListener('keydown', event => {
+    const destinations = {
+      ArrowLeft: (index - 1 + buttons.length) % buttons.length,
+      ArrowRight: (index + 1) % buttons.length, Home: 0, End: buttons.length - 1
+    };
+    if (!(event.key in destinations)) return;
+    event.preventDefault();
+    const target = buttons[destinations[event.key]];
+    target.click();
+    target.focus();
+  }));
 }

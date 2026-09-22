@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { MORSE_TABLE, CHAR_TO_CODE, CODE_TO_CHAR, morseMap } from '../js/morseMap.js';
+import { MORSE_TABLE, CHAR_TO_CODE, CODE_TO_CHAR, formatCode } from '../js/morseMap.js';
 
 test('55 entries, ITU order, unique codes and 5 customary signs', () => {
   assert.equal(MORSE_TABLE.length, 55);
@@ -13,7 +13,7 @@ test('55 entries, ITU order, unique codes and 5 customary signs', () => {
   for (const e of MORSE_TABLE) {
     assert.match(e.code, /^[.-]{1,7}$/);
     assert.ok(e.name);
-    assert.equal(morseMap[e.char], e.code.replaceAll('.', '\u30fb').replaceAll('-', '\u2212'));
+    assert.equal(formatCode(e.code), e.code.replaceAll('.', '\u30fb').replaceAll('-', '\u2212'));
   }
   const expected = ['.-.-.-', '--..--', '---...', '..--..', '.----.', '-....-', '-..-.',
     '-.--.', '-.--.-', '.-..-.', '-...-', '.-.-.', '.--.-.'];

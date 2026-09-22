@@ -4,6 +4,7 @@ import { createTreeView } from './treeRenderer.js';
 import { createAnimator } from './animator.js';
 import { t } from './messages.js';
 import { el, settings } from './utils.js';
+import { bindTabKeys } from './script.js';
 
 export function initStudyMode() {
   const view = createTreeView(document.getElementById('tree-container-study'));
@@ -19,10 +20,18 @@ export function initStudyMode() {
   const subtabButtons = document.querySelectorAll('#tab-study .subtab-button');
   const subtabContents = document.querySelectorAll('#tab-study .subtab-content');
   subtabButtons.forEach(btn => btn.addEventListener('click', () => {
-    subtabButtons.forEach(b => b.classList.toggle('active', b === btn));
-    subtabContents.forEach(content => content.classList.toggle('active', content.id === 'subtab-' + btn.dataset.subtab));
+    subtabButtons.forEach(b => {
+      b.classList.toggle('active', b === btn);
+      b.setAttribute('aria-selected', String(b === btn));
+      b.tabIndex = b === btn ? 0 : -1;
+    });
+    subtabContents.forEach(content => {
+      content.hidden = content.id !== 'subtab-' + btn.dataset.subtab;
+      content.classList.toggle('active', !content.hidden);
+    });
     animator.stop();
   }));
+  bindTabKeys(subtabButtons);
 
   // 文字確認。文字表と同じ順を保つ。
   const select = document.getElementById('manualCharSelect');

@@ -2,23 +2,6 @@ import { MORSE_TABLE, formatCode } from './morseMap.js';
 import { timeline } from './morseCodec.js';
 import { t } from './messages.js';
 
-/**
- * HTMLエスケープ関数
- * XSS攻撃を防ぐため、特殊文字をHTMLエンティティに変換
- */
-export function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
-}
-
-/**
- * 配列の要素をHTMLエスケープして結合
- */
-export function escapeAndJoin(array, separator = ', ') {
-  return array.map(escapeHtml).join(separator);
-}
-
 export function el(tag, attrs = {}, children = []) {
   const node = document.createElement(tag);
   for (const [key, value] of Object.entries(attrs)) node.setAttribute(key, value);
@@ -69,7 +52,8 @@ export function renderResult(container, words, output, mode) {
     el('output', { class: mode === 'encode' ? 'morse-code-display' : 'decoded-text-display', 'aria-live': 'polite' }, output), copy, status);
   const table = el('table', { class: mode === 'encode' ? 'morse-encode-table' : 'morse-decode-table' });
   const head = el('tr');
-  for (const key of ['table.char', 'table.code', 'table.kind', 'table.note']) head.append(el('th', { scope: 'col' }, t(key)));
+  const headings = mode === 'encode' ? ['table.char', 'table.code'] : ['table.code', 'table.char'];
+  for (const key of [...headings, 'table.kind', 'table.note']) head.append(el('th', { scope: 'col' }, t(key)));
   table.append(el('thead', {}, head));
   const body = el('tbody');
   const rows = [];
@@ -80,6 +64,7 @@ export function renderResult(container, words, output, mode) {
       const row = el('tr', { 'data-char': char }, [el('td', {}, char), el('td', {}, formatCode(code, settings.notation)),
         el('td', {}, t(entry.itu ? 'table.itu' : 'table.custom')),
         el('td', {}, code.length > 6 ? t('tree.outside', { n: code.length }) : '')]);
+      if (mode === 'decode') row.prepend(row.children[1]);
       body.append(row);
       rows.push(row);
     });
@@ -116,7 +101,12 @@ export function bindPlayback(host, animator, getCanonical, getRows = () => []) {
     paused = !paused;
     pause.textContent = t(paused ? 'anim.resume' : 'anim.pause');
   });
-  host.querySelector('[data-action="stop"]').addEventListener('click', () => { animator.stop(); paused = false; });
+  host.querySelector('[data-action="stop"]').addEventListener('click', () => {
+    animator.stop();
+    paused = false;
+    pause.textContent = t('anim.pause');
+    getRows().forEach(row => { row.classList.remove('current'); row.removeAttribute('aria-current'); });
+  });
   host.querySelector('[data-action="previous"]').addEventListener('click', () => animator.step(-1));
   host.querySelector('[data-action="next"]').addEventListener('click', () => animator.step(1));
   const speed = host.querySelector('select');
@@ -125,6 +115,12 @@ export function bindPlayback(host, animator, getCanonical, getRows = () => []) {
     settings.wpm = Number(speed.value);
     document.querySelectorAll('.playback select').forEach(select => { select.value = settings.wpm; });
   });
-  document.addEventListener('tab-switch', () => { animator.pause(); });
+  document.addEventListener('tab-switch', () => {
+    if (animator.isPlaying) {
+      animator.pause();
+      paused = true;
+      pause.textContent = t('anim.resume');
+    }
+  });
   return run;
 }

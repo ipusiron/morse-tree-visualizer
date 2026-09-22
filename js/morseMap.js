@@ -33,6 +33,3 @@ export function formatCode(code, notation = 'ja') {
   if (!n) throw new RangeError('Unknown notation');
   return code.replace(/[.-]/g, c => c === '.' ? n.dot : n.dash);
 }
-
-// Compatibility for the first migration gate.
-export const morseMap = Object.fromEntries(MORSE_TABLE.map(({ char, code }) => [char, formatCode(code)]));
