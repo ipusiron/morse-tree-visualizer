@@ -50,7 +50,7 @@ label {
 }
 
 /* テキスト入力とモールス入力のラベルのスタイル */
-label[for="textInput"], label[for="morseInput"] {
+label[for="inputText"], label[for="morseInput"] {
   display: inline-block;
   vertical-align: middle;
   align-self: flex-start;
@@ -489,9 +489,7 @@ body {
 }
 
 .copy-button {
-  position: absolute;
-  bottom: 0.5rem;
-  right: 0.5rem;
+  position: static;
   padding: 0.3rem 0.6rem;
   font-size: 0.8rem;
   background-color: #42a5f5;
@@ -767,4 +765,26 @@ summary:hover {
 }
 .depth-label {
   fill: #666666;
+}
+
+.playback {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.error-message:empty {
+  display: none;
+}
+.morse-code-display, .decoded-text-display {
+  display: block;
+  overflow-wrap: anywhere;
+}
+tr.current {
+  background: #fff8e1;
+}
+.clipboard-fallback {
+  position: fixed;
+  left: -10000px;
 }

@@ -31,15 +31,31 @@
         <button class="tab-button" data-tab="table">モールス信号一覧表</button>
       </div>
 
+      <fieldset class="notation-control">
+        <legend>符号の表記</legend>
+        <label><input type="radio" name="notation" value="ja" checked>・−</label>
+        <label><input type="radio" name="notation" value="ascii">.-</label>
+      </fieldset>
+
       <!-- タブ1：エンコード -->
       <div class="tab-content active" id="tab-encode">
         <section>
-          <label for="textInput">テキスト入力：</label>
-          <textarea id="inputText" placeholder="HELLO などを入力" rows="1"></textarea>
+          <label for="inputText">テキスト入力：</label>
+          <textarea id="inputText" placeholder="HELLO などを入力" rows="2"></textarea>
           <button id="startButton">エンコード＆表示</button>
-          <div id="encodeError"></div>
+          <div id="encodeError" class="error-message" role="alert"></div>
         </section>
         <div id="morseResult"></div>
+        <div class="playback" id="encode-playback">
+          <button type="button" data-action="play">▶ 再生</button>
+          <button type="button" data-action="pause">⏸ 一時停止</button>
+          <button type="button" data-action="stop">■ 停止</button>
+          <button type="button" data-action="previous" aria-label="前の符号">◀</button>
+          <button type="button" data-action="next" aria-label="次の符号">▶</button>
+          <label for="encode-wpm">WPM</label>
+          <select id="encode-wpm"><option>5</option><option selected>10</option><option>15</option><option>20</option></select>
+        </div>
+        <p class="tree-legend">点灯＝経路、破線の丸＝空き、黄色の破線＝慣用符号</p>
         <div class="tree-scroll-wrapper">
           <div id="tree-container"></div>
         </div>
@@ -50,20 +66,33 @@
         <section>
           <div class="input-with-button">
             <label for="morseInput">モールス入力：</label>
-            <textarea id="morseInput" placeholder="・−− ・−・ ・・・ ・・− / ・−− ・−・・ −・ など" rows="1"></textarea>
+            <textarea id="morseInput" placeholder=".- ... または ・− ・・・（語の区切りは / ）" rows="1"></textarea>
             <button id="decodeButton">デコード</button>
           </div>
-          <div id="decodeError"></div>
+          <div id="decodeError" class="error-message" role="alert"></div>
           <div class="morse-input-buttons">
-            <button type="button" class="morse-char-btn" data-char="・">・</button>
-            <button type="button" class="morse-char-btn" data-char="−">−</button>
+            <button type="button" class="morse-char-btn" data-char=".">・</button>
+            <button type="button" class="morse-char-btn" data-char="-">−</button>
             <button type="button" class="morse-char-btn" data-char=" ">スペース</button>
             <button type="button" class="morse-char-btn" data-char="/">/</button>
-            <button type="button" class="sample-button" id="sampleButton">ASDF GHJKのモールス信号</button>
+            <button type="button" class="sample-button" id="sampleButton" data-sample="ASDF GHJK">ASDF GHJK</button>
+            <button type="button" class="sample-button" data-sample="SOS">SOS</button>
+            <button type="button" class="sample-button" data-sample="HELLO WORLD">HELLO WORLD</button>
+            <button type="button" class="sample-button" data-sample="CQ CQ DE JA1ABC">CQ CQ DE JA1ABC</button>
           </div>
           <p class="input-hint">使用可能文字：・（ドット）、−（ダッシュ）、スペース（文字区切り）、/（単語区切り）</p>
         </section>
         <div id="decodeResult"></div>
+        <div class="playback" id="decode-playback">
+          <button type="button" data-action="play">▶ 再生</button>
+          <button type="button" data-action="pause">⏸ 一時停止</button>
+          <button type="button" data-action="stop">■ 停止</button>
+          <button type="button" data-action="previous" aria-label="前の符号">◀</button>
+          <button type="button" data-action="next" aria-label="次の符号">▶</button>
+          <label for="decode-wpm">WPM</label>
+          <select id="decode-wpm"><option>5</option><option selected>10</option><option>15</option><option>20</option></select>
+        </div>
+        <p class="tree-legend">点灯＝経路、破線の丸＝空き、黄色の破線＝慣用符号</p>
         <div class="tree-scroll-wrapper">
           <div id="tree-container-decode"></div>
         </div>

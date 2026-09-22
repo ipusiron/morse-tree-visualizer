@@ -22,7 +22,30 @@ export const MESSAGES = {
   'anim.play': '▶ 再生',
   'anim.pause': '⏸ 一時停止',
   'anim.resume': '▶ 再開',
-  'anim.stop': '■ 停止'
+  'anim.stop': '■ 停止',
+  'anim.previous': '前の符号',
+  'anim.next': '次の符号',
+  'result.details': '詳細を表示',
+  'table.char': '文字',
+  'table.code': '符号',
+  'table.kind': '種類',
+  'table.note': '備考',
+  'table.name': '英語名',
+  'table.word_gap': '（語の区切り）',
+  'table.wait': 'ITUではWait（待て）の手続き符号と同じ符号',
+  'group.letter': '英字',
+  'group.digit': '数字',
+  'group.punct': '記号',
+  'group.itu': '記号（ITU）',
+  'group.custom': '記号（慣用）',
+  'study.path': '経路',
+  'study.left': '左',
+  'study.right': '右',
+  'quiz.scope_empty': '出題範囲を1つ以上選んでください。',
+  'quiz.score': '正答 {correct}／出題 {total}（連続 {streak}）',
+  'quiz.next': '次の問題',
+  'quiz.question_char': 'この符号の文字を入力してください。',
+  'quiz.question_code': 'この文字の符号を入力してください。'
 };
 
 export function t(key, params = {}) {
