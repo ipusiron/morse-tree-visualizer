@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
-import { encode, decode } from '../js/morseCodec.js';
-import { MORSE_TABLE } from '../js/morseMap.js';
+import { encode, decode, farnsworthGaps } from '../js/morseCodec.js';
+import { MORSE_TABLE, PROSIGNS } from '../js/morseMap.js';
 
 const root = new URL('../', import.meta.url);
 const readme = readFileSync(new URL('README.md', root), 'utf8');
@@ -35,10 +35,26 @@ test('README metadata and image references are intact', () => {
     'repo_url: "https://github.com/ipusiron/morse-tree-visualizer"',
     'demo_url: "https://ipusiron.github.io/morse-tree-visualizer/"']) assert.ok(yaml.includes(expected));
   const images = [...readme.matchAll(/!\[[^\]]*\]\(([^)]+)\)/g)].map(m => m[1]).filter(p => !p.startsWith('https:'));
-  assert.equal(images.length, 4);
+  assert.equal(images.length, 7);
   images.forEach(path => assert.ok(existsSync(new URL(path, root)), path));
   const pngs = readdirSync(new URL('assets/', root)).filter(f => f.endsWith('.png')).map(f => 'assets/' + f);
   assert.deepEqual(images.sort(), pngs.sort());
+});
+
+test('README Farnsworth and nine prosign tables agree with executable definitions', () => {
+  const timing = [...readme.matchAll(/^\| (\d+) \| (\d+) \| ([\d.]+) \| ([\d.]+) \| ([\d.]+) \|$/gm)];
+  assert.equal(timing.length, 3);
+  for (const [, c, s, unit, letter, word] of timing) {
+    const g = farnsworthGaps(Number(c), Number(s));
+    assert.deepEqual([g.unitMs, g.letterGapMs, g.wordGapMs].map(n => n.toFixed(1)), [unit, letter, word]);
+  }
+  const signs = [...readme.matchAll(/^\| ([A-Z]+) \| `([.-]+)` \| ([^|]+) \| (ITU|慣用) \| ([^|]+) \|$/gm)];
+  assert.equal(signs.length, 9);
+  assert.deepEqual(signs.map(m => [m[1], m[2], m[4] === 'ITU', m[5] === '—' ? undefined : m[5]]),
+    PROSIGNS.map(p => [p.label, p.code, p.itu, p.sameAs]));
+  assert.ok(readme.includes('ITU-R M.1677-1にはない'));
+  assert.ok(readme.includes('76ノード'));
+  assert.ok(readme.includes('64行'));
 });
 
 test('README tree contains every repository file and directory with aligned descriptions', () => {

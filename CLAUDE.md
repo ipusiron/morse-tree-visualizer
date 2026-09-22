@@ -25,8 +25,9 @@ The site is automatically deployed to GitHub Pages when pushing to the main bran
 ### Tests
 Run `npm test` with Node 22 or newer. No dependencies or install step are needed.
 GitHub Actions runs the same `node --test` suite on push and pull_request.
-The nine test files cover codec boundaries and round-trips, the 55-entry table,
-tree geometry, timing, messages, HTML security/ARIA, contrast, formatting, and README consistency.
+The fourteen test files cover codec boundaries and round-trips, the 55-entry character table,
+tree geometry, timing, messages, HTML security/ARIA, contrast, formatting, README consistency,
+keying, nine prosigns, shared URLs, theme storage and static print/security constraints.
 
 ## Architecture
 
@@ -39,8 +40,12 @@ The application uses ES6 modules with the following architecture:
   - `js/decode.js` - Morse to English decoding functionality
   - `js/study.js` - Learning mode with character confirmation and random quizzes
   - `js/table.js` - Morse code reference table display
+  - `js/audio.js` - User-activated Web Audio scheduling, mute and keying sidetone
+  - `js/keying.js` - Pointer/Space input, duration meters, pending symbols and decoded state
+  - `js/share.js` - Pure bounded URL parsing/formatting; text and morse are mutually exclusive
+  - `js/theme.js` - Light/dark/system choice and guarded localStorage access
 - **Data & Visualization**:
-  - `js/morseMap.js` - MORSE_TABLE, lookup Maps and notation formatting: 55 characters (ITU 50 + customary 5)
+  - `js/morseMap.js` - MORSE_TABLE: 55 characters (ITU 50 + customary 5); PROSIGNS: 9 (ITU 8 + customary SOS)
   - `js/morseTree.js` - buildTree, completeTo, layoutTree; generated from MORSE_TABLE, not a handwritten tree
   - `js/morseCodec.js` - DOM-free normalization, encode/decode, paths and ITU timing
   - `js/messages.js` - Japanese MESSAGES dictionary and t(key, params), ready for a future English dictionary
@@ -60,8 +65,9 @@ The application uses ES6 modules with the following architecture:
    - Tree traversal visualizes the encoding/decoding process with animated highlighting
 
 4. **SVG Tree Rendering**: Each view uses ASCII `data-code` attributes. Depth five is complete;
-   depth six includes valid table paths. There are 75 nodes, 34 leaves and 12 depth-six nodes.
-   `$` is outside the tree because its code has seven elements. The SVG stays 1080 by 470 pixels;
+   depth six includes valid table and prosign paths. There are 76 nodes, 34 leaves and 13 depth-six nodes.
+   The character-only tree remains 75 nodes for compatibility. `$`, HH and SOS are outside the tree.
+   Prosign labels can be toggled; SK adds one node without moving existing coordinates. The SVG stays 1080 by 470 pixels;
    only the tree wrapper scrolls horizontally. Empty/customary nodes have distinct dashed borders.
 
 5. **Security**: Render text with textContent and elements with createElement, never innerHTML.
@@ -71,7 +77,14 @@ The application uses ES6 modules with the following architecture:
 
 6. **Timing**: dot=1, dash=3, element gap=1, letter gap=3, word gap=7 units.
    One unit is 1200/WPM ms. SOS is 27 units (3240ms at 10WPM); PARIS is 43 plus 7=50 units.
-   Reduced motion highlights all final paths synchronously. Tab switches pause playback.
+   Farnsworth uses c=character WPM and s=min(overall WPM,c): a=(60c-37.2s)/(s*c)*1000 ms,
+   letterGap=3*a/19 and wordGap=7*a/19 when s<c; these replace, not augment, ordinary gaps.
+   Default playback is 15/10 WPM, 700 Hz and 50% volume. Numeric timeline arguments retain ordinary timing.
+   Audio uses one oscillator per playback and short gain ramps. AudioContext is created/resumed only after user action.
+   requestAnimationFrame follows AudioContext.currentTime; audio-off/unavailable uses the original timer path.
+   Pause/stop cancel sound, resume schedules remaining tones, and tab switches pause playback.
+   Reduced motion highlights all final paths synchronously while sound retains its schedule; the lamp is disabled.
+   The lamp is 40px, initially off; do not flash a large surface.
 
 7. **Input and messages**: English input uses NFKC, uppercase and collapsed whitespace.
    Internal codes are ASCII; format only at display/copy time. Decoder accepts dot/dash variants,
@@ -79,13 +92,28 @@ The application uses ES6 modules with the following architecture:
    Put dynamic UI text in messages.js and call t(). Do not add raw Japanese literals in other JS modules;
    use Unicode escapes for the Japanese notation constants. No persistent quiz scores.
 
+8. **Keying**: u=1200/WPM; a press shorter than 2u is a dot, otherwise a dash.
+   The next press classifies the release gap: <2u same character, <5u next character, otherwise next word.
+   Idle UI timers show pending symbols at 2u, commit a character at 5u and a word at 10u.
+   Committing clears the highlighted path. Ignore repeat Space and editable controls; cancel on blur/tab changes.
+
+9. **Prosigns and sharing**: `<AR>` syntax sends one procedural signal, not separate A and R.
+   Decode character aliases first (+, =, K, &); only unambiguous codes produce angle-bracket labels.
+   SOS as a single nine-element sign is customary, not listed in ITU-R M.1677-1.
+   Shared inputs are limited to 1000 characters. Loading a URL may convert but must not create an AudioContext.
+
+10. **Theme and print**: `morse-tree-theme` stores light/dark/system with try/catch around storage access.
+    Use semantic foreground colors (on-primary and node-hl-text), not paper or ordinary node-text on highlighted surfaces.
+    PrintSheet is a separate body child, hidden on screen, with 64 rows (27+10+18+9) in two columns.
+    Print CSS always restores light colors; the browser print dialog provides PDF output.
+
 ### Development Notes
 
 - The project is part of the "100 Security Tools with Generative AI" series (Day 025)
 - Primary language is Japanese for UI and documentation
 - Default display symbols are `・` (U+30FB) and `−` (U+2212); ASCII `.` and `-` are also supported
 - Word separation uses / and character separation uses space
-- English UI, audio, keying, prosigns, Wabun, dark mode, URL sharing and PNG export are deferred
+- English UI, Wabun and PNG export are deferred; do not add these in phase two
 - HTTP is required for ES modules; file:// is not supported
 
 ### Staged development record
@@ -99,3 +127,17 @@ The application uses ES6 modules with the following architecture:
 
 Each gate runs npm test plus its browser checks before a separate Japanese stage commit.
 Screenshot scripts and browser verification scripts belong outside the repository.
+
+### Phase two staged development
+
+1. Farnsworth, tone schedules, keying classification, prosigns and URL logic/tests (UI unchanged)
+2. Audio-clock playback, shared speed/sound settings and small optional lamp
+3. Pointer/Space keying tab and sidetone
+4. Prosign tree/table/manual selection and shared-input URLs
+5. Light/dark/system themes and printable 64-row reference
+6. README/CLAUDE, three additional screenshots and documentation tests
+
+Keep the first four screenshots unchanged. README tree-only maintenance is allowed at each stage to keep inventory tests valid.
+Use actual foreground/background pairs for both-theme contrast tests (minimum 4.5:1).
+Screenshot five captures confirmed SO plus pending S: the specification's committed SOS plus a lit tree is impossible
+because committing a character clears the path. This depiction was explicitly approved.
