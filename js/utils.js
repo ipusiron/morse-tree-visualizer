@@ -45,7 +45,7 @@ export async function copyText(text, status) {
 export function renderResult(container, words, output, mode) {
   container.replaceChildren();
   const copy = el('button', { type: 'button', class: 'copy-button' }, t('copy.button'));
-  const status = el('p', { role: 'status' });
+  const status = el('p', { role: 'status', class: 'copy-status' });
   copy.addEventListener('click', () => copyText(output, status));
   const box = el('div', { class: mode === 'encode' ? 'morse-result-container' : 'decode-result-container' });
   box.append(el('h3', {}, t(mode === 'encode' ? 'result.morse_heading' : 'result.text_heading')),

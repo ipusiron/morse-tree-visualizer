@@ -154,6 +154,7 @@ textarea#morseInput {
 .input-hint {
   font-size: 0.9rem;
   color: var(--hint);
+  background-color: var(--page-bg);
   margin: 0.3rem 0 1rem 0;
   font-style: italic;
 }
@@ -846,6 +847,12 @@ fieldset label {
 }
 [role="status"]:not(:empty) {
   overflow-wrap: anywhere;
+}
+.copy-status:not(:empty) {
+  color: var(--paper);
+  background: var(--success);
+  padding: 0.5rem;
+  border-radius: 4px;
 }
 .morse-encode-table, .morse-decode-table {
   table-layout: fixed;
