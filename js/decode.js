@@ -36,13 +36,13 @@ export function initDecodeTab() {
       const char = symbol === '.' ? NOTATIONS[settings.notation].dot : symbol === '-' ? NOTATIONS[settings.notation].dash : symbol;
       morseInput.setRangeText(char, morseInput.selectionStart, morseInput.selectionEnd, 'end');
       morseInput.focus();
-      follow();
+      morseInput.dispatchEvent(new Event('input'));
     });
   });
   document.querySelectorAll('[data-sample]').forEach(button => button.addEventListener('click', () => {
     morseInput.value = encode(button.dataset.sample, settings.notation).morse;
     morseInput.focus();
-    follow();
+    morseInput.dispatchEvent(new Event('input'));
   }));
 
   function convert() {

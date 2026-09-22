@@ -121,6 +121,7 @@ export function initKeying() {
     cancel();
     switchTab('decode');
     document.getElementById('morseInput').value = formatCode(canonical, settings.notation);
+    document.getElementById('morseInput').dispatchEvent(new Event('input'));
     document.getElementById('decodeButton').click();
   });
   speed.addEventListener('change', () => { cancel(); commit(); upAt = null; });
