@@ -104,27 +104,34 @@ label[for="inputText"], label[for="morseInput"] {
   line-height: 1.5;
 }
 
-/* 入力欄とボタンの横並び配置 */
+/* 入力から実行へ、画面幅によらず同じ順序で配置する。 */
 .input-with-button {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem;
   margin-bottom: 0.5rem;
 }
 
 .input-with-button label {
-  flex-shrink: 0;
-  margin-top: 0.8rem;
+  margin: 0;
 }
 
-.input-with-button textarea {
-  flex: 1;
+.input-with-button textarea#inputText, .input-with-button textarea#morseInput {
+  width: 100%;
+  max-width: none;
+  margin: 0;
 }
 
 .input-with-button button {
-  flex-shrink: 0;
-  align-self: flex-start;
-  margin-top: 0.4rem;
+  width: 100%;
+  margin: 0;
+}
+
+@media (min-width: 600px) {
+  .input-with-button button {
+    width: auto;
+    justify-self: end;
+  }
 }
 
 input[type="text"] {
@@ -700,14 +707,15 @@ summary:hover {
 }
 /* 木は固定サイズの独立したSVGとして描く。 */
 .tree-box {
+  width: 1080px;
+  margin-inline: auto;
+}
+.tree-scroll-wrapper {
   background: var(--paper);
   border: 1px solid var(--border-soft);
   border-radius: 6px;
   margin-top: 1rem;
   min-width: 0;
-  max-width: 100%;
-}
-.tree-scroll-wrapper {
   overflow-x: auto;
   overflow-y: hidden;
   max-width: 100%;
@@ -760,11 +768,48 @@ summary:hover {
 }
 
 .playback {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
   margin-top: 1rem;
+}
+.wpm-control, .wpm-help {
+  display: inline-flex;
+  align-items: center;
+}
+.wpm-control {
+  gap: 0.5rem;
+}
+.wpm-help-button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.5rem;
+  border-radius: 50%;
+  font-weight: bold;
+}
+.wpm-tooltip {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 10;
+  width: min(36rem, 100%);
+  padding: 1rem;
+  background: var(--paper);
+  color: var(--text);
+  border: 1px solid #767676;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px #00000026;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.wpm-tooltip strong, .wpm-tooltip span {
+  display: block;
+}
+.wpm-tooltip span {
+  margin-top: 0.4rem;
 }
 .error-message:empty {
   display: none;
@@ -864,9 +909,6 @@ fieldset label {
   }
   .tab-content.active {
     padding: 0.75rem;
-  }
-  .input-with-button {
-    flex-wrap: wrap;
   }
   textarea#morseInput, textarea#inputText {
     width: 100%;

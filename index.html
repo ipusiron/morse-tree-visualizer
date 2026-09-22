@@ -53,9 +53,11 @@
       <div class="tab-content active" id="tab-encode" role="tabpanel"
         aria-labelledby="tab-button-encode">
         <section>
-          <label for="inputText">テキスト入力：</label>
-          <textarea id="inputText" placeholder="HELLO などを入力" rows="2"></textarea>
-          <button id="startButton">エンコード＆表示</button>
+          <div class="input-with-button">
+            <label for="inputText">テキスト入力：</label>
+            <textarea id="inputText" placeholder="HELLO などを入力" rows="2"></textarea>
+            <button id="startButton">エンコード＆表示</button>
+          </div>
           <div id="encodeError" class="error-message" role="alert"></div>
         </section>
         <div id="morseResult"></div>
@@ -205,6 +207,9 @@
             <li>英語テキストを入力してモールス信号に変換</li>
             <li>変換結果をワンクリックでクリップボードにコピー</li>
             <li>ITUの時間比で1符号ずつ再生。WPMは5／10／15／20から選択</li>
+            <li>WPMは数値が小さいほどゆっくり、大きいほど速く再生します。20 WPMは10 WPMの2倍の速さです。</li>
+            <li>木の経路をゆっくり確認したいときは、5 WPMから試してください。変更後は「再生」で最初から再生します。</li>
+            <li>WPMの隣の「?」は、マウスを重ねる・タップ・キーボードのフォーカスで説明を表示します。Escで閉じられます。</li>
             <li>再生・一時停止・停止・前後の手動ステップに対応</li>
           </ul>
 

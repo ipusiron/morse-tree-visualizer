@@ -22,3 +22,20 @@ test('dictionary keys, substitution and pure logic source', () => {
   const dictionary = readFileSync(new URL('../js/messages.js', import.meta.url), 'utf8');
   assert.doesNotMatch(dictionary, /\b(document|window)\b/);
 });
+
+test('WPM guidance agrees across tooltip, help and README', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const readme = readFileSync(new URL('../README.md', import.meta.url), 'utf8');
+  for (const key of ['wpm.help_speed', 'wpm.help_example', 'wpm.help_start']) {
+    assert.ok(html.includes(t(key)), key);
+    assert.ok(readme.includes(t(key)), key);
+  }
+  const source = readFileSync(new URL('../js/utils.js', import.meta.url), 'utf8');
+  for (const key of ['wpm.help_label', 'wpm.help_title', 'wpm.help_speed',
+    'wpm.help_example', 'wpm.help_start', 'wpm.help_apply']) {
+    assert.ok(MESSAGES[key]);
+    assert.ok(source.includes(key), key);
+  }
+  assert.match(source, /role: 'tooltip'/);
+  assert.match(source, /'aria-describedby': id/);
+});
