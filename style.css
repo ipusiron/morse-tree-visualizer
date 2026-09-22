@@ -471,6 +471,10 @@ footer {
   overflow-wrap: anywhere;
 }
 
+.morse-table td:nth-child(-n+3), .badge {
+  white-space: nowrap;
+}
+
 @media screen and (max-width: 768px) {
   .morse-table-wrapper {
     flex-wrap: wrap;
