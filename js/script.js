@@ -3,6 +3,7 @@ import { initMorseTable } from './table.js';
 import { initKeying } from './keying.js';
 import { parseShare } from './share.js';
 import { t } from './messages.js';
+import { initTheme } from './theme.js';
 
 import { initEncodeTab } from './encode.js';
 import { initDecodeTab } from './decode.js';
@@ -14,6 +15,7 @@ let decodeInitialized = false;
 let keyingInitialized = false;
 
 document.addEventListener('DOMContentLoaded', () => {
+  initTheme();
   const tabButtons = document.querySelectorAll('.tab-button');
 
   switchTab('encode');

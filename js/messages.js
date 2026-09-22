@@ -1,4 +1,11 @@
 export const MESSAGES = {
+  'theme.label': '配色: {theme}（押すと切り替え）',
+  'theme.light': 'ライト',
+  'theme.dark': 'ダーク',
+  'theme.system': 'システム連動',
+  'print.title': 'モールス符号表（ITU-R M.1677-1）',
+  'print.date': '生成日 {date}',
+  'print.note': '慣用はITUの文字表にない符号です。SOSは1符号として使う慣用の手続き符号です。',
   'group.prosign': '手続き符号',
   'prosign.show': '手続き符号を表示',
   'prosign.alias': '手続き符号{label}と同じ符号',

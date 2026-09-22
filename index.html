@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <title>MorseTree Visualizer</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark">
     <meta http-equiv="Content-Security-Policy"
       content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
     <meta name="referrer" content="no-referrer">
@@ -19,6 +20,7 @@
           <p>モールス信号を可視化して学べるツールです。</p>
         </div>
         <button class="help-icon-button" id="helpBtn" title="ヘルプ" aria-label="ヘルプを開く">？</button>
+        <button type="button" id="themeToggle" aria-label="配色: システム連動">🖥</button>
       </div>
     </header>
 
@@ -219,6 +221,7 @@
         aria-labelledby="tab-button-table" hidden>
   <section>
     <h2>モールス信号 一覧表</h2>
+    <button type="button" id="printTable">🖨 印刷（PDFに保存）</button>
     <div class="morse-table-wrapper">
       <!-- グループ表示は JSでここに挿入 -->
     </div>
@@ -306,6 +309,9 @@
             <li>エラーメッセージで入力ミスを素早く確認</li>
           </ul>
 
+          <h3>🎨 配色と印刷</h3>
+          <p>ヘッダーの配色ボタンはライト→ダーク→システム連動の順に切り替わります。一覧表の印刷ボタンから、ブラウザーの印刷ダイアログで「PDFに保存」を選べます。</p>
+
           <h3>📱 動作環境</h3>
           <p>
             モダンブラウザー（Chrome、Firefox、Safari、Edge）で動作します。<br>
@@ -316,6 +322,7 @@
     </div>
 
     </main>
+    <section id="printSheet" hidden aria-label="印刷用の符号表"></section>
 
     <!-- フッター -->
     <footer>

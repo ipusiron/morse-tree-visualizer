@@ -8,6 +8,10 @@ test('secure markup, main and nested tabs, dialog and real label targets', () =>
   assert.doesNotMatch(html, /unsafe-inline|frame-ancestors|\sstyle\s*=|\son\w+\s*=/i);
   assert.match(html, /name="referrer" content="no-referrer"/);
   assert.match(html, /<noscript>/);
+  assert.match(html, /name="color-scheme" content="light dark"/);
+  for (const id of ['themeToggle', 'printSheet', 'printTable', 'encodeShare', 'decodeShare']) {
+    assert.ok(html.includes(`id="${id}"`));
+  }
   assert.deepEqual([...html.matchAll(/<script[^>]*>/g)].map(m => m[0]), ['<script type="module" src="js/script.js">']);
   // Five main tabs plus two nested study tabs.
   assert.equal([...html.matchAll(/role="tablist"/g)].length, 2);

@@ -35,5 +35,26 @@ export function initMorseTable() {
     }
   }
   render();
+  renderPrintSheet();
+  document.getElementById('printTable').addEventListener('click', () => { renderPrintSheet(); window.print(); });
   document.addEventListener('notation-change', render);
+}
+
+export function renderPrintSheet() {
+  const sheet = document.getElementById('printSheet');
+  sheet.replaceChildren(el('h1', {}, t('print.title')), el('p', {}, t('print.date', { date: new Date().toLocaleDateString('ja-JP') })));
+  const columns = el('div', { class: 'print-columns' }, [el('div'), el('div')]);
+  for (const [index, kind] of ['letter', 'digit', 'punct', 'prosign'].entries()) {
+    const entries = kind === 'prosign' ? PROSIGNS.map(p => ({ ...p, char: `<${p.label}>` })) : MORSE_TABLE.filter(e => e.kind === kind);
+    const table = el('table');
+    const body = el('tbody');
+    for (const entry of entries) body.append(el('tr', {}, [
+      el('td', {}, entry.char), el('td', {}, formatCode(entry.code, 'ja')), el('td', {}, entry.code),
+      el('td', {}, t(entry.itu ? 'table.itu' : 'table.custom'))
+    ]));
+    table.append(body);
+    columns.children[index < 2 ? 0 : 1].append(el('h2', {}, t('group.' + kind)), table);
+  }
+  sheet.append(columns, el('p', {}, t('print.note')),
+    el('p', {}, 'https://ipusiron.github.io/morse-tree-visualizer/'));
 }
