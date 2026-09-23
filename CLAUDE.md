@@ -98,8 +98,10 @@ The application uses ES6 modules with the following architecture:
    One unit is 1200/WPM ms. SOS is 27 units (3240ms at 10WPM); PARIS is 43 plus 7=50 units.
    Farnsworth uses c=character WPM and s=min(overall WPM,c): a=(60c-37.2s)/(s*c)*1000 ms,
    letterGap=3*a/19 and wordGap=7*a/19 when s<c; these replace, not augment, ordinary gaps.
-   Default playback is 15/10 WPM, 700 Hz and 50% volume. Numeric timeline arguments retain ordinary timing.
-   Audio uses one oscillator per playback and short gain ramps. AudioContext is created/resumed only after user action.
+   Default playback has sound off, 15/10 WPM, 700 Hz and 50% volume. Numeric timeline arguments retain ordinary timing.
+   The shared sound checkbox starts unchecked and also mutes keying sidetone, even when its local Sidetone option is checked.
+   Enabling Sound alone must not create an AudioContext; create/resume it on the first subsequent playback or keying action.
+   Audio uses one oscillator per playback and short gain ramps. Do not create an AudioContext before user action.
    requestAnimationFrame follows AudioContext.currentTime; audio-off/unavailable uses the original timer path.
    Pause/stop cancel sound, resume schedules remaining tones, and tab switches pause playback.
    Reduced motion highlights all final paths synchronously while sound retains its schedule; the lamp is disabled.

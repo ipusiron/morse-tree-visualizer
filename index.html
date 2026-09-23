@@ -64,7 +64,7 @@
         <label for="keying-wpm" data-i18n="keying.speed">打鍵の速さ（WPM）</label>
         <select id="keying-wpm"><option>5</option><option>8</option><option selected>10</option><option>12</option><option>15</option><option>20</option></select>
         <label class="check-control"><input type="checkbox" id="keying-sidetone" checked><span data-i18n="keying.sidetone">側音</span></label>
-        <p data-i18n="keying.audio_note">音量・周波数・音のオン／オフは再生タブの設定と共通です。</p>
+        <p data-i18n="keying.audio_note">音量・周波数・音のオン／オフは再生タブの設定と共通です。初期状態では音はオフです。</p>
         <button type="button" id="keyButton" aria-label="キー（押している間が信号）" data-i18n-aria-label="keying.key_label" data-i18n="keying.key">キー／Space</button>
         <p><span data-i18n="keying.pending">確定待ち</span> <output id="keyingPending"></output></p>
         <p><span data-i18n="table.code">符号</span> <output id="keyingMorse"></output></p>
@@ -340,7 +340,7 @@
 
           <h3 data-i18n="help.audio">🔊 音・速度・ランプ</h3>
           <p data-i18n="help.farnsworth">文字速度は符号自体の速さ、全体速度は文字間・語間を含む速さです。全体速度を下げると、考える間隔を長くできます。</p>
-          <p data-i18n="help.light">音は再生操作のあとに開始します。ランプは既定でオフです。WCAG 2.3.1の点滅への配慮として40px角に抑え、動きを減らす設定では表示しません。</p>
+          <p data-i18n="help.light">音は既定でオフです。「🔊 音」をオンにしてから再生してください。ランプも既定でオフです。WCAG 2.3.1の点滅への配慮として40px角に抑え、動きを減らす設定では表示しません。</p>
 
           <h3 data-i18n="help.tree">🌳 モールスツリーの見方</h3>
           <p data-i18n="help.layout">「木の見た目」で二分木とチャートを切り替えられます。4つの木の設定は共通で、切り替えると点灯と再生を停止します。</p>

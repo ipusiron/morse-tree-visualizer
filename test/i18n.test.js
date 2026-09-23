@@ -4,6 +4,9 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { DICTIONARIES, MESSAGES, t, getLang, setLang } from '../js/messages.js';
 import { initialLang, readLang, writeLang, setMessage, applyLanguage } from '../js/i18n.js';
 import { createAnimator } from '../js/animator.js';
+import { initMorseTable, formatPrintDate } from '../js/table.js';
+import { el } from '../js/utils.js';
+import { TRIVIA_CARDS } from '../js/trivia.js';
 
 const placeholders = text => [...text.matchAll(/\{(\w+)\}/g)].map(match => match[1]).sort();
 
@@ -232,4 +235,159 @@ test('language events invalidate pending audio and do not restart conversions or
   const css = readFileSync(new URL('../style.css', import.meta.url), 'utf8');
   assert.match(css, /#themeToggle, #langToggle\s*\{\s*min-width: 44px;\s*min-height: 44px/);
   assert.match(css, /\.wpm-control\s*\{[^}]*flex-wrap: wrap/);
+});
+
+test('print dates use local calendar dates in English and retain Japanese formatting', () => {
+  const date = new Date(2026, 0, 2, 0, 5);
+  assert.equal(formatPrintDate(date, 'en'), '2026-01-02');
+  assert.equal(formatPrintDate(date, 'ja'), date.toLocaleDateString('ja-JP'));
+  try {
+    setLang('en');
+    assert.equal(formatPrintDate(date), '2026-01-02');
+  } finally { setLang('ja'); }
+});
+
+// Minimal DOM for exercising the real table/card renderers; this is not a browser layout test.
+function installRenderDOM() {
+  const previous = ['document', 'window', 'Node'].map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]);
+  class Element extends EventTarget {
+    constructor(tagName) {
+      super();
+      this.tagName = tagName.toUpperCase();
+      this.attributes = {};
+      this.dataset = {};
+      this.childNodes = [];
+      this._text = '';
+      this.hidden = false;
+      this.scrollTop = 0;
+      this.scrollLeft = 0;
+    }
+    get children() { return this.childNodes.filter(node => node.tagName !== '#TEXT'); }
+    get lastChild() { return this.childNodes.at(-1); }
+    get textContent() { return this._text + this.childNodes.map(node => node.textContent).join(''); }
+    set textContent(value) { this._text = String(value); this.childNodes = []; }
+    setAttribute(key, value) {
+      this.attributes[key] = String(value);
+      if (key.startsWith('data-')) this.dataset[key.slice(5).replace(/-([a-z])/g, (_, c) => c.toUpperCase())] = String(value);
+    }
+    getAttribute(key) { return this.attributes[key] ?? null; }
+    removeAttribute(key) { delete this.attributes[key]; }
+    append(...nodes) { this.childNodes.push(...nodes); }
+    appendChild(node) { this.append(node); return node; }
+    replaceChildren(...nodes) { this._text = ''; this.childNodes = [...nodes]; }
+    querySelectorAll(selector) {
+      const descendants = this.children.flatMap(node => [node, ...node.querySelectorAll('*')]);
+      return descendants.filter(node => {
+        if (selector === '*') return true;
+        if (selector.startsWith('#')) return node.getAttribute('id') === selector.slice(1);
+        if (selector.startsWith('.')) return (node.getAttribute('class') || '').split(' ').includes(selector.slice(1));
+        if (selector.startsWith('[')) {
+          const [, key, value] = selector.match(/^\[([^=\]]+)(?:="([^"]*)")?\]$/);
+          return value === undefined ? node.getAttribute(key) !== null : node.getAttribute(key) === value;
+        }
+        return node.tagName === selector.toUpperCase();
+      });
+    }
+    querySelector(selector) { return this.querySelectorAll(selector)[0] ?? null; }
+  }
+  const doc = new EventTarget();
+  doc.documentElement = new Element('html');
+  doc.body = new Element('body');
+  doc.documentElement.append(doc.body);
+  doc.createElement = tag => new Element(tag);
+  doc.createTextNode = text => { const node = new Element('#text'); node.textContent = text; return node; };
+  doc.querySelectorAll = selector => doc.documentElement.querySelectorAll(selector);
+  doc.getElementById = id => doc.documentElement.querySelector('#' + id);
+  const win = new EventTarget();
+  win.scrollX = 0;
+  win.scrollY = 0;
+  win.scrollTo = ({ left, top }) => { win.scrollX = left; win.scrollY = top; };
+  let prints = 0;
+  win.print = () => { prints++; };
+  for (const [key, value] of [['document', doc], ['window', win], ['Node', Element]]) {
+    Object.defineProperty(globalThis, key, { configurable: true, value });
+  }
+  doc.body.append(el('button', { id: 'langToggle' }));
+  return { doc, win, get prints() { return prints; }, restore() {
+    setLang('ja');
+    for (const [key, descriptor] of previous) {
+      if (descriptor) Object.defineProperty(globalThis, key, descriptor); else delete globalThis[key];
+    }
+  } };
+}
+
+test('table and print labels switch in place with 64 unchanged rows, focus and scroll preserved', () => {
+  const dom = installRenderDOM();
+  try {
+    setLang('ja');
+    const wrapper = el('div', { class: 'morse-table-wrapper' });
+    const print = el('section', { id: 'printSheet' });
+    dom.doc.body.append(el('section', { id: 'tab-table' }, wrapper), el('button', { id: 'printTable' }), print);
+    initMorseTable();
+    const groups = wrapper.querySelectorAll('.morse-table-group');
+    const rows = wrapper.querySelectorAll('[data-char]');
+    const printRows = print.querySelectorAll('tr');
+    const codes = rows.map(row => row.children[1].textContent);
+    assert.equal(rows.length, 64);
+    assert.equal(printRows.length, 64);
+    dom.doc.activeElement = groups[2];
+    groups[2].scrollLeft = 130;
+    applyLanguage('en');
+    assert.doesNotMatch(wrapper.textContent + print.textContent, /[ぁ-んァ-ヶ一-龠]/);
+    assert.deepEqual(wrapper.querySelectorAll('h3').map(node => node.textContent),
+      ['Letters (27)', 'Digits (10)', 'Punctuation (18)', 'Prosigns (9)']);
+    assert.match(wrapper.textContent, /Same code as the ITU Wait prosign/);
+    assert.match(wrapper.textContent, /End of transmission \(same code as \+\)/);
+    assert.match(dom.doc.getElementById('printDate').textContent, /^Generated \d{4}-\d{2}-\d{2}$/);
+    rows.forEach((row, i) => assert.equal(wrapper.querySelectorAll('[data-char]')[i], row));
+    printRows.forEach((row, i) => assert.equal(print.querySelectorAll('tr')[i], row));
+    assert.deepEqual(rows.map(row => row.children[1].textContent), codes);
+    assert.equal(groups[2].scrollLeft, 130);
+    assert.equal(dom.doc.activeElement, groups[2]);
+    assert.equal(dom.prints, 0);
+    dom.win.dispatchEvent(new Event('beforeprint'));
+    assert.equal(print.querySelectorAll('tr').length, 64);
+    assert.doesNotMatch(print.textContent, /[ぁ-んァ-ヶ一-龠]/);
+    applyLanguage('ja');
+    assert.match(wrapper.textContent, /手続き符号 \(9\)/);
+  } finally { dom.restore(); }
+});
+
+test('all trivia cards switch in place without resetting the selected field, links or buttons', async () => {
+  const dom = installRenderDOM();
+  try {
+    setLang('ja');
+    const grid = el('div', { class: 'trivia-grid' });
+    const chips = ['all', 'math', 'code', 'crypto', 'computer', 'network', 'history', 'survival'].map(field =>
+      el('button', { class: 'chip', 'data-field': field, 'data-i18n': 'trivia.' + field }, t('trivia.' + field)));
+    const panel = el('section', { id: 'tab-trivia' }, [grid, ...chips, el('p', { id: 'triviaCount' })]);
+    dom.doc.body.append(panel);
+    const { initTriviaTab } = await import('../js/script.js');
+    initTriviaTab();
+    const cards = grid.querySelectorAll('article');
+    const links = grid.querySelectorAll('a');
+    const buttons = grid.querySelectorAll('button');
+    assert.equal(cards.length, 16);
+    assert.equal(links.length, 20);
+    assert.equal(buttons.length, 14);
+    chips[1].dispatchEvent(new Event('click'));
+    dom.doc.activeElement = chips[1];
+    grid.scrollTop = 85;
+    applyLanguage('en');
+    assert.doesNotMatch(panel.textContent, /[ぁ-んァ-ヶ一-龠]/);
+    assert.deepEqual(grid.querySelectorAll('h3').map(node => node.textContent), TRIVIA_CARDS.map(card => card.titleEn));
+    assert.equal(dom.doc.getElementById('triviaCount').textContent, 'Math: 3 cards');
+    assert.equal(cards.filter(card => !card.hidden).length, 3);
+    assert.equal(chips[1].getAttribute('aria-pressed'), 'true');
+    assert.equal(dom.doc.activeElement, chips[1]);
+    assert.equal(grid.scrollTop, 85);
+    cards.forEach((card, i) => assert.equal(grid.querySelectorAll('article')[i], card));
+    links.forEach((link, i) => assert.equal(grid.querySelectorAll('a')[i], link));
+    buttons.forEach((button, i) => assert.equal(grid.querySelectorAll('button')[i], button));
+    assert.match(cards[0].textContent, /6\.09/);
+    assert.match(cards[0].textContent, /The 2 letters/);
+    applyLanguage('ja');
+    assert.equal(dom.doc.getElementById('triviaCount').textContent, '数学：3枚');
+    assert.equal(cards.filter(card => !card.hidden).length, 3);
+  } finally { dom.restore(); }
 });

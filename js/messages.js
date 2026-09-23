@@ -233,7 +233,7 @@ Object.assign(MESSAGES, {
   "keying.instructions": "キーを押すかSpaceを押して打ちます。短く押すとドット、長く押すとダッシュです。",
   "keying.speed": "打鍵の速さ（WPM）",
   "keying.sidetone": "側音",
-  "keying.audio_note": "音量・周波数・音のオン／オフは再生タブの設定と共通です。",
+  "keying.audio_note": "音量・周波数・音のオン／オフは再生タブの設定と共通です。初期状態では音はオフです。",
   "keying.key": "キー／Space",
   "keying.key_label": "キー（押している間が信号）",
   "keying.pending": "確定待ち",
@@ -303,7 +303,8 @@ Object.assign(MESSAGES, {
   "help.share": "共有URLには入力した平文・符号が含まれます。共有したい場合だけ使ってください。上限は1,000字です。",
   "help.audio": "🔊 音・速度・ランプ",
   "help.farnsworth": "文字速度は符号自体の速さ、全体速度は文字間・語間を含む速さです。全体速度を下げると、考える間隔を長くできます。",
-  "help.light": "音は再生操作のあとに開始します。ランプは既定でオフです。WCAG 2.3.1の点滅への配慮として40px角に抑え、動きを減らす設定では表示しません。",
+  "help.light": "音は既定でオフです。「🔊 音」をオンにしてから再生してください。ランプも既定でオフです。"
+      + "WCAG 2.3.1の点滅への配慮として40px角に抑え、動きを減らす設定では表示しません。",
   "help.tree": "🌳 モールスツリーの見方",
   "help.layout": "「木の見た目」で二分木とチャートを切り替えられます。4つの木の設定は共通で、切り替えると点灯と再生を停止します。",
   "help.chart": "チャートは左がダッシュ側、右がドット側です。丸はドット、長方形はダッシュを表し、下へ進むと反対の符号を追加します。",
@@ -364,7 +365,7 @@ Object.assign(DICTIONARIES.en, {
   "keying.instructions": "Press the key button or Space. A short press is a dot; a long press is a dash.",
   "keying.speed": "Keying speed (WPM)",
   "keying.sidetone": "Sidetone",
-  "keying.audio_note": "Volume, frequency and the sound switch are shared with the playback settings.",
+  "keying.audio_note": "Volume, frequency and the sound switch are shared with the playback settings. Sound is off by default.",
   "keying.key": "Key / Space",
   "keying.key_label": "Key (hold to send a signal)",
   "keying.pending": "Pending",
@@ -446,8 +447,8 @@ Object.assign(DICTIONARIES.en, {
   "help.audio": "🔊 Sound, speed and light",
   "help.farnsworth": "Character speed sets the speed of the symbols. Effective speed includes gaps between characters and "
       + "words. Lower effective speed gives you more time to think.",
-  "help.light": "Sound starts after a playback action. The light is off by default. To address flashing under WCAG 2."
-      + "3.1, it is limited to a 40px square and hidden when reduced motion is enabled.",
+  "help.light": "Sound is off by default. Enable Sound before playback. The light is also off by default. "
+      + "To address flashing under WCAG 2.3.1, it is limited to a 40px square and hidden when reduced motion is enabled.",
   "help.tree": "🌳 Reading the Morse tree",
   "help.layout": "Tree layout switches between Binary tree and Chart. The choice is shared by all four trees. Changing"
       + " layout clears highlights and stops playback.",

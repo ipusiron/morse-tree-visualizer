@@ -16,7 +16,7 @@ export function msg(tag, key, params = {}, attrs = {}) {
   return el(tag, { ...attrs, ...messageAttrs(key, params) }, t(key, params));
 }
 
-export const settings = { notation: 'ja', charWpm: 15, overallWpm: 10, frequency: 700, volume: 50, sound: true, lamp: false };
+export const settings = { notation: 'ja', charWpm: 15, overallWpm: 10, frequency: 700, volume: 50, sound: false, lamp: false };
 
 export function bindSettings() {
   document.querySelectorAll('input[name="notation"]').forEach(input => input.addEventListener('change', () => {
