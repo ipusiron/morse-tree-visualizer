@@ -534,6 +534,7 @@ morse-tree-visualizer/              # モールス符号を木の経路として
 │   ├── script.js                   # 起動・タブ・ヘルプの操作
 │   ├── share.js                    # 共有URLの入力解析と生成
 │   ├── study.js                    # 文字確認・クイズ・成績
+│   ├── system.js                   # 欧文と和文の選択・保存・現在の符号表
 │   ├── table.js                    # ITUと慣用を区別する一覧表
 │   ├── theme.js                    # ライト・ダーク・システム連動と保存
 │   ├── treeRenderer.js             # 木ごとのSVG描画と点灯・追従
@@ -556,6 +557,7 @@ morse-tree-visualizer/              # モールス符号を木の経路として
     ├── readme.test.js              # 日英の表・例・節構成・画像・ツリー・YAML
     ├── share.test.js               # 共有URLの解析と長さ制限
     ├── static.test.js              # 印刷用CSSと外部通信手段なしの検証
+    ├── system.test.js              # 符号選択・保存・再変換と木の切り替え
     ├── table.test.js               # 文字表の件数・順序・符号
     ├── theme.test.js               # テーマの保存と変数集合の検証
     ├── timing.test.js              # ITU時間比とPARIS・SOS

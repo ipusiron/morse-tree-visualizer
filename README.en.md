@@ -541,6 +541,7 @@ morse-tree-visualizer/              # Learn Morse code as tree paths
 │   ├── script.js                   # Startup, tabs, and Help controls
 │   ├── share.js                    # Shared-input URL parsing and generation
 │   ├── study.js                    # Character lookup, quizzes, and scores
+│   ├── system.js                   # Code selection, storage, and the current code table
 │   ├── table.js                    # ITU/customary reference table
 │   ├── theme.js                    # Light/dark/system themes and storage
 │   ├── treeRenderer.js             # Per-view SVG rendering, highlighting, and following
@@ -563,6 +564,7 @@ morse-tree-visualizer/              # Learn Morse code as tree paths
     ├── readme.test.js              # JA/EN tables, examples, sections, images, inventory, and YAML
     ├── share.test.js               # Shared URL parsing and length limits
     ├── static.test.js              # Print CSS and absence of network clients
+    ├── system.test.js              # Code selection, storage, reconversion, and tree switching
     ├── table.test.js               # Character-table counts, order, and codes
     ├── theme.test.js               # Theme storage and variable sets
     ├── timing.test.js              # ITU ratios, PARIS, and SOS

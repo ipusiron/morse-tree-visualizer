@@ -1047,6 +1047,30 @@ svg:not(.show-prosigns) .prosign-extension {
 .tree-box.chart-box svg {
   height: 808px;
 }
+.tree-box.chart-box svg.wabun {
+  height: 920px;
+}
+.code-settings, .notation-control, .system-control {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+.notation-control, .system-control {
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+}
+.notation-control label, .system-control label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 44px;
+  min-height: 44px;
+  margin: 0;
+}
 svg.chart:not(.show-prosigns) .prosign-only rect {
   width: 28px;
   height: 18px;

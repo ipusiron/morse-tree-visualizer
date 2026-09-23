@@ -1,6 +1,6 @@
 import { createTreeView } from './treeRenderer.js';
 import { createAnimator } from './animator.js';
-import { encode } from './morseCodec.js';
+import { encodeCurrent as encode, bindSystemConversion } from './system.js';
 import { settings, bindSettings, describeChars, renderResult, bindPlayback } from './utils.js';
 import { bindShareButton } from './utils.js';
 import { setMessage } from './i18n.js';
@@ -29,7 +29,8 @@ export function initEncodeTab() {
     const result = encode(inputText.value, settings.notation);
     if (!result.ok) {
       if (result.unknownProsign) setMessage(errorDiv, 'prosign.unknown', { label: result.unknownProsign });
-      else setMessage(errorDiv, 'error.unsupported_chars', { list: describeChars(result.unsupported) });
+      else setMessage(errorDiv, settings.system === 'wabun' ? 'wabun.unsupported' : 'error.unsupported_chars',
+        { list: describeChars(result.unsupported) });
       return;
     }
     if (!result.items.length) {
@@ -43,4 +44,5 @@ export function initEncodeTab() {
   startButton.addEventListener('click', () => convert());
   startButton.addEventListener('convert-input', () => convert(false));
   document.addEventListener('notation-change', () => { if (rendered) convert(false); });
+  bindSystemConversion(document.getElementById('tab-encode'), convert);
 }

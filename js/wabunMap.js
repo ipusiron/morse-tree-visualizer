@@ -69,3 +69,4 @@ export const WABUN_TABLE = [
 ];
 export const WABUN_CHAR_TO_CODE = new Map(WABUN_TABLE.map(({ char, code }) => [char, code]));
 export const WABUN_CODE_TO_CHAR = new Map(WABUN_TABLE.map(({ char, code }) => [code, char]));
+export const WABUN_SAMPLES = ['モールス', 'イロハ', 'がっこう', 'サクラ サク'];

@@ -51,11 +51,18 @@
           aria-controls="tab-trivia" aria-selected="false" tabindex="-1" data-i18n="trivia.tab">🔍 雑学</button>
       </div>
 
+      <div class="code-settings">
       <fieldset class="notation-control">
         <legend data-i18n="notation.legend">符号の表記</legend>
         <label><input type="radio" name="notation" value="ja" checked>・−</label>
         <label><input type="radio" name="notation" value="ascii">.-</label>
       </fieldset>
+      <fieldset class="system-control">
+        <legend data-i18n="system.legend">符号</legend>
+        <label><input type="radio" name="system" value="intl" checked><span data-i18n="system.intl">欧文</span></label>
+        <label><input type="radio" name="system" value="wabun"><span data-i18n="system.wabun">和文</span></label>
+      </fieldset>
+      </div>
       <p id="shareStatus" role="status"></p>
 
       <div class="tab-content" id="tab-keying" role="tabpanel" aria-labelledby="tab-button-keying" hidden>

@@ -1,8 +1,9 @@
-import { MORSE_TABLE, PROSIGNS, formatCode } from './morseMap.js';
+import { PROSIGNS, formatCode } from './morseMap.js';
 import { buildTree, completeTo, layoutTree, layoutChart } from './morseTree.js';
 import { readLayout } from './layout.js';
 import { t } from './messages.js';
 import { settings } from './utils.js';
+import { currentTable } from './system.js';
 
 export function createTreeView(container, { layout = readLayout() } = {}) {
   let tree;
@@ -41,8 +42,12 @@ export function createTreeView(container, { layout = readLayout() } = {}) {
   function setLayout(next) {
     mode = next === 'chart' ? 'chart' : 'tree';
     const chart = mode === 'chart';
+    const wabun = settings.system === 'wabun';
+    const table = currentTable();
     // Always pack all prosign paths; hiding them must never move the other nodes.
-    tree = buildTree(MORSE_TABLE, 6, PROSIGNS);
+    tree = buildTree(table, 6, wabun ? [] : PROSIGNS);
+    label.hidden = wabun;
+    svg.classList.toggle('wabun', wabun);
     let width = 1080;
     let height = 470;
     if (chart) ({ width, height } = layoutChart(tree));
@@ -68,9 +73,9 @@ export function createTreeView(container, { layout = readLayout() } = {}) {
         edges.set(child.code, line);
         lines.append(line);
       }
-      const entry = MORSE_TABLE.find(e => e.code === n.code);
+      const entry = table.find(e => e.code === n.code);
       const empty = !n.char && !n.prosign && n.depth !== 0;
-      const group = make('g', { class: 'tree-node' + (empty ? ' empty' : '') + (entry && !entry.itu ? ' custom' : ''),
+      const group = make('g', { class: 'tree-node' + (empty ? ' empty' : '') + (!wabun && entry && !entry.itu ? ' custom' : ''),
         'data-code': n.code });
       const inside = chart && n.prosign && !n.char;
       if (n.prosign && !n.char) group.classList.add('prosign-only');
@@ -80,9 +85,9 @@ export function createTreeView(container, { layout = readLayout() } = {}) {
         const h = empty ? 18 : 30;
         group.append(make('rect', { x: n.x - w / 2, y: n.y - h / 2, width: w, height: h, rx: 3 }));
       } else group.append(make('circle', { cx: n.x, cy: n.y, r: empty ? 8 : chart && n.depth ? 15 : 13 }));
-      group.append(make('text', { x: n.x, y: n.y + 4, 'text-anchor': 'middle', 'font-size': n.depth ? 13 : 10,
+      group.append(make('text', { x: n.x, y: n.y + 4, 'text-anchor': 'middle', 'font-size': entry?.kind === 'mark' ? 20 : n.depth ? 13 : 10,
         class: inside ? 'chart-prosign' : 'node-label' }, n.depth ? n.char || (inside ? n.prosign : '') : 'start'));
-      group.append(make('title', {}, (n.char || n.prosign || '') + ' ' + formatCode(n.code, settings.notation)));
+      group.append(make('title', {}, nodeTitle(n)));
       if (n.prosign && !inside) {
         group.append(make('text', { x: n.x + 13, y: n.y + 19, class: 'prosign-label', 'font-size': 11 }, n.prosign));
       }
@@ -137,17 +142,25 @@ export function createTreeView(container, { layout = readLayout() } = {}) {
     }
   }
   const onLayout = event => setLayout(event.detail.layout);
+  const onSystem = () => setLayout(mode);
+  function nodeTitle(node) {
+    const entry = currentTable().find(e => e.code === node.code);
+    const name = settings.system === 'wabun' && entry?.name ? ' ' + t(entry.name) : '';
+    return (node.char || node.prosign || '') + name + ' ' + formatCode(node.code, settings.notation);
+  }
   const onLanguage = () => {
     for (const n of tree.nodes.values()) {
-      groups.get(n.code).querySelector('title').textContent = (n.char || n.prosign || '') + ' ' + formatCode(n.code, settings.notation);
+      groups.get(n.code).querySelector('title').textContent = nodeTitle(n);
     }
   };
   document.addEventListener('layout-change', onLayout);
+  document.addEventListener('system-change', onSystem);
   document.addEventListener('language-change', onLanguage);
   document.addEventListener('notation-change', onLanguage);
   setLayout(layout);
   return { svg, highlight, clear, setCurrent, scrollToCode, setLayout, destroy() {
     document.removeEventListener('layout-change', onLayout);
+    document.removeEventListener('system-change', onSystem);
     document.removeEventListener('language-change', onLanguage);
     document.removeEventListener('notation-change', onLanguage);
     label.remove();

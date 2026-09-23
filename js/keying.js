@@ -132,6 +132,7 @@ export function initKeying() {
   document.addEventListener('notation-change', () => render());
   document.addEventListener('tab-switch', cancel);
   document.addEventListener('layout-change', cancel);
+  document.addEventListener('system-change', cancel);
   document.addEventListener('language-change', () => cancel({ preserveView: true }));
   window.addEventListener('blur', cancel);
   document.addEventListener('visibilitychange', () => { if (document.hidden) cancel(); });

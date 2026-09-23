@@ -1,9 +1,10 @@
-import { MORSE_TABLE, PROSIGN_BY_LABEL, PROSIGN_BY_CODE, formatCode } from './morseMap.js';
+import { PROSIGN_BY_LABEL, PROSIGN_BY_CODE, formatCode } from './morseMap.js';
 import { timeline } from './morseCodec.js';
 import { t } from './messages.js';
 import { createMorseAudio } from './audio.js';
 import { formatShare } from './share.js';
 import { messageAttrs, setMessage } from './i18n.js';
+import { currentTable } from './system.js';
 
 export function el(tag, attrs = {}, children = []) {
   const node = document.createElement(tag);
@@ -16,7 +17,8 @@ export function msg(tag, key, params = {}, attrs = {}) {
   return el(tag, { ...attrs, ...messageAttrs(key, params) }, t(key, params));
 }
 
-export const settings = { notation: 'ja', charWpm: 15, overallWpm: 10, frequency: 700, volume: 50, sound: false, lamp: false };
+export const settings = { system: 'intl', notation: 'ja', charWpm: 15, overallWpm: 10,
+  frequency: 700, volume: 50, sound: false, lamp: false };
 
 export function bindSettings() {
   document.querySelectorAll('input[name="notation"]').forEach(input => input.addEventListener('change', () => {
@@ -79,9 +81,11 @@ export function renderResult(container, words, output, mode) {
   words.forEach((word, wi) => {
     if (wi) body.append(el('tr', { class: 'word-gap' }, [msg('td', 'table.word_gap'), el('td', { colspan: 3 }, '/')]));
     word.forEach(({ char, code, prosign }) => {
-      const entry = prosign ? PROSIGN_BY_LABEL.get(prosign) : MORSE_TABLE.find(e => e.char === char);
-      const alias = PROSIGN_BY_CODE.get(code);
+      const wabun = settings.system === 'wabun';
+      const entry = prosign ? PROSIGN_BY_LABEL.get(prosign) : currentTable().find(e => e.char === char);
+      const alias = wabun ? null : PROSIGN_BY_CODE.get(code);
       const notes = [];
+      if (wabun && entry.name) notes.push(msg('span', entry.name));
       if (prosign) notes.push(msg('span', entry.ja));
       else if (alias) notes.push(msg('span', 'prosign.alias', { label: alias.label }));
       if (code.length > 6) {
@@ -89,7 +93,8 @@ export function renderResult(container, words, output, mode) {
         notes.push(msg('span', 'tree.outside', { n: code.length }));
       }
       const row = el('tr', { 'data-char': char }, [el('td', {}, char), el('td', {}, formatCode(code, settings.notation)),
-        msg('td', prosign ? 'group.prosign' : entry.itu ? 'table.itu' : 'table.custom'), el('td', {}, notes)]);
+        msg('td', wabun ? 'wabun.standard' : prosign ? 'group.prosign' : entry.itu ? 'table.itu' : 'table.custom'),
+        el('td', {}, notes)]);
       if (mode === 'decode') row.prepend(row.children[1]);
       body.append(row);
       rows.push(row);
@@ -217,6 +222,7 @@ export function bindPlayback(host, animator, getCanonical, getRows = () => []) {
   host.querySelector('[data-action="stop"]').addEventListener('click', stopPlayback);
   document.addEventListener('notation-change', stopPlayback);
   document.addEventListener('layout-change', stopPlayback);
+  document.addEventListener('system-change', () => { stopPlayback(); animator.reset(); audio.stop(); });
   document.addEventListener('language-change', () => {
     generation++;
     animator.stop({ preserveView: true });
