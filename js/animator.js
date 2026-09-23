@@ -55,13 +55,13 @@ export function createAnimator(view) {
     playing = false;
     callbacks.onPause?.();
   }
-  function stop() {
+  function stop({ preserveView = false } = {}) {
     pause();
     index = -1;
     elapsed = 0;
     clock?.stop?.();
     clock = undefined;
-    view.clear();
+    if (!preserveView) view.clear();
   }
   function play(nextEvents, nextCallbacks = {}, nextClock) {
     stop();

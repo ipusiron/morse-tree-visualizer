@@ -5,6 +5,7 @@ import { createAnimator } from './animator.js';
 import { t } from './messages.js';
 import { el, settings, bindPlayback } from './utils.js';
 import { bindTabKeys } from './script.js';
+import { setMessage } from './i18n.js';
 
 export function initStudyMode() {
   const view = createTreeView(document.getElementById('tree-container-study'));
@@ -41,20 +42,22 @@ export function initStudyMode() {
     ['group.letter', e => e.kind === 'letter'], ['group.digit', e => e.kind === 'digit'],
     ['group.itu', e => e.kind === 'punct' && e.itu], ['group.custom', e => !e.itu]
   ]) {
-    const group = el('optgroup', { label: t(key) });
+    const group = el('optgroup', { label: t(key), 'data-i18n-label': key });
     MORSE_TABLE.filter(predicate).forEach(e => group.append(el('option', { value: e.char }, e.char)));
     select.append(group);
   }
-  const prosignGroup = el('optgroup', { label: t('group.prosign') });
+  const prosignGroup = el('optgroup', { label: t('group.prosign'), 'data-i18n-label': 'group.prosign' });
   PROSIGNS.forEach(p => prosignGroup.append(el('option', { value: `<${p.label}>` }, `<${p.label}>`)));
   select.append(prosignGroup);
-  function showManual() {
-    animator.stop();
+  function showManual({ preserveView = false } = {}) {
+    if (!preserveView) animator.stop();
     resultManual.replaceChildren();
     const entry = manualEntries.find(e => e.char === select.value);
     if (!entry) return;
-    view.highlight(entry.code);
-    view.scrollToCode(entry.code);
+    if (!preserveView) {
+      view.highlight(entry.code);
+      view.scrollToCode(entry.code);
+    }
     for (const [key, value] of [['table.char', entry.char], ['table.code', formatCode(entry.code, settings.notation)],
       ['study.path', pathFor(entry.code).map(d => t(d === 'left' ? 'study.left' : 'study.right')).join(' › ')],
       ['table.kind', t(entry.itu ? 'table.itu' : 'table.custom')]]) {
@@ -79,16 +82,16 @@ export function initStudyMode() {
     return MORSE_TABLE.filter(e => kinds.includes(e.char === 'É' ? 'punct' : e.kind));
   }
   function updateScore() {
-    score.textContent = t('quiz.score', { correct, total, streak });
+    setMessage(score, 'quiz.score', { correct, total, streak });
   }
   function updateScope() {
     randomBtn.disabled = pool().length === 0;
-    document.getElementById('quizScopeStatus').textContent = randomBtn.disabled ? t('quiz.scope_empty') : '';
+    setMessage(document.getElementById('quizScopeStatus'), randomBtn.disabled ? 'quiz.scope_empty' : null);
   }
   function displayQuestion() {
     if (!currentQuizAnswer) return;
     quizCode.textContent = direction() === 'char' ? formatCode(currentQuizAnswer.code, settings.notation) : currentQuizAnswer.char;
-    document.getElementById('quizQuestion').textContent = t(direction() === 'char' ? 'quiz.question_char' : 'quiz.question_code');
+    setMessage(document.getElementById('quizQuestion'), direction() === 'char' ? 'quiz.question_char' : 'quiz.question_code');
     if (direction() === 'char') input.setAttribute('maxlength', '1');
     else input.removeAttribute('maxlength');
   }
@@ -105,7 +108,7 @@ export function initStudyMode() {
     animator.stop();
     quizContainer.hidden = false;
     input.value = '';
-    feedback.textContent = '';
+    setMessage(feedback, null);
     feedback.className = '';
     displayQuestion();
     updateScore();
@@ -114,7 +117,7 @@ export function initStudyMode() {
   function checkAnswer() {
     if (!currentQuizAnswer || answered) return;
     if (!input.value.trim()) {
-      feedback.textContent = t('quiz.enter_answer');
+      setMessage(feedback, 'quiz.enter_answer');
       return;
     }
     const normalized = normalizeMorse(input.value);
@@ -123,7 +126,7 @@ export function initStudyMode() {
       : !normalized.unknown.length && normalized.canonical === currentQuizAnswer.code;
     answered = true;
     if (good) { correct++; streak++; } else streak = 0;
-    feedback.textContent = good ? t('quiz.correct') : t('quiz.wrong', {
+    setMessage(feedback, good ? 'quiz.correct' : 'quiz.wrong', {
       answer: direction() === 'char' ? currentQuizAnswer.char : formatCode(currentQuizAnswer.code, settings.notation)
     });
     feedback.className = good ? 'quiz-correct' : 'quiz-wrong';
@@ -148,6 +151,10 @@ export function initStudyMode() {
     animator.stop();
   }));
   document.addEventListener('notation-change', () => { showManual(); displayQuestion(); });
+  document.addEventListener('language-change', () => {
+    if (resultManual.childNodes.length) showManual({ preserveView: true });
+    displayQuestion();
+  });
   updateScope();
   updateScore();
 }

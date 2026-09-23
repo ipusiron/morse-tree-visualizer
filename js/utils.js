@@ -3,12 +3,17 @@ import { timeline } from './morseCodec.js';
 import { t } from './messages.js';
 import { createMorseAudio } from './audio.js';
 import { formatShare } from './share.js';
+import { messageAttrs, setMessage } from './i18n.js';
 
 export function el(tag, attrs = {}, children = []) {
   const node = document.createElement(tag);
   for (const [key, value] of Object.entries(attrs)) node.setAttribute(key, value);
   for (const child of [children].flat()) node.append(child instanceof Node ? child : document.createTextNode(String(child)));
   return node;
+}
+
+export function msg(tag, key, params = {}, attrs = {}) {
+  return el(tag, { ...attrs, ...messageAttrs(key, params) }, t(key, params));
 }
 
 export const settings = { notation: 'ja', charWpm: 15, overallWpm: 10, frequency: 700, volume: 50, sound: true, lamp: false };
@@ -30,7 +35,7 @@ export function bindShareButton(button, input, kind) {
   input.addEventListener('input', update);
   document.addEventListener('share-loaded', update);
   button.addEventListener('click', () => {
-    if (input.value.length > 1000) { status.textContent = t('share.too_long'); return; }
+    if (input.value.length > 1000) { setMessage(status, 'share.too_long'); return; }
     copyText(location.origin + location.pathname + formatShare(kind, input.value), status);
   });
   update();
@@ -40,16 +45,16 @@ export async function copyText(text, status) {
   try {
     if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
     await navigator.clipboard.writeText(text);
-    status.textContent = t('copy.done');
+    setMessage(status, 'copy.done');
   } catch {
     const field = el('textarea', { class: 'clipboard-fallback', 'aria-label': t('copy.button') });
     field.value = text;
     document.body.append(field);
     field.select();
     try {
-      status.textContent = t(document.execCommand('copy') ? 'copy.done' : 'copy.failed');
+      setMessage(status, document.execCommand('copy') ? 'copy.done' : 'copy.failed');
     } catch {
-      status.textContent = t('copy.failed');
+      setMessage(status, 'copy.failed');
     } finally {
       field.remove();
     }
@@ -58,35 +63,40 @@ export async function copyText(text, status) {
 
 export function renderResult(container, words, output, mode) {
   container.replaceChildren();
-  const copy = el('button', { type: 'button', class: 'copy-button' }, t('copy.button'));
+  const copy = msg('button', 'copy.button', {}, { type: 'button', class: 'copy-button' });
   const status = el('p', { role: 'status', class: 'copy-status' });
   copy.addEventListener('click', () => copyText(output, status));
   const box = el('div', { class: mode === 'encode' ? 'morse-result-container' : 'decode-result-container' });
-  box.append(el('h3', {}, t(mode === 'encode' ? 'result.morse_heading' : 'result.text_heading')),
+  box.append(msg('h3', mode === 'encode' ? 'result.morse_heading' : 'result.text_heading'),
     el('output', { class: mode === 'encode' ? 'morse-code-display' : 'decoded-text-display', 'aria-live': 'polite' }, output), copy, status);
   const table = el('table', { class: mode === 'encode' ? 'morse-encode-table' : 'morse-decode-table' });
   const head = el('tr');
   const headings = mode === 'encode' ? ['table.char', 'table.code'] : ['table.code', 'table.char'];
-  for (const key of [...headings, 'table.kind', 'table.note']) head.append(el('th', { scope: 'col' }, t(key)));
+  for (const key of [...headings, 'table.kind', 'table.note']) head.append(msg('th', key, {}, { scope: 'col' }));
   table.append(el('thead', {}, head));
   const body = el('tbody');
   const rows = [];
   words.forEach((word, wi) => {
-    if (wi) body.append(el('tr', { class: 'word-gap' }, [el('td', {}, t('table.word_gap')), el('td', { colspan: 3 }, '/')]));
+    if (wi) body.append(el('tr', { class: 'word-gap' }, [msg('td', 'table.word_gap'), el('td', { colspan: 3 }, '/')]));
     word.forEach(({ char, code, prosign }) => {
       const entry = prosign ? PROSIGN_BY_LABEL.get(prosign) : MORSE_TABLE.find(e => e.char === char);
       const alias = PROSIGN_BY_CODE.get(code);
-      const note = prosign ? t(entry.ja) : alias ? t('prosign.alias', { label: alias.label }) : '';
+      const notes = [];
+      if (prosign) notes.push(msg('span', entry.ja));
+      else if (alias) notes.push(msg('span', 'prosign.alias', { label: alias.label }));
+      if (code.length > 6) {
+        if (notes.length) notes.push(' / ');
+        notes.push(msg('span', 'tree.outside', { n: code.length }));
+      }
       const row = el('tr', { 'data-char': char }, [el('td', {}, char), el('td', {}, formatCode(code, settings.notation)),
-        el('td', {}, t(prosign ? 'group.prosign' : entry.itu ? 'table.itu' : 'table.custom')),
-        el('td', {}, [note, code.length > 6 ? t('tree.outside', { n: code.length }) : ''].filter(Boolean).join(' / '))]);
+        msg('td', prosign ? 'group.prosign' : entry.itu ? 'table.itu' : 'table.custom'), el('td', {}, notes)]);
       if (mode === 'decode') row.prepend(row.children[1]);
       body.append(row);
       rows.push(row);
     });
   });
   table.append(body);
-  box.append(el('details', {}, [el('summary', {}, t('result.details')), table]));
+  box.append(el('details', {}, [msg('summary', 'result.details'), table]));
   container.append(box);
   return rows;
 }
@@ -94,10 +104,11 @@ export function renderResult(container, words, output, mode) {
 function bindSpeedHelp(host, speed) {
   const id = speed.id + '-help';
   const button = el('button', { type: 'button', class: 'wpm-help-button',
-    'aria-label': t('wpm.help_label'), 'aria-describedby': id, 'aria-controls': id, 'aria-expanded': 'false' }, '?');
+    'aria-label': t('wpm.help_label'), 'data-i18n-aria-label': 'wpm.help_label',
+    'aria-describedby': id, 'aria-controls': id, 'aria-expanded': 'false' }, '?');
   const tooltip = el('span', { id, class: 'wpm-tooltip', role: 'tooltip', hidden: '' }, [
-    el('strong', {}, t('wpm.help_title')),
-    ...['wpm.help_speed', 'wpm.help_example', 'wpm.help_start', 'wpm.help_apply'].map(key => el('span', {}, t(key)))
+    msg('strong', 'wpm.help_title'),
+    ...['wpm.help_speed', 'wpm.help_example', 'wpm.help_start', 'wpm.help_apply'].map(key => msg('span', key))
   ]);
   const wrapper = el('span', { class: 'wpm-help' }, [button, tooltip]);
   const control = el('span', { class: 'wpm-control' });
@@ -134,23 +145,25 @@ export function bindPlayback(host, animator, getCanonical, getRows = () => []) {
   const prefix = host.id.replace('-playback', '');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const controls = el('div', { class: 'audio-controls' });
-  const lamp = el('span', { id: prefix + '-lamp', class: 'signal-lamp', role: 'img', 'aria-label': t('audio.lamp'), hidden: '' });
+  const lamp = el('span', { id: prefix + '-lamp', class: 'signal-lamp', role: 'img',
+    'aria-label': t('audio.lamp'), 'data-i18n-aria-label': 'audio.lamp', hidden: '' });
   host.after(lamp);
   for (const [key, label, choices] of [
     ['overallWpm', 'audio.overall', [5, 8, 10, 12, 15, 18, 20, 25]],
     ['frequency', 'audio.frequency', [500, 600, 700, 800, 900]]
   ]) {
     const id = prefix + (key === 'overallWpm' ? '-overall-wpm' : '-frequency');
-    controls.append(el('label', { for: id }, t(label)), el('select', { id, 'data-setting': key },
+    controls.append(msg('label', label, {}, { for: id }), el('select', { id, 'data-setting': key },
       choices.map(n => el('option', { value: n }, n))));
   }
   for (const [key, label] of [['sound', 'audio.sound'], ['lamp', 'audio.lamp']]) {
     controls.append(el('label', { class: 'check-control' }, [
-      el('input', { type: 'checkbox', 'data-setting': key, id: prefix + '-' + key + '-enabled' }), t(label)
+      el('input', { type: 'checkbox', 'data-setting': key, id: prefix + '-' + key + '-enabled' }), msg('span', label)
     ]));
   }
-  controls.append(el('label', { for: prefix + '-volume' }, t('audio.volume')),
-    el('input', { id: prefix + '-volume', type: 'range', min: 0, max: 100, 'data-setting': 'volume', 'aria-label': t('audio.volume') }));
+  controls.append(msg('label', 'audio.volume', {}, { for: prefix + '-volume' }),
+    el('input', { id: prefix + '-volume', type: 'range', min: 0, max: 100, 'data-setting': 'volume',
+      'aria-label': t('audio.volume'), 'data-i18n-aria-label': 'audio.volume' }));
   host.append(controls);
   const play = host.querySelector('[data-action="play"]');
   const pause = host.querySelector('[data-action="pause"]');
@@ -204,6 +217,14 @@ export function bindPlayback(host, animator, getCanonical, getRows = () => []) {
   host.querySelector('[data-action="stop"]').addEventListener('click', stopPlayback);
   document.addEventListener('notation-change', stopPlayback);
   document.addEventListener('layout-change', stopPlayback);
+  document.addEventListener('language-change', () => {
+    generation++;
+    animator.stop({ preserveView: true });
+    audio.stop();
+    paused = false;
+    setMessage(pause, 'anim.pause');
+    lamp.classList.remove('is-on');
+  });
   host.querySelector('[data-action="previous"]').addEventListener('click', () => animator.step(-1));
   host.querySelector('[data-action="next"]').addEventListener('click', () => animator.step(1));
   const speed = host.querySelector('[data-setting="charWpm"]');

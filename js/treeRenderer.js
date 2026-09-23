@@ -2,6 +2,7 @@ import { MORSE_TABLE, PROSIGNS, formatCode } from './morseMap.js';
 import { buildTree, completeTo, layoutTree, layoutChart } from './morseTree.js';
 import { readLayout } from './layout.js';
 import { t } from './messages.js';
+import { settings } from './utils.js';
 
 export function createTreeView(container, { layout = readLayout() } = {}) {
   let tree;
@@ -25,10 +26,14 @@ export function createTreeView(container, { layout = readLayout() } = {}) {
   const toggle = document.createElement('input');
   toggle.type = 'checkbox';
   toggle.className = 'prosign-toggle';
-  label.append(toggle, document.createTextNode(t('prosign.show')));
+  const toggleText = document.createElement('span');
+  toggleText.dataset.i18n = 'prosign.show';
+  toggleText.textContent = t('prosign.show');
+  label.append(toggle, toggleText);
   if (controls?.classList.contains('tree-controls')) controls.append(label); else wrapper.before(label);
   const legend = document.createElement('p');
   legend.className = 'chart-legend';
+  legend.dataset.i18n = 'chart.legend';
   legend.textContent = t('chart.legend');
   wrapper.before(legend);
   toggle.addEventListener('change', () => svg.classList.toggle('show-prosigns', toggle.checked));
@@ -46,6 +51,7 @@ export function createTreeView(container, { layout = readLayout() } = {}) {
     svg.setAttribute('width', width);
     svg.setAttribute('height', height);
     svg.setAttribute('aria-label', t(chart ? 'chart.label' : 'tree.label'));
+    svg.setAttribute('data-i18n-aria-label', chart ? 'chart.label' : 'tree.label');
     svg.classList.toggle('chart', chart);
     container.classList.toggle('chart-box', chart);
     legend.hidden = !chart;
@@ -76,7 +82,7 @@ export function createTreeView(container, { layout = readLayout() } = {}) {
       } else group.append(make('circle', { cx: n.x, cy: n.y, r: empty ? 8 : chart && n.depth ? 15 : 13 }));
       group.append(make('text', { x: n.x, y: n.y + 4, 'text-anchor': 'middle', 'font-size': n.depth ? 13 : 10,
         class: inside ? 'chart-prosign' : 'node-label' }, n.depth ? n.char || (inside ? n.prosign : '') : 'start'));
-      group.append(make('title', {}, (n.char || n.prosign || '') + ' ' + formatCode(n.code)));
+      group.append(make('title', {}, (n.char || n.prosign || '') + ' ' + formatCode(n.code, settings.notation)));
       if (n.prosign && !inside) {
         group.append(make('text', { x: n.x + 13, y: n.y + 19, class: 'prosign-label', 'font-size': 11 }, n.prosign));
       }
@@ -85,14 +91,16 @@ export function createTreeView(container, { layout = readLayout() } = {}) {
     }
     if (chart) {
       for (const [x, key] of [[220, 'chart.dir_dash'], [500, 'chart.dir_dot']]) {
-        svg.append(make('text', { x, y: 16, class: 'direction-label', 'text-anchor': 'middle' }, t(key)));
+        svg.append(make('text', { x, y: 16, class: 'direction-label', 'text-anchor': 'middle', 'data-i18n': key }, t(key)));
       }
     } else {
       for (const [side, key] of [['left', 'tree.dir_dot'], ['right', 'tree.dir_dash']]) {
-        svg.append(make('text', { x: tree.root[side].x, y: -12, class: 'direction-label', 'text-anchor': 'middle' }, t(key)));
+        svg.append(make('text', { x: tree.root[side].x, y: -12, class: 'direction-label',
+          'text-anchor': 'middle', 'data-i18n': key }, t(key)));
       }
       for (let depth = 1; depth <= 6; depth++) {
-        svg.append(make('text', { x: 0, y: 30 + depth * 64 + 4, class: 'depth-label', 'text-anchor': 'end', 'font-size': 11 },
+        svg.append(make('text', { x: 0, y: 30 + depth * 64 + 4, class: 'depth-label', 'text-anchor': 'end', 'font-size': 11,
+          'data-i18n': 'tree.depth', 'data-i18n-params': JSON.stringify({ n: depth }) },
           t('tree.depth', { n: depth })));
       }
     }
@@ -129,10 +137,19 @@ export function createTreeView(container, { layout = readLayout() } = {}) {
     }
   }
   const onLayout = event => setLayout(event.detail.layout);
+  const onLanguage = () => {
+    for (const n of tree.nodes.values()) {
+      groups.get(n.code).querySelector('title').textContent = (n.char || n.prosign || '') + ' ' + formatCode(n.code, settings.notation);
+    }
+  };
   document.addEventListener('layout-change', onLayout);
+  document.addEventListener('language-change', onLanguage);
+  document.addEventListener('notation-change', onLanguage);
   setLayout(layout);
   return { svg, highlight, clear, setCurrent, scrollToCode, setLayout, destroy() {
     document.removeEventListener('layout-change', onLayout);
+    document.removeEventListener('language-change', onLanguage);
+    document.removeEventListener('notation-change', onLanguage);
     label.remove();
     legend.remove();
     svg.remove();

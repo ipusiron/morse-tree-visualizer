@@ -148,7 +148,7 @@
   fill: var(--node-hl-text);
 }
 
-#themeToggle {
+#themeToggle, #langToggle {
   min-width: 44px;
   min-height: 44px;
 }
@@ -331,11 +331,15 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .header-content > div {
   text-align: center;
   flex: 1;
+  min-width: min(100%, 16rem);
+  overflow-wrap: anywhere;
 }
 
 .header-content h1 {
@@ -1154,6 +1158,8 @@ svg:not(.show-prosigns) .chart-prosign {
 }
 .wpm-control {
   gap: 0.5rem;
+  flex-wrap: wrap;
+  max-width: 100%;
 }
 .wpm-help-button {
   min-width: 44px;

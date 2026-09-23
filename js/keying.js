@@ -78,6 +78,8 @@ export function initKeying() {
     button.classList.remove('is-down');
     pending += classifyPress(duration, unit());
     const bar = el('meter', { min: 0, max: 4, low: 2, high: 2, optimum: 1, value: Math.min(4, duration / unit()),
+      'data-i18n-aria-label': 'keying.duration', 'data-i18n-title': 'keying.duration',
+      'data-i18n-params': JSON.stringify({ ms: Math.round(duration) }),
       'aria-label': t('keying.duration', { ms: Math.round(duration) }), title: t('keying.duration', { ms: Math.round(duration) }) });
     bars.append(el('span', { class: 'press-bar' }, bar));
     while (bars.children.length > 10) bars.firstElementChild.remove();
@@ -86,14 +88,14 @@ export function initKeying() {
     later(commit, 5 * unit());
     later(word, 10 * unit());
   }
-  function cancel() {
+  function cancel({ preserveView = false } = {}) {
     clearTimers();
     generation++;
     downAt = null;
     source = null;
     audio.stop();
     button.classList.remove('is-down');
-    view.clear();
+    if (!preserveView) view.clear();
   }
   button.addEventListener('pointerdown', event => {
     if (event.button !== 0 || downAt !== null) return;
@@ -130,6 +132,7 @@ export function initKeying() {
   document.addEventListener('notation-change', () => render());
   document.addEventListener('tab-switch', cancel);
   document.addEventListener('layout-change', cancel);
+  document.addEventListener('language-change', () => cancel({ preserveView: true }));
   window.addEventListener('blur', cancel);
   document.addEventListener('visibilitychange', () => { if (document.hidden) cancel(); });
   render();

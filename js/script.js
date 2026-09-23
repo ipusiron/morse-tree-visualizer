@@ -2,7 +2,8 @@ import { initStudyMode } from './study.js';
 import { initMorseTable } from './table.js';
 import { initKeying } from './keying.js';
 import { parseShare } from './share.js';
-import { t } from './messages.js';
+import { t, getLang } from './messages.js';
+import { initialLang, applyLanguage, writeLang, setMessage } from './i18n.js';
 import { initTheme } from './theme.js';
 import { initLayout, changeLayout } from './layout.js';
 import { TRIVIA_CARDS, formatTrivia, fillTriviaBody } from './trivia.js';
@@ -19,9 +20,16 @@ let keyingInitialized = false;
 let triviaInitialized = false;
 
 document.addEventListener('DOMContentLoaded', () => {
+  const lang = initialLang(location.search, navigator.language);
+  settings.notation = lang === 'en' ? 'ascii' : 'ja';
+  document.querySelectorAll('[name="notation"]').forEach(input => { input.checked = input.value === settings.notation; });
+  applyLanguage(lang);
+  document.getElementById('langToggle').addEventListener('click', () => {
+    applyLanguage(getLang() === 'ja' ? 'en' : 'ja');
+    writeLang(getLang());
+  });
   initTheme();
   initLayout();
-  document.querySelectorAll('[data-message]').forEach(node => { node.textContent = t(node.dataset.message); });
   const tabButtons = document.querySelectorAll('.tab-button');
 
   switchTab('encode');
@@ -36,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const share = parseShare(location.search);
   if (share.ok) {
     applyInput(share.kind, share.value);
-  } else if (share.errorKey !== 'share.none') document.getElementById('shareStatus').textContent = t(share.errorKey);
+  } else if (share.errorKey !== 'share.none') setMessage(document.getElementById('shareStatus'), share.errorKey);
 
   // ヘルプモーダル開閉処理
   const helpButton = document.getElementById('helpBtn');
