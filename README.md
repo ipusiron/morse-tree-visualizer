@@ -6,10 +6,10 @@ slug: morse-tree-visualizer
 title: "MorseTree Visualizer"
 
 subtitle_ja: "モールス信号を視覚化する学習ツール"
-subtitle_en: "Interactive Morse Code Learning Tool with Binary Tree Visualization"
+subtitle_en: "Interactive Morse Code Learning Tool with Tree and Chart Visualization"
 
-description_ja: "モールス信号をバイナリツリー構造で視覚化し、エンコード・デコード・学習モードを通じて直感的に学べるインタラクティブなWebツール"
-description_en: "An interactive web tool that visualizes Morse code as a binary tree structure, enabling intuitive learning through encoding, decoding, and study modes"
+description_ja: "モールス信号を二分木とチャートで視覚化し、変換・学習・打鍵・出所つきの雑学を通じて学べるWebツール"
+description_en: "An interactive Morse code learning tool with tree and chart views, encoding, decoding, quizzes, keying, and sourced trivia"
 
 category_ja:
   - モールス信号
@@ -76,9 +76,17 @@ hub: true
 ![ダークテーマのSOSと音の設定](assets/screenshot7.png)
 > *SOSの再生後のSの経路、音の設定、ランプをダークテーマで表示しています。*
 
+![SOSと手続き符号を表示したチャート](assets/screenshot8.png)
+> *チャートでSとOの経路を同時に点灯し、手続き符号SN・SKも表示しています。1280×1100px、55,792バイト（約56KB）。*
+
+![数学の3枚に絞り込んだ雑学タブ](assets/screenshot9.png)
+> *平均符号長・ハフマン符号・組み合わせの3枚と、それぞれの出所を表示しています。1280×1100px、95,936バイト（約96KB）。*
+
 ## ✨ 機能
 
-- 英語⇒モールス、モールス⇒英語、学習、一覧表、打鍵の5タブ
+- 英語⇒モールス、モールス⇒英語、学習、一覧表、打鍵、雑学の6タブ
+- 二分木／チャートの表示切り替え、4つの木の同期と設定の保存
+- 出所つきの雑学16枚、7分野での絞り込み、実行時の数値計算と「ツールで試す」
 - ASCIIの`.-`と`・−`の入力・表示・コピー
 - ITUタイミングに沿った経路再生、一時停止・再開・停止・前後の手動ステップ
 - 音と木の点灯の同期、周波数・音量・小さなランプの選択
@@ -151,9 +159,21 @@ WPMはモールス信号の速さです。数値が小さいほどゆっくり�
 Esc、もう一度のクリック・タップ、または説明の外をクリック・タップすると閉じます。Tabで次の操作へ移っても閉じます。
 動きを減らす設定ではWPMにかかわらず全経路が一度に点灯するため、経路を順に確認するには手動ステップを使ってください。
 
+### 🧭 木の見た目
+
+木の上の「木の見た目」で「二分木」または「チャート」を選びます。
+選択は4つの木に共通で、次回も同じ見た目を使います。保存が禁止された環境でも、そのページ内では切り替えられます。
+切り替えると点灯と再生を停止します。続けて音を聞くときは「再生」を押してください。
+
+### 🔍 雑学
+
+「雑学」タブを開き、分野のボタンでカードを絞り込みます。「すべて」で16枚に戻せます。
+「出所」のリンクで根拠となる資料を開けます。「ツールで試す」があるカードでは、関連するタブへ移動します。
+例がある場合は入力と変換まで行い、音や再生は始めません。
+
 ## 📐 画面構成
 
-上部に5つのタブと表記の選択、各変換タブに入力・結果・再生制御・木を配置しています。
+上部に6つのタブと表記の選択、各変換タブに入力・結果・再生制御・木を配置しています。
 学習タブは文字確認とランダム出題に分かれます。ヘルプは右上の「？」から開けます。
 
 - タブ移動：←／→、先頭・末尾：Home／End
@@ -238,12 +258,56 @@ PARISの末尾に次の語までの間隔を含めると、1語は60/s秒にな�
 英字27＋数字10＋記号18＋手続き符号9＝64行を2列にし、ASCIIと「・−」の両方を載せます。
 印刷はダークテーマでもライト配色です。ChromiumではA4縦の1ページに収まることを確認しています。
 
+## 🧭 チャート型の見た目
+
+チャートは、基板型のモールス学習具でも使われる配置です。中心のstartから符号をたどります。
+
+| 見る場所 | 読み方 |
+|---|---|
+| 中心から左側 | ダッシュから始まる符号 |
+| 中心から右側 | ドットから始まる符号 |
+| 丸 | 最後の符号がドット |
+| 長方形 | 最後の符号がダッシュ |
+| 左側でさらに左へ | ダッシュを追加 |
+| 右側でさらに右へ | ドットを追加 |
+| 下へ | その側とは反対の符号を追加 |
+
+下の子は、部分木と縦線の通り道がほかの節と重ならない最浅の段に置きます。段の番号は符号の長さではありません。
+11列×14段、720×808pxの配置で、手続き符号を隠すと64ノード、表示すると66ノードが見えます。
+SN・SKを隠しても、ほかの節は動きません。KAは記号の経路上の節、AR・BT・AS・Kは文字と同じ節に表示します。
+破線の小さな節は空き、黄色の破線は慣用符号です。狭い画面では木の箱の中を横スクロールします。
+
+## 🔍 雑学（他の分野とのつながり）
+
+7分野16枚のカードから、モールスとほかの技術・歴史の関係を学べます。
+平均符号長や接頭関係の数などは、文字表と文字頻度から実行時に計算しています。
+出所のない話や、資料で確認できない由来・俗説は載せない方針です。各カードの資料は下の「参考」にもまとめています。
+
+| 分野 | 見出し |
+|---|---|
+| 数学 | E は1、O は11 |
+| 符号・情報 | ドットとダッシュだけでは足りない |
+| 数学 | ハフマン符号と比べる |
+| 数学 | 長さ4までで 30 通り |
+| コンピューター | 木を下りる＝二分探索 |
+| コンピューター | ASCII は7ビット、点字は6点、モールスは1〜7 |
+| コンピューター | スマホのキーボードでもモールス |
+| ネットワーク・通信 | QRS＝もっとゆっくり送って |
+| ネットワーク・通信 | 航空機は今もモールスで局を確かめる |
+| ネットワーク・通信 | 免許の必須科目から任意へ（2003） |
+| 歴史 | ...---... は1906年に決まった |
+| 歴史 | 最初の電信文 |
+| サバイバル | 光と旗で3短3長3短 |
+| 符号・情報 | 手続き符号は間を空けない |
+| 暗号 | 符号と暗号は別物 |
+| 暗号 | 暗号文はモールスに乗って飛んだ |
+
 ## 🔬 技術的な説明
 
 ### 文字表と木
 
 `MORSE_TABLE`を唯一の文字表とし、英字27（A〜ZとÉ）、数字10、記号18（ITU 13＋慣用5）の計55文字を定義しています。
-ITU 50文字と慣用5文字を含みます。木はこの表から生成し、深さ5までの空ノードを補います。
+ITU 50文字と慣用5文字を含みます。二分木はこの表から生成し、深さ5までの空ノードを補います。
 手続き符号も含めると深さ6までで76ノード、葉34、深さ6のノード13です。葉へ左から30px間隔で座標を割り当て、親のx座標を存在する子の平均にします。
 
 左の枝がドット、右の枝がダッシュです。破線の丸は空き、黄色い破線は慣用符号を示します。
@@ -272,6 +336,33 @@ ITU 50文字と慣用5文字を含みます。木はこの表から生成し、�
 
 `&`の符号はITUのWait（待て）の手続き符号ASと同じです。`&`は文字、`<AS>`は手続き符号として入力できます。
 `É`（accented e）はITUにある`..-..`です。
+
+### チャートの配置と雑学の計算
+
+`layoutTree`は二分木、`layoutChart`はチャートの座標を生成します。
+チャートには`completeTo`を使わず、手続き符号を含む66ノードを常に配置します。
+左右の部分木の形と縦線の通過セルを記憶し、横の子を先に、下の子を衝突しない最浅の段へ置きます。
+列は−5〜5、行は0〜13で、座標は`x=360+col×64`、`y=40+row×56`です。
+どちらの見た目も同じ`data-code`で点灯・再生・打鍵・クイズを扱います。設定キーは`morse-tree-layout`です。
+
+`computeTrivia`は英字26字の要素数・時間長、接頭関係、長さ別の使用数、エントロピー、2値ハフマン符号長を計算します。
+時間長はドット1・ダッシュ3・要素間1unitの合計で、文字間を含みません。
+頻度は[Day018 CipherClimb](https://github.com/ipusiron/cipherclimb)の`ngramModel.js`に由来する、Project Gutenberg 10作品・5,141,270文字の集計です。
+小数1桁に丸めた出現率を合計で割り直して正規化します。原資料の丸め前の頻度を使った結果とは区別します。
+
+| 計算項目 | 値 |
+|---|---|
+| 均等な重みでの平均要素数 | 3.15 |
+| 頻度で重みづけした平均要素数 | 2.54 |
+| 均等な重みでの平均時間長 | 8.23 unit |
+| 頻度で重みづけした平均時間長 | 6.09 unit（26.0%短縮） |
+| 同じ符号を頻度順に割り当て直した平均時間長 | 5.69 unit（さらに6.6%短縮） |
+| 固定長の2値符号 | 5ビット |
+| 出現率のエントロピー | 4.17ビット |
+| 2値ハフマン符号の平均長 | 4.20ビット |
+| 接頭関係の順序対 | 英字26字で56組、55文字で168組 |
+
+カードの小数は2桁、短縮率は1桁で表示します。モールスの要素数とハフマンのビット数は、区切りを含む条件が違うため直接比較できません。
 
 ### 時間比と速度
 
@@ -303,10 +394,10 @@ PARISは文字と文字間で43unit、次の語までの7unitを加えて50unit�
 
 画面は入力を`textContent`で描画し、HTMLとして解釈しません。インラインイベント・style属性を除き、meta CSPで同一オリジンのスクリプトとCSSに制限しています。
 referrerは`no-referrer`、外部リンクは`noopener noreferrer`です。ページを開いて操作したときの外部ホストへの要求はChromiumで0件でした。
-テーマのみを保存し、入力や成績は自動保存しません。共有URLには明示的に入力を含めるため、共有先やブラウザーの履歴に残ることがあります。
+テーマと木の見た目のみを保存し、入力や成績は自動保存しません。共有URLには明示的に入力を含めるため、共有先やブラウザーの履歴に残ることがあります。
 
 meta CSPではクリックジャッキングを防げません。`frame-ancestors`はHTTPヘッダー専用で、GitHub Pagesでは任意のレスポンスヘッダーを設定できません。
-外部のGitHubリンクを利用者が開いた場合は、そのサイトへの通信が発生します。
+利用者がGitHubやカードの出所のリンクを開いた場合は、そのサイトへの通信が発生します。カードの表示時には出所を取得しません。
 
 ## ⚠️ 注意
 
@@ -330,7 +421,7 @@ meta CSPではクリックジャッキングを防げません。`frame-ancestor
 
 ### スマートフォンで木が横長になる理由
 
-文字を読める大きさに保つため、木のSVGは1080×470pxで表示します。ページ全体ではなく木の箱の中を横スクロールします。
+文字を読める大きさに保つため、二分木は1080×470px、チャートは720×808pxで表示します。ページ全体ではなく木の箱の中を横スクロールします。
 
 ## 🔗 参考
 
@@ -338,6 +429,22 @@ meta CSPではクリックジャッキングを防げません。`frame-ancestor
 - [ARRL “A Standard for Morse Timing Using the Farnsworth Technique”](https://www.arrl.org/files/file/Technology/x9004008.pdf)（PARIS基準と文字間・語間の計算）
 - [WCAG 2.3.1](https://www.w3.org/WAI/WCAG22/Understanding/three-flashes-or-below-threshold.html)（点滅の回数と面積）
 - [MDN Web Audio API best practices](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Best_practices)（音声開始時のユーザー操作）
+
+- [Project Gutenberg 10作品（Day018 CipherClimb）](https://github.com/ipusiron/cipherclimb)
+- [D. A. Huffman, A Method for the Construction of Minimum-Redundancy Codes（1952）](https://doi.org/10.1109/JRPROC.1952.273898)
+- [RFC 20](https://www.rfc-editor.org/rfc/rfc20.txt)
+- [Braille Authority of North America, Size and Spacing of Braille Characters](https://www.brailleauthority.org/size-and-spacing-braille-characters)
+- [Google The Keyword, Making Morse code available to more people on Gboard（2018-07-11）](https://blog.google/products-and-platforms/products/search/making-morse-code-available-more-people-gboard/)
+- [ITU-R M.1172（海上移動業務の略号と信号）](https://www.itu.int/rec/R-REC-M.1172-0-199510-I/en)
+- [FAA Aeronautical Information Manual 1-1-3（VOR）](https://www.faa.gov/air_traffic/publications/atpubs/aim_html/chap1_section_1.html)
+- [ITU, WRC-03 Final Acts, MOD 25.5](https://www.itu.int/dms_pub/itu-r/opb/act/R-ACT-WRC.7-2003-PDF-E.pdf)
+- [International Radiotelegraph Convention of Berlin, 1906, Service Regulations XVI（ITU History Portal）](https://search.itu.int/history/HistoryDigitalCollectionDocLibrary/4.37.57.en.100.pdf)
+- [Library of Congress, First telegraph message, 24 May 1844](https://www.loc.gov/item/mcc.019/)
+- [FM 21-76 U.S. Army Survival Manual（Internet Archiveの再版）](https://archive.org/details/Fm21-76SurvivalManual)
+- [Encyclopaedia Britannica, Cryptology](https://www.britannica.com/topic/cryptology)
+- [W. Clauson-Thue, The ABC Universal Commercial Electric Telegraphic Code（1881）](https://archive.org/details/abcuniversalco00clau)
+- [Bletchley Park Trust, Enigma Red messages](https://www.bletchleypark.org.uk/our-story/enigma-red-messages/)
+- [Y Stations: Interception](https://www.bletchleypark.org.uk/about-y-stations/work-at-the-y-stations/y-stations-interception/)
 
 ## 🧪 テスト
 
@@ -349,6 +456,9 @@ GitHub Actionsもpushとpull_requestで同じテストを実行します。READM
 | codec.test.js | 正規化・変換・往復・境界・エラー |
 | table.test.js | 55文字・ITU／慣用・一意性・順序 |
 | tree.test.js | 文字表のみ75ノード・手続き符号込み76ノード・葉34・座標 |
+| chart.test.js | チャート66ノードの全座標・衝突・縦線の通り道・設定保存 |
+| frequency.test.js | 出現頻度26個・正規化と上位5文字 |
+| trivia.test.js | 平均値・ハフマン・接頭関係・16カード・出所・文字列の整形 |
 | timing.test.js | ITU時間比・Farnsworth・PARIS・SOSの音の予定表 |
 | messages.test.js | 辞書とJS内の日本語リテラル |
 | html.test.js | CSP・referrer・ARIA・属性とラベル |
@@ -380,8 +490,10 @@ morse-tree-visualizer/              # モールス符号を木の経路として
 │   ├── screenshot4.png             # ITUと慣用の一覧表
 │   ├── screenshot5.png             # 打鍵でSOが確定し最後のSが確定待ちの状態
 │   ├── screenshot6.png             # SKの詳細表と手続き符号のラベル
-│   └── screenshot7.png             # ダークテーマのSOSと音の設定
-├── index.html                      # 5タブ・ヘルプ・CSPのマークアップ
+│   ├── screenshot7.png             # ダークテーマのSOSと音の設定
+│   ├── screenshot8.png             # SOSと手続き符号を表示したチャート
+│   └── screenshot9.png             # 数学3枚に絞り込んだ雑学タブ
+├── index.html                      # 6タブ・ヘルプ・CSPのマークアップ
 ├── js/                             # JavaScriptのES module
 │   ├── animator.js                 # 1符号ずつの再生と一時停止・手動ステップ
 │   ├── audio.js                    # Web Audioの音の予約と打鍵側音
@@ -400,7 +512,7 @@ morse-tree-visualizer/              # モールス符号を木の経路として
 │   ├── table.js                    # ITUと慣用を区別する一覧表
 │   ├── theme.js                    # ライト・ダーク・システム連動と保存
 │   ├── treeRenderer.js             # 木ごとのSVG描画と点灯・追従
-│   ├── trivia.js                   # 雑学タブで使う計算ロジック
+│   ├── trivia.js                   # 雑学16枚・出所・数値計算と本文の整形
 │   └── utils.js                    # 安全なDOM生成と共通制御
 ├── package.json                    # 依存なしのnpm test定義
 ├── style.css                       # 配色変数とモバイル・木の表示

@@ -25,9 +25,10 @@ The site is automatically deployed to GitHub Pages when pushing to the main bran
 ### Tests
 Run `npm test` with Node 22 or newer. No dependencies or install step are needed.
 GitHub Actions runs the same `node --test` suite on push and pull_request.
-The fourteen test files cover codec boundaries and round-trips, the 55-entry character table,
+The seventeen test files cover codec boundaries and round-trips, the 55-entry character table,
 tree geometry, timing, messages, HTML security/ARIA, contrast, formatting, README consistency,
 keying, nine prosigns, shared URLs, theme storage and static print/security constraints.
+Phase three adds chart coordinates/storage, English letter frequencies and executable trivia/card checks.
 
 ## Architecture
 
@@ -44,12 +45,15 @@ The application uses ES6 modules with the following architecture:
   - `js/keying.js` - Pointer/Space input, duration meters, pending symbols and decoded state
   - `js/share.js` - Pure bounded URL parsing/formatting; text and morse are mutually exclusive
   - `js/theme.js` - Light/dark/system choice and guarded localStorage access
+  - `js/layout.js` - Shared tree/chart choice, guarded storage and layout-change events
 - **Data & Visualization**:
   - `js/morseMap.js` - MORSE_TABLE: 55 characters (ITU 50 + customary 5); PROSIGNS: 9 (ITU 8 + customary SOS)
-  - `js/morseTree.js` - buildTree, completeTo, layoutTree; generated from MORSE_TABLE, not a handwritten tree
+  - `js/morseTree.js` - buildTree, completeTo, layoutTree and layoutChart, generated from MORSE_TABLE
+  - `js/frequency.js` - Rounded A-Z frequencies from Day018 CipherClimb's Gutenberg corpus
+  - `js/trivia.js` - DOM-free computeTrivia, text formatting and 16 sourced cards in seven fields
   - `js/morseCodec.js` - DOM-free normalization, encode/decode, paths and ITU timing
   - `js/messages.js` - Japanese MESSAGES dictionary and t(key, params), ready for a future English dictionary
-  - `js/treeRenderer.js` - Independent SVG view instances for encoding, decoding and study
+  - `js/treeRenderer.js` - Independent SVG view instances for encoding, decoding, study and keying
   - `js/animator.js` - Per-view playback, pause/resume/stop and manual steps
   - `js/utils.js` - Safe element creation, shared notation/WPM settings, results, copy and playback controls
 
@@ -72,6 +76,19 @@ The application uses ES6 modules with the following architecture:
    The SVG stays 1080 by 470 pixels;
    only the tree wrapper scrolls horizontally. Empty/customary nodes have distinct dashed borders.
 
+   Chart mode uses layoutChart(buildTree(MORSE_TABLE, 6, PROSIGNS)), without completeTo.
+   Always pack all 66 nodes; toggling prosigns only hides SN/SK and their edges, leaving 64 visible nodes.
+   Packing a character-only 64-node tree moves 26 nodes, so never repack for the toggle.
+   Root is (col=0,row=0), dash subtree left and dot subtree right. Continue the same symbol horizontally;
+   the opposite symbol goes down to the shallowest collision-free row, counting vertical connector cells.
+   Memoize subtree shapes. Columns -5..5 and rows 0..13 map to x=360+64*col, y=40+56*row.
+   viewBox is 0 0 720 808. Dot-ending nodes are circles (r=15); dash-ending nodes are rectangles (48x30).
+   Empty nodes use r=8 or 28x18 with dashed borders. The root retains the binary tree's start circle.
+   SN/SK/KA labels go inside nodes; shared aliases remain small prosign-labels. Rows are not depth labels.
+   createTreeView(container, { layout = readLayout() }) exposes setLayout(mode).
+   Both layouts share data-code, highlight/current classes and playback; do not fork playback by layout.
+   Keep horizontal following; scroll chart nodes vertically only when outside the window viewport.
+
 5. **Security**: Render text with textContent and elements with createElement, never innerHTML.
    CSP allows only local scripts/styles and has no unsafe-inline or frame-ancestors directive.
    Do not add style attributes, inline event handlers, external requests or dependencies.
@@ -91,7 +108,7 @@ The application uses ES6 modules with the following architecture:
 7. **Input and messages**: English input uses NFKC, uppercase and collapsed whitespace.
    Internal codes are ASCII; format only at display/copy time. Decoder accepts dot/dash variants,
    slash, vertical bar, newlines and three or more spaces as word separators.
-   Put dynamic UI text in messages.js and call t(). Do not add raw Japanese literals in other JS modules;
+   Put dynamic UI text in messages.js and call t(). The only Japanese-literal exception is trivia.js card data/formatting;
    use Unicode escapes for the Japanese notation constants. No persistent quiz scores.
 
 8. **Keying**: u=1200/WPM; a press shorter than 2u is a dot, otherwise a dash.
@@ -110,13 +127,32 @@ The application uses ES6 modules with the following architecture:
     Print CSS always restores light colors; compact cells fit A4 portrait on one page in Chromium.
     The browser print dialog provides PDF output.
 
+11. **Shared layout**: morse-tree-layout accepts tree/chart, defaults to tree and catches storage exceptions.
+    Keep the latest choice in memory too, so lazily initialized views agree when storage is blocked.
+    Four independently named radio groups update together via layout-change.
+    A change clears paths and stops all playback (including hidden panels and pending AudioContext work).
+    It also cancels keying tones and timers; changing layout never starts sound.
+
+12. **Trivia**: Keep 16 cards in math(3), code(2), crypto(2), computer(3), network(3), history(2), survival(1).
+    Every card requires a source label and HTTPS URL; source.secondary holds the second supplied source, if any.
+    Do not add unsourced origin stories or folklore. Keep card content and computed formatting in trivia.js;
+    general UI labels stay in messages.js. Create article/h3/p/link/button elements with el/textContent.
+    Source links use target=_blank and rel="noopener noreferrer", with no fetching or external requests on render.
+    Derive calculable quantities with computeTrivia/formatTrivia placeholders, not literals in body text.
+    Normalize the one-decimal LETTER_FREQUENCY by its sum before computing averages or entropy.
+    Weighted/uniform mean units are 6.09/8.23 (26.0% saving), reassignment 5.69 (6.6%), entropy 4.17, Huffman 4.20.
+    Morse unit costs exclude letter gaps and cannot be directly equated to prefix-code bit lengths.
+    The Gutenberg source is 10 works / 5,141,270 characters from Day018 ngramModel.js.
+    URL loads and trivia actions share applyInput, dispatching convert-input to convert(false).
+    Never click an autoplay conversion button from trivia/share code. Lamps respect reduced motion.
+
 ### Development Notes
 
 - The project is part of the "100 Security Tools with Generative AI" series (Day 025)
 - Primary language is Japanese for UI and documentation
 - Default display symbols are `・` (U+30FB) and `−` (U+2212); ASCII `.` and `-` are also supported
 - Word separation uses / and character separation uses space
-- English UI, Wabun and PNG export are deferred; do not add these in phase two
+- JA/EN, README.en.md and Wabun belong to phase four; do not implement them ahead of approval. PNG export remains deferred.
 - HTTP is required for ES modules; file:// is not supported
 
 ### Staged development record
@@ -144,3 +180,17 @@ Keep the first four screenshots unchanged. README tree-only maintenance is allow
 Use actual foreground/background pairs for both-theme contrast tests (minimum 4.5:1).
 Screenshot five captures confirmed SO plus pending S: the specification's committed SOS plus a lit tree is impossible
 because committing a character clears the path. This depiction was explicitly approved.
+
+### Phase three staged development
+
+1. Chart layout and English frequency/trivia logic with reference-value tests; UI unchanged
+2. Chart rendering and synchronized layout controls for the four tree views
+3. Sixth tab with 16 sourced trivia cards, filtering and non-playing example actions
+4. README/CLAUDE, two additional screenshots and documentation consistency checks
+
+Keep the first seven images unchanged. New images are Python Playwright/Chromium viewport captures,
+1280x1100 and at most 300KB each, not full-page or element screenshots.
+Screenshot eight shows chart SOS paths and SN/SK; screenshot nine shows the three math cards and sources in light mode.
+For this phase, the user assigned browser checks and image capture to Nagisa.
+Codex commits each stage after npm test and git diff --check, reporting browser results as delegated/pending.
+Publish only as far as PR creation and a successful Test CI run. Do not merge or delete the branch until instructed.
