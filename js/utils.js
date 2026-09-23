@@ -203,6 +203,7 @@ export function bindPlayback(host, animator, getCanonical, getRows = () => []) {
   }
   host.querySelector('[data-action="stop"]').addEventListener('click', stopPlayback);
   document.addEventListener('notation-change', stopPlayback);
+  document.addEventListener('layout-change', stopPlayback);
   host.querySelector('[data-action="previous"]').addEventListener('click', () => animator.step(-1));
   host.querySelector('[data-action="next"]').addEventListener('click', () => animator.step(1));
   const speed = host.querySelector('[data-setting="charWpm"]');

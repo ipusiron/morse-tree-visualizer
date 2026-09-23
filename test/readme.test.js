@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { encode, decode, farnsworthGaps } from '../js/morseCodec.js';
 import { MORSE_TABLE, PROSIGNS } from '../js/morseMap.js';
+import { TRIVIA_CARDS, formatTrivia } from '../js/trivia.js';
 
 const root = new URL('../', import.meta.url);
 const readme = readFileSync(new URL('README.md', root), 'utf8');
@@ -35,10 +36,33 @@ test('README metadata and image references are intact', () => {
     'repo_url: "https://github.com/ipusiron/morse-tree-visualizer"',
     'demo_url: "https://ipusiron.github.io/morse-tree-visualizer/"']) assert.ok(yaml.includes(expected));
   const images = [...readme.matchAll(/!\[[^\]]*\]\(([^)]+)\)/g)].map(m => m[1]).filter(p => !p.startsWith('https:'));
-  assert.equal(images.length, 7);
+  assert.equal(images.length, 9);
   images.forEach(path => assert.ok(existsSync(new URL(path, root)), path));
   const pngs = readdirSync(new URL('assets/', root)).filter(f => f.endsWith('.png')).map(f => 'assets/' + f);
   assert.deepEqual(images.sort(), pngs.sort());
+  for (const name of ['screenshot8.png', 'screenshot9.png']) {
+    const data = readFileSync(new URL('assets/' + name, root));
+    assert.deepEqual([...data.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
+    assert.deepEqual([data.readUInt32BE(16), data.readUInt32BE(20)], [1280, 1100]);
+    assert.ok(data.length <= 300 * 1024, name);
+  }
+});
+
+test('README explains both layouts and all sourced cards with the computed values', () => {
+  assert.ok(readme.includes('## 🧭 チャート型の見た目'));
+  assert.ok(readme.includes('## 🔍 雑学（他の分野とのつながり）'));
+  for (const card of TRIVIA_CARDS) {
+    assert.ok(readme.includes(card.title), card.id);
+    for (const source of [card.source, card.source.secondary].filter(Boolean)) assert.ok(readme.includes(source.url), source.url);
+  }
+  const values = formatTrivia();
+  for (const key of ['avgElemUniform', 'avgElemWeighted', 'avgUnitUniform', 'avgUnitWeighted',
+    'savingPct', 'reassignedUnits', 'reassignedSavingPct', 'entropyBits', 'huffmanBits']) {
+    assert.ok(readme.includes(values[key]), key);
+  }
+  for (const text of ['66ノード', '64ノード', '11列×14段', '720×808px', 'layoutChart', 'computeTrivia', '5,141,270']) {
+    assert.ok(readme.includes(text), text);
+  }
 });
 
 test('README Farnsworth and nine prosign tables agree with executable definitions', () => {

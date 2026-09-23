@@ -129,6 +129,7 @@ export function initKeying() {
   document.addEventListener('playback-settings', () => audio.setMuted(!settings.sound));
   document.addEventListener('notation-change', () => render());
   document.addEventListener('tab-switch', cancel);
+  document.addEventListener('layout-change', cancel);
   window.addEventListener('blur', cancel);
   document.addEventListener('visibilitychange', () => { if (document.hidden) cancel(); });
   render();

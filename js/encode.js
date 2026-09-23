@@ -41,5 +41,6 @@ export function initEncodeTab() {
     if (autoplay) run();
   }
   startButton.addEventListener('click', () => convert());
+  startButton.addEventListener('convert-input', () => convert(false));
   document.addEventListener('notation-change', () => { if (rendered) convert(false); });
 }

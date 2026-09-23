@@ -2,6 +2,21 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
+test('four independently named layout controls have legends and both modes', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const controls = [...html.matchAll(/<fieldset class="layout-control">([\s\S]*?)<\/fieldset>/g)].map(m => m[1]);
+  assert.equal(controls.length, 4);
+  const names = new Set();
+  for (const control of controls) {
+    assert.match(control, /<legend>木の見た目<\/legend>/);
+    const inputs = [...control.matchAll(/<input type="radio" name="([^"]+)" value="([^"]+)"/g)];
+    assert.deepEqual(inputs.map(m => m[2]), ['tree', 'chart']);
+    assert.equal(inputs[0][1], inputs[1][1]);
+    names.add(inputs[0][1]);
+  }
+  assert.equal(names.size, 4);
+});
+
 test('secure markup, main and nested tabs, dialog and real label targets', () => {
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
   assert.match(html, /http-equiv="Content-Security-Policy"/);
@@ -13,12 +28,16 @@ test('secure markup, main and nested tabs, dialog and real label targets', () =>
     assert.ok(html.includes(`id="${id}"`));
   }
   assert.deepEqual([...html.matchAll(/<script[^>]*>/g)].map(m => m[0]), ['<script type="module" src="js/script.js">']);
-  // Five main tabs plus two nested study tabs.
+  // Six main tabs plus two nested study tabs.
   assert.equal([...html.matchAll(/role="tablist"/g)].length, 2);
-  assert.equal([...html.matchAll(/class="tab-button[^>]+role="tab"/g)].length, 5);
-  assert.equal([...html.matchAll(/class="tab-content[^>]+role="tabpanel"/g)].length, 5);
-  assert.equal([...html.matchAll(/role="tab"/g)].length, 7);
-  assert.equal([...html.matchAll(/role="tabpanel"/g)].length, 7);
+  assert.equal([...html.matchAll(/class="tab-button[^>]+role="tab"/g)].length, 6);
+  assert.equal([...html.matchAll(/class="tab-content[^>]+role="tabpanel"/g)].length, 6);
+  assert.equal([...html.matchAll(/role="tab"/g)].length, 8);
+  assert.equal([...html.matchAll(/role="tabpanel"/g)].length, 8);
+  const trivia = html.slice(html.indexOf('id="tab-trivia"'), html.indexOf('<!-- ヘルプモーダル -->'));
+  assert.match(trivia, /role="tabpanel" aria-labelledby="tab-button-trivia"/);
+  assert.equal([...trivia.matchAll(/class="chip"[^>]+aria-pressed="(?:true|false)"/g)].length, 8);
+  assert.match(trivia, /id="triviaCount" aria-live="polite"/);
   assert.match(html, /id="helpModal"[^>]+role="dialog"[^>]+aria-modal="true"/);
   const ids = new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(m => m[1]));
   for (const match of html.matchAll(/\bfor="([^"]+)"/g)) assert.ok(ids.has(match[1]), match[1]);

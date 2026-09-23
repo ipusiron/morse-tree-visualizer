@@ -58,3 +58,65 @@ export function layoutTree(tree, { xStep = 30, yStep = 64, x0 = 20, y0 = 30 } = 
   const maxY = Math.max(...all.map(n => n.y));
   return { leaves, minX, maxX, maxY, width: maxX - minX, height: maxY - y0 };
 }
+
+export function layoutChart(tree, { xStep = 64, yStep = 56, ox = 360, oy = 40 } = {}) {
+  const key = (x, y) => x + ',' + y;
+  const shapes = new Map();
+  function shape(node, side) {
+    if (shapes.has(node.code)) return shapes.get(node.code);
+    const cells = new Set([key(0, 0)]);
+    const rel = new Map([[node.code, [0, 0]]]);
+    const horizontal = side < 0 ? node.right : node.left;
+    const down = side < 0 ? node.left : node.right;
+    if (horizontal) {
+      const hs = shape(horizontal, side);
+      for (const c of hs.cells) {
+        const [x, y] = c.split(',').map(Number);
+        cells.add(key(x + side, y));
+      }
+      for (const [code, [x, y]] of hs.rel) rel.set(code, [x + side, y]);
+    }
+    if (down) {
+      const ds = shape(down, side);
+      let dy = 1;
+      for (;;) {
+        let clash = false;
+        for (let r = 1; r < dy && !clash; r++) if (cells.has(key(0, r))) clash = true;
+        if (!clash) for (const c of ds.cells) {
+          const [x, y] = c.split(',').map(Number);
+          if (cells.has(key(x, y + dy))) {
+            clash = true;
+            break;
+          }
+        }
+        if (!clash) break;
+        dy++;
+      }
+      for (let r = 1; r < dy; r++) cells.add(key(0, r));
+      for (const c of ds.cells) {
+        const [x, y] = c.split(',').map(Number);
+        cells.add(key(x, y + dy));
+      }
+      for (const [code, [x, y]] of ds.rel) rel.set(code, [x, y + dy]);
+    }
+    const result = { cells, rel };
+    shapes.set(node.code, result);
+    return result;
+  }
+  const pos = new Map([['', [0, 0]]]);
+  if (tree.root.right) for (const [code, [x, y]] of shape(tree.root.right, -1).rel) pos.set(code, [x - 1, y]);
+  if (tree.root.left) for (const [code, [x, y]] of shape(tree.root.left, 1).rel) pos.set(code, [x + 1, y]);
+  for (const node of tree.nodes.values()) {
+    const [col, row] = pos.get(node.code);
+    node.col = col;
+    node.row = row;
+    node.x = ox + col * xStep;
+    node.y = oy + row * yStep;
+    node.shape = node.depth === 0 ? 'root' : node.code.endsWith('.') ? 'circle' : 'rect';
+  }
+  const all = [...tree.nodes.values()];
+  const minCol = Math.min(...all.map(n => n.col));
+  const maxCol = Math.max(...all.map(n => n.col));
+  const maxRow = Math.max(...all.map(n => n.row));
+  return { minCol, maxCol, maxRow, width: (maxCol - minCol) * xStep + 80, height: maxRow * yStep + 80 };
+}
