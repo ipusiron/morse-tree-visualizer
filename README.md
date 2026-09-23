@@ -538,7 +538,8 @@ morse-tree-visualizer/              # モールス符号を木の経路として
 │   ├── theme.js                    # ライト・ダーク・システム連動と保存
 │   ├── treeRenderer.js             # 木ごとのSVG描画と点灯・追従
 │   ├── trivia.js                   # 雑学16枚・出所・数値計算と本文の整形
-│   └── utils.js                    # 安全なDOM生成と共通制御
+│   ├── utils.js                    # 安全なDOM生成と共通制御
+│   └── wabunMap.js                 # 和文65件とローマ字・翻訳キーの定義
 ├── package.json                    # 依存なしのnpm test定義
 ├── style.css                       # 配色変数とモバイル・木の表示
 └── test/                           # 依存なしの自動テスト
@@ -559,7 +560,8 @@ morse-tree-visualizer/              # モールス符号を木の経路として
     ├── theme.test.js               # テーマの保存と変数集合の検証
     ├── timing.test.js              # ITU時間比とPARIS・SOS
     ├── tree.test.js                # 文字表75・手続き符号込み76ノード・葉34・座標
-    └── trivia.test.js              # 実行時に計算する雑学の数値
+    ├── trivia.test.js              # 実行時に計算する雑学の数値
+    └── wabun.test.js               # 和文65行・正規化・変換・復号・木とチャート
 ```
 
 ## 💻 動作環境

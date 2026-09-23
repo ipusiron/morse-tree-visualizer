@@ -545,7 +545,8 @@ morse-tree-visualizer/              # Learn Morse code as tree paths
 │   ├── theme.js                    # Light/dark/system themes and storage
 │   ├── treeRenderer.js             # Per-view SVG rendering, highlighting, and following
 │   ├── trivia.js                   # 16 cards, sources, calculations, and body formatting
-│   └── utils.js                    # Safe DOM creation and shared controls
+│   ├── utils.js                    # Safe DOM creation and shared controls
+│   └── wabunMap.js                 # 65 Wabun entries with romanization and translation keys
 ├── package.json                    # Dependency-free npm test definition
 ├── style.css                       # Color variables, mobile layout, and diagrams
 └── test/                           # Dependency-free automated tests
@@ -566,7 +567,8 @@ morse-tree-visualizer/              # Learn Morse code as tree paths
     ├── theme.test.js               # Theme storage and variable sets
     ├── timing.test.js              # ITU ratios, PARIS, and SOS
     ├── tree.test.js                # 75 character/76 prosign-inclusive nodes, 34 leaves, and coordinates
-    └── trivia.test.js              # Runtime trivia calculations
+    ├── trivia.test.js              # Runtime trivia calculations
+    └── wabun.test.js               # Wabun table, normalization, codec, tree and chart references
 ```
 
 ## 💻 Requirements
