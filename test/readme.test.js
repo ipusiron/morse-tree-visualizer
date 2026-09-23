@@ -108,3 +108,99 @@ test('README tree contains every repository file and directory with aligned desc
   }
   assert.deepEqual([...represented].sort(), walk().sort());
 });
+
+const englishReadmePath = new URL('README.en.md', root);
+
+test('English README has every section in order, matching icons and reciprocal language links', () => {
+  assert.ok(existsSync(englishReadmePath));
+  const english = readFileSync(englishReadmePath, 'utf8');
+  const [languageLink, ...body] = english.split('\n');
+  assert.equal(languageLink, 'English · [日本語](README.md)');
+  assert.ok(readme.includes('[English](README.en.md) · 日本語'));
+  // Only the exact first-line language link is exempt, not arbitrary Japanese elsewhere.
+  assert.doesNotMatch(body.join('\n'), /[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}]/u);
+  const sections = text => [...text.matchAll(/^## (\S+) (.+)$/gm)];
+  const ja = sections(readme), en = sections(english);
+  assert.equal(en.length, ja.length);
+  assert.deepEqual(en.map(m => m[1]), ja.map(m => m[1]));
+  assert.deepEqual(en.map(m => m[2]), [
+    'Demo', 'Screenshots', 'Features', 'Usage', 'Interface', 'Use cases', 'Sound and Farnsworth timing',
+    'Learning by keying', 'Prosigns', 'Sharing input', 'Themes', 'Printing (save as PDF)', 'Chart view',
+    'Trivia (connections to other fields)', 'Technical details', 'Security', 'Limitations', 'FAQ',
+    'References', 'Tests', 'Directory structure', 'Requirements', 'License', 'About this tool'
+  ]);
+});
+
+test('English README matches the Japanese file inventory, commands and external link destinations', () => {
+  const english = readFileSync(englishReadmePath, 'utf8');
+  const tree = text => text.match(/## 📁 [^\n]+\s+```text\n([\s\S]*?)\n```/)[1].split('\n');
+  const ja = tree(readme), en = tree(english);
+  assert.equal(en.length, ja.length);
+  assert.deepEqual(en.map(line => line.split('#')[0]), ja.map(line => line.split('#')[0]));
+  assert.ok(en.every(line => line.indexOf('#') === en[0].indexOf('#')));
+  en.forEach(line => assert.match(line, /# \S.+$/));
+  const commands = text => [...text.matchAll(/```bash\n([\s\S]*?)\n```/g)].map(m => m[1]);
+  assert.deepEqual(commands(english), commands(readme));
+  const links = text => [...new Set([...text.matchAll(/\]\((https?:[^)]+)\)/g)].map(m => m[1]))].sort();
+  assert.deepEqual(links(english), links(readme));
+});
+
+test('English README references exactly nine real English PNGs with accurate size captions', () => {
+  const english = readFileSync(englishReadmePath, 'utf8');
+  const images = [...english.matchAll(/!\[[^\]]*\]\(([^)]+)\)/g)].map(m => m[1]).filter(p => !p.startsWith('https:'));
+  const names = Array.from({ length: 9 }, (_, i) => `screenshot${i ? i + 1 : ''}.png`);
+  assert.deepEqual(images, names.map(name => 'assets/en/' + name));
+  assert.deepEqual(readdirSync(new URL('assets/en/', root)).sort(), [...names].sort());
+  for (const path of images) {
+    assert.ok(existsSync(new URL(path, root)), path);
+    const png = readFileSync(new URL(path, root));
+    assert.deepEqual([...png.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
+    const width = png.readUInt32BE(16), height = png.readUInt32BE(20);
+    assert.deepEqual([width, height], [1280, 1100]);
+    assert.ok(png.length > 0 && png.length <= 300 * 1024, path);
+    const caption = english.split('](' + path + ')\n')[1].split('\n')[0];
+    assert.ok(caption.includes(`${width}×${height} px, ${png.length.toLocaleString('en-US')} bytes.`), path);
+  }
+});
+
+test('English README examples, punctuation, Farnsworth and prosigns retain the executable values', () => {
+  const english = readFileSync(englishReadmePath, 'utf8');
+  const examples = [...english.matchAll(/^\| (encode|decode) \| `([^`]+)` \| `([^`]+)` \|$/gm)];
+  assert.equal(examples.length, 5);
+  for (const [, operation, written, expected] of examples) {
+    const input = written.replace('(newline)', '\n').replace('(3 spaces)', '   ');
+    assert.equal(operation === 'encode' ? encode(input).morse : decode(input).text, expected, written);
+  }
+  const signs = [...english.matchAll(/^\| (ITU|customary) \| `([^`]+)` \| `([.-]+)` \|$/gm)];
+  assert.equal(signs.length, 18);
+  assert.deepEqual(signs.map(m => [m[2], m[3], m[1] === 'ITU']),
+    MORSE_TABLE.filter(e => e.kind === 'punct').map(e => [e.char, e.code, e.itu]));
+  const timing = [...english.matchAll(/^\| (\d+) \| (\d+) \| ([\d.]+) \| ([\d.]+) \| ([\d.]+) \|$/gm)];
+  assert.equal(timing.length, 3);
+  for (const [, c, s, unit, letter, word] of timing) {
+    const gaps = farnsworthGaps(Number(c), Number(s));
+    assert.deepEqual([gaps.unitMs, gaps.letterGapMs, gaps.wordGapMs].map(n => n.toFixed(1)), [unit, letter, word]);
+  }
+  const prosigns = [...english.matchAll(/^\| ([A-Z]+) \| `([.-]+)` \| ([^|]+) \| (ITU|customary) \| ([^|]+) \|$/gm)];
+  assert.equal(prosigns.length, 9);
+  assert.deepEqual(prosigns.map(m => [m[1], m[2], m[4] === 'ITU', m[5] === '—' ? undefined : m[5]]),
+    PROSIGNS.map(p => [p.label, p.code, p.itu, p.sameAs]));
+});
+
+test('English README documents every approved trivia title and source, computed values and sound-off defaults', () => {
+  const english = readFileSync(englishReadmePath, 'utf8');
+  for (const card of TRIVIA_CARDS) {
+    assert.ok(english.includes(card.titleEn), card.id);
+    for (const source of [card.source, card.source.secondary].filter(Boolean)) assert.ok(english.includes(source.url), source.url);
+  }
+  const values = formatTrivia(undefined, 'en');
+  for (const key of ['avgElemUniform', 'avgElemWeighted', 'avgUnitUniform', 'avgUnitWeighted',
+    'savingPct', 'reassignedUnits', 'reassignedSavingPct', 'entropyBits', 'huffmanBits']) {
+    assert.ok(english.includes(values[key]), key);
+  }
+  assert.ok(english.includes('Default playback has sound off'));
+  assert.ok(english.includes('Sound is off by default.'));
+  assert.ok(english.includes('Enabling Sound alone does not create an AudioContext'));
+  assert.ok(english.includes('It is silent by default too.'));
+  assert.ok(english.includes('Wabun (Japanese Morse) and PNG export are not supported'));
+});

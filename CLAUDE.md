@@ -25,10 +25,12 @@ The site is automatically deployed to GitHub Pages when pushing to the main bran
 ### Tests
 Run `npm test` with Node 22 or newer. No dependencies or install step are needed.
 GitHub Actions runs the same `node --test` suite on push and pull_request.
-The seventeen test files cover codec boundaries and round-trips, the 55-entry character table,
+The eighteen test files cover codec boundaries and round-trips, the 55-entry character table,
 tree geometry, timing, messages, HTML security/ARIA, contrast, formatting, README consistency,
 keying, nine prosigns, shared URLs, theme storage and static print/security constraints.
 Phase three adds chart coordinates/storage, English letter frequencies and executable trivia/card checks.
+Phase four-a adds JA/EN dictionaries, language selection/storage, state-preserving translation,
+English trivia/print formatting and matching Japanese/English README content, trees and image references.
 
 ## Architecture
 
@@ -46,13 +48,14 @@ The application uses ES6 modules with the following architecture:
   - `js/share.js` - Pure bounded URL parsing/formatting; text and morse are mutually exclusive
   - `js/theme.js` - Light/dark/system choice and guarded localStorage access
   - `js/layout.js` - Shared tree/chart choice, guarded storage and layout-change events
+  - `js/i18n.js` - Initial language, guarded storage, data-i18n updates and language-change events
 - **Data & Visualization**:
   - `js/morseMap.js` - MORSE_TABLE: 55 characters (ITU 50 + customary 5); PROSIGNS: 9 (ITU 8 + customary SOS)
   - `js/morseTree.js` - buildTree, completeTo, layoutTree and layoutChart, generated from MORSE_TABLE
   - `js/frequency.js` - Rounded A-Z frequencies from Day018 CipherClimb's Gutenberg corpus
   - `js/trivia.js` - DOM-free computeTrivia, text formatting and 16 sourced cards in seven fields
   - `js/morseCodec.js` - DOM-free normalization, encode/decode, paths and ITU timing
-  - `js/messages.js` - Japanese MESSAGES dictionary and t(key, params), ready for a future English dictionary
+  - `js/messages.js` - Matching JA/EN dictionaries, setLang/getLang and strict t(key, params)
   - `js/treeRenderer.js` - Independent SVG view instances for encoding, decoding, study and keying
   - `js/animator.js` - Per-view playback, pause/resume/stop and manual steps
   - `js/utils.js` - Safe element creation, shared notation/WPM settings, results, copy and playback controls
@@ -148,13 +151,35 @@ The application uses ES6 modules with the following architecture:
     URL loads and trivia actions share applyInput, dispatching convert-input to convert(false).
     Never click an autoplay conversion button from trivia/share code. Lamps respect reduced motion.
 
+13. **Language (phase four-a)**: Keep the key sets and interpolation parameter sets of DICTIONARIES.ja/en identical.
+    MESSAGES remains an alias for the Japanese dictionary. Use t(key, params); unknown keys or missing parameters throw.
+    Fixed HTML uses data-i18n, data-i18n-aria-label, data-i18n-title and data-i18n-placeholder.
+    Keep Japanese fallback text in HTML. Update document language, title and meta description too.
+    Dynamic text uses setMessage/msg and language-change listeners; preserve existing controls and result nodes.
+    Switching languages keeps input, results, highlighted paths, selected tabs, filters, focus and scroll positions.
+    Stop playback and keying audio without clearing highlights; language switching must never start sound.
+    Initial language priority: valid ?lang=ja|en, saved morse-tree-lang, then navigator.language (ja prefix or en).
+    Catch storage read/write failures. The language button displays the destination EN/JA.
+    English starts with ASCII .- notation; Japanese starts with U+30FB/U+2212. Preserve manually selected notation.
+    Shared-input URLs omit lang so recipients use their own language preference.
+    Use "Depth {n}" for binary-tree depth labels and "Name" for the English table column heading.
+    English print dates use the local calendar date as YYYY-MM-DD, including the beforeprint path.
+    Nagisa's approved ref/day025/day025_trivia_en.json is the source of truth for all 16 English trivia cards.
+    The reference JSON lives outside this repository; do not add it as a runtime fetch or a full test fixture.
+    Preserve titleEn/bodyEn/source.labelEn (including secondary sources) verbatim and compute numbers at runtime.
+    Keep Japanese and English placeholder sets equal; the approved frequency sentence includes {longCount}.
+    Update README.md and README.en.md together, with matching sections, examples, numbers and directory inventories.
+    Japanese images stay in assets/; English images stay in assets/en/. Do not overwrite the Japanese images.
+    Only the required Japanese-language link on README.en.md's first line is exempt from its Japanese-text check.
+    Wabun belongs to phase four-b: do not implement it ahead of separate approval.
+
 ### Development Notes
 
 - The project is part of the "100 Security Tools with Generative AI" series (Day 025)
-- Primary language is Japanese for UI and documentation
-- Default display symbols are `・` (U+30FB) and `−` (U+2212); ASCII `.` and `-` are also supported
+- The UI and documentation support Japanese and English
+- Initial notation follows the UI language: Japanese U+30FB/U+2212 or English ASCII `.` and `-`
 - Word separation uses / and character separation uses space
-- JA/EN, README.en.md and Wabun belong to phase four; do not implement them ahead of approval. PNG export remains deferred.
+- JA/EN and README.en.md are phase four-a. Wabun (four-b) requires separate approval; PNG export remains deferred.
 - HTTP is required for ES modules; file:// is not supported
 
 ### Staged development record
@@ -196,3 +221,16 @@ Screenshot eight shows chart SOS paths and SN/SK; screenshot nine shows the thre
 For this phase, the user assigned browser checks and image capture to Nagisa.
 Codex commits each stage after npm test and git diff --check, reporting browser results as delegated/pending.
 Publish only as far as PR creation and a successful Test CI run. Do not merge or delete the branch until instructed.
+
+### Phase four-a staged development
+
+1. Matching JA/EN dictionaries and language selection/storage; no UI change
+2. Fixed and dynamic UI translation with state preservation and no audio start
+3. Sixteen approved English trivia cards, locale formatting, table and print translation; sound defaults off
+4. Full English README, reciprocal language links, nine English screenshots and bilingual documentation tests
+
+The stage-three follow-up shortens depth labels to Depth n and the table heading to Name without changing geometry or data.
+Nagisa supplies browser verification and all nine English PNGs, captured from 64db767 in Chromium at 1280x1100.
+Keep the original Japanese PNGs unchanged. Record dimensions and byte sizes for the English copies.
+Codex gates each commit on npm test and git diff --check; do not claim automated/static tests are browser checks.
+Push the branch, create the PR, and wait for successful Test CI. Stop there; do not merge until explicitly instructed.

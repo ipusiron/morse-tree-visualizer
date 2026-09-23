@@ -34,6 +34,8 @@ hub: true
 ---
 -->
 
+[English](README.en.md) · 日本語
+
 # MorseTree Visualizer - モールス符号を木の上の経路として学ぶ可視化ツール
 
 ![GitHub Repo stars](https://img.shields.io/github/stars/ipusiron/morse-tree-visualizer?style=social)
@@ -85,6 +87,7 @@ hub: true
 ## ✨ 機能
 
 - 英語⇒モールス、モールス⇒英語、学習、一覧表、打鍵、雑学の6タブ
+- 日本語／英語の画面切り替え、言語の保存と`?lang=ja`／`?lang=en`での指定
 - 二分木／チャートの表示切り替え、4つの木の同期と設定の保存
 - 出所つきの雑学16枚、7分野での絞り込み、実行時の数値計算と「ツールで試す」
 - ASCIIの`.-`と`・−`の入力・表示・コピー
@@ -175,6 +178,12 @@ Esc、もう一度のクリック・タップ、または説明の外をクリ�
 
 上部に6つのタブと表記の選択、各変換タブに入力・結果・再生制御・木を配置しています。
 学習タブは文字確認とランダム出題に分かれます。ヘルプは右上の「？」から開けます。
+
+ヘッダーの「EN／JA」で画面の言語を切り替えます。
+初期言語は`?lang=ja`／`?lang=en`、保存した選択、ブラウザーの言語の順に決まり、日本語以外は英語になります。
+英語で開いたときの既定表記はASCIIの`.-`、日本語では`・−`です。
+手動で選んだ表記は、その後に言語を切り替えても保持します。
+言語の切り替えは入力・結果・点灯・タブ・スクロール位置を保ち、再生中なら停止します。音は始めません。
 
 - タブ移動：←／→、先頭・末尾：Home／End
 - デコード実行：入力欄のEnter、改行：Shift+Enter
@@ -397,7 +406,7 @@ PARISは文字と文字間で43unit、次の語までの7unitを加えて50unit�
 
 画面は入力を`textContent`で描画し、HTMLとして解釈しません。インラインイベント・style属性を除き、meta CSPで同一オリジンのスクリプトとCSSに制限しています。
 referrerは`no-referrer`、外部リンクは`noopener noreferrer`です。ページを開いて操作したときの外部ホストへの要求はChromiumで0件でした。
-テーマと木の見た目のみを保存し、入力や成績は自動保存しません。共有URLには明示的に入力を含めるため、共有先やブラウザーの履歴に残ることがあります。
+テーマ、木の見た目、言語の選択を保存し、入力や成績は自動保存しません。共有URLには明示的に入力を含めるため、共有先やブラウザーの履歴に残ることがあります。
 
 meta CSPではクリックジャッキングを防げません。`frame-ancestors`はHTTPヘッダー専用で、GitHub Pagesでは任意のレスポンスヘッダーを設定できません。
 利用者がGitHubやカードの出所のリンクを開いた場合は、そのサイトへの通信が発生します。カードの表示時には出所を取得しません。
@@ -409,7 +418,7 @@ meta CSPではクリックジャッキングを防げません。`frame-ancestor
 - アクセント文字はÉ以外に非対応
 - 慣用符号は通信環境によって異なる場合がある
 - iOSでは音の開始にタップが必要。iOS実機は未検証
-- 和文モールス・英語UI・PNG保存は未対応
+- 和文モールス・PNG保存は未対応
 
 ## ❓ FAQ
 
@@ -465,9 +474,10 @@ GitHub Actionsもpushとpull_requestで同じテストを実行します。READM
 | timing.test.js | ITU時間比・Farnsworth・PARIS・SOSの音の予定表 |
 | messages.test.js | 辞書とJS内の日本語リテラル |
 | html.test.js | CSP・referrer・ARIA・属性とラベル |
+| i18n.test.js | 日英辞書・初期言語・保存制限・状態を保つ切り替え・一覧表と印刷 |
 | contrast.test.js | 配色の4.5:1以上 |
 | format.test.js | 行数・行長 |
-| readme.test.js | 表・例・YAML・ツリー・画像 |
+| readme.test.js | 日英の表・例・節構成・YAML・ツリー・画像・相互リンク |
 | keying.test.js | 打鍵の2u・5uの境界と乱れた入力 |
 | prosign.test.js | 手続き符号9件・変換・復号と別名 |
 | share.test.js | URLの解析・1,000文字制限・生成 |
@@ -486,7 +496,18 @@ morse-tree-visualizer/              # モールス符号を木の経路として
 ├── CLAUDE.md                       # AI向けの開発ガイド
 ├── LICENSE                         # MITライセンス
 ├── README.md                       # 使い方・仕様・検証の説明
+├── README.en.md                    # 日本語版と同じ節構成の英語ドキュメント
 ├── assets/                         # README用の画像
+│   ├── en/                         # 英語UIのスクリーンショット
+│   │   ├── screenshot.png          # SOSの変換結果とS・Oの点灯
+│   │   ├── screenshot2.png         # LOVEの復号結果と詳細表
+│   │   ├── screenshot3.png         # Qの正解と成績
+│   │   ├── screenshot4.png         # 英字と数字の一覧表
+│   │   ├── screenshot5.png         # 打鍵でSOが確定し最後のSが確定待ちの状態
+│   │   ├── screenshot6.png         # SKの詳細表と手続き符号のラベル
+│   │   ├── screenshot7.png         # ダークテーマのSOSと音の設定
+│   │   ├── screenshot8.png         # SOSと手続き符号を表示したチャート
+│   │   └── screenshot9.png         # 数学3枚に絞り込んだ雑学タブ
 │   ├── screenshot.png              # SOSの変換結果とS・Oの点灯
 │   ├── screenshot2.png             # LOVEの復号結果と詳細表
 │   ├── screenshot3.png             # Qの正解と成績
@@ -503,10 +524,10 @@ morse-tree-visualizer/              # モールス符号を木の経路として
 │   ├── decode.js                   # 復号と入力支援・リアルタイム追従
 │   ├── encode.js                   # 英文の変換と結果・コピー・再生
 │   ├── frequency.js                # Day018由来の英字出現頻度
-│   ├── i18n.js                     # 初期言語の選択と保存
+│   ├── i18n.js                     # 初期言語の選択・保存と画面文言の切り替え
 │   ├── keying.js                   # 押し離しから符号と文字を確定する打鍵タブ
 │   ├── layout.js                   # 木の見た目の保存と4か所の同期
-│   ├── messages.js                 # 動的な画面文言の日本語辞書
+│   ├── messages.js                 # 画面文言の日英辞書
 │   ├── morseCodec.js               # 入力正規化・変換・経路・ITUタイミング
 │   ├── morseMap.js                 # 55文字と手続き符号9件の定義・表記
 │   ├── morseTree.js                # 文字表から木を生成し座標を決定
@@ -531,7 +552,7 @@ morse-tree-visualizer/              # モールス符号を木の経路として
     ├── keying.test.js              # 打鍵の時間境界と符号・文字の確定
     ├── messages.test.js            # 辞書と日本語リテラルの集約
     ├── prosign.test.js             # 手続き符号9件と変換・復号
-    ├── readme.test.js              # 表・例・画像・ツリー・YAML
+    ├── readme.test.js              # 日英の表・例・節構成・画像・ツリー・YAML
     ├── share.test.js               # 共有URLの解析と長さ制限
     ├── static.test.js              # 印刷用CSSと外部通信手段なしの検証
     ├── table.test.js               # 文字表の件数・順序・符号
