@@ -31,7 +31,9 @@ test('t switches language, interpolates and rejects invalid keys, parameters and
     setLang('en');
     assert.equal(getLang(), 'en');
     assert.equal(t('layout.tree'), 'Binary tree');
-    assert.equal(t('tree.depth', { n: 3 }), '3 elements');
+    assert.equal(t('tree.depth', { n: 3 }), 'Depth 3');
+    assert.equal(t('tree.depth', { n: 1 }), 'Depth 1');
+    assert.equal(t('table.name'), 'Name');
     assert.throws(() => t('unknown'));
     assert.throws(() => t('tree.depth'));
     assert.throws(() => setLang('xx'), RangeError);
@@ -43,6 +45,8 @@ test('t switches language, interpolates and rejects invalid keys, parameters and
     } finally { DICTIONARIES.en['layout.tree'] = previous; }
     setLang('ja');
     assert.equal(t('layout.tree'), MESSAGES['layout.tree']);
+    assert.equal(t('tree.depth', { n: 1 }), '1符号');
+    assert.equal(t('table.name'), '英語名');
   } finally { setLang('ja'); }
 });
 
