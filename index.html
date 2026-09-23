@@ -2,7 +2,8 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
-    <title>MorseTree Visualizer</title>
+    <title data-i18n="app.title">MorseTree Visualizer</title>
+    <meta name="description" data-i18n="app.description" content="モールス信号を可視化して学べるツールです。">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="light dark">
     <meta http-equiv="Content-Security-Policy"
@@ -12,70 +13,71 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <noscript>このツールを使うにはJavaScriptを有効にしてください。</noscript>
+    <noscript data-i18n="app.noscript">このツールを使うにはJavaScriptを有効にしてください。</noscript>
     <header>
       <div class="header-content">
         <div>
           <h1>MorseTree Visualizer</h1>
-          <p>モールス信号を可視化して学べるツールです。</p>
+          <p data-i18n="app.description">モールス信号を可視化して学べるツールです。</p>
         </div>
-        <button class="help-icon-button" id="helpBtn" title="ヘルプ" aria-label="ヘルプを開く">？</button>
-        <button type="button" id="themeToggle" aria-label="配色: システム連動">🖥</button>
+        <button class="help-icon-button" id="helpBtn" title="ヘルプ" data-i18n-title="help.button" aria-label="ヘルプを開く" data-i18n-aria-label="help.open">？</button>
+        <button type="button" id="themeToggle" aria-label="配色: システム連動" data-i18n-aria-label="theme.initial">🖥</button>
+        <button type="button" id="langToggle" aria-label="English">EN</button>
       </div>
     </header>
 
     <main>
       <!-- タブメニュー -->
-      <div class="tab-menu" role="tablist" aria-label="機能">
+      <div class="tab-menu" role="tablist" aria-label="機能" data-i18n-aria-label="tab.label">
         <button class="tab-button active" data-tab="encode" id="tab-button-encode" role="tab"
           aria-controls="tab-encode" aria-selected="true" tabindex="0">
-          <span class="tab-long">英語 ⇒ モールス信号</span><span class="tab-short">英語 ⇒ モールス</span>
+          <span class="tab-long" data-i18n="tab.encode">英語 ⇒ モールス信号</span><span class="tab-short" data-i18n="tab.encode_short">英語 ⇒ モールス</span>
         </button>
         <button class="tab-button" data-tab="decode" id="tab-button-decode" role="tab"
           aria-controls="tab-decode" aria-selected="false" tabindex="-1">
-          <span class="tab-long">モールス信号 ⇒ 英語</span><span class="tab-short">モールス ⇒ 英語</span>
+          <span class="tab-long" data-i18n="tab.decode">モールス信号 ⇒ 英語</span><span class="tab-short" data-i18n="tab.decode_short">モールス ⇒ 英語</span>
         </button>
         <button class="tab-button" data-tab="study" id="tab-button-study" role="tab"
           aria-controls="tab-study" aria-selected="false" tabindex="-1">
-          <span class="tab-long">学習モード</span><span class="tab-short">学習</span>
+          <span class="tab-long" data-i18n="tab.study">学習モード</span><span class="tab-short" data-i18n="tab.study_short">学習</span>
         </button>
         <button class="tab-button" data-tab="table" id="tab-button-table" role="tab"
           aria-controls="tab-table" aria-selected="false" tabindex="-1">
-          <span class="tab-long">モールス信号一覧表</span><span class="tab-short">一覧表</span>
+          <span class="tab-long" data-i18n="tab.table">モールス信号一覧表</span><span class="tab-short" data-i18n="tab.table_short">一覧表</span>
         </button>
         <button class="tab-button" data-tab="keying" id="tab-button-keying" role="tab"
-          aria-controls="tab-keying" aria-selected="false" tabindex="-1">⌨ 打鍵</button>
+          aria-controls="tab-keying" aria-selected="false" tabindex="-1" data-i18n="tab.keying">⌨ 打鍵</button>
         <button class="tab-button" data-tab="trivia" id="tab-button-trivia" role="tab"
-          aria-controls="tab-trivia" aria-selected="false" tabindex="-1" data-message="trivia.tab">🔍 雑学</button>
+          aria-controls="tab-trivia" aria-selected="false" tabindex="-1" data-i18n="trivia.tab">🔍 雑学</button>
       </div>
 
       <fieldset class="notation-control">
-        <legend>符号の表記</legend>
+        <legend data-i18n="notation.legend">符号の表記</legend>
         <label><input type="radio" name="notation" value="ja" checked>・−</label>
         <label><input type="radio" name="notation" value="ascii">.-</label>
       </fieldset>
       <p id="shareStatus" role="status"></p>
 
       <div class="tab-content" id="tab-keying" role="tabpanel" aria-labelledby="tab-button-keying" hidden>
-        <h2>⌨ 打鍵で覚える</h2>
-        <p>キーを押すかSpaceを押して打ちます。短く押すとドット、長く押すとダッシュです。</p>
-        <label for="keying-wpm">打鍵の速さ（WPM）</label>
+        <h2 data-i18n="keying.heading">⌨ 打鍵で覚える</h2>
+        <p data-i18n="keying.instructions">キーを押すかSpaceを押して打ちます。短く押すとドット、長く押すとダッシュです。</p>
+        <label for="keying-wpm" data-i18n="keying.speed">打鍵の速さ（WPM）</label>
         <select id="keying-wpm"><option>5</option><option>8</option><option selected>10</option><option>12</option><option>15</option><option>20</option></select>
-        <label class="check-control"><input type="checkbox" id="keying-sidetone" checked>側音</label>
-        <p>音量・周波数・音のオン／オフは再生タブの設定と共通です。</p>
-        <button type="button" id="keyButton" aria-label="キー（押している間が信号）">キー／Space</button>
-        <p>確定待ち <output id="keyingPending"></output></p>
-        <p>符号 <output id="keyingMorse"></output></p>
-        <p>文字 <output id="keyingText" aria-live="polite"></output></p>
-        <p>押した長さ（直近10回、中央の線は2unitの境界）</p>
+        <label class="check-control"><input type="checkbox" id="keying-sidetone" checked><span data-i18n="keying.sidetone">側音</span></label>
+        <p data-i18n="keying.audio_note">音量・周波数・音のオン／オフは再生タブの設定と共通です。初期状態では音はオフです。</p>
+        <button type="button" id="keyButton" aria-label="キー（押している間が信号）" data-i18n-aria-label="keying.key_label" data-i18n="keying.key">キー／Space</button>
+        <p><span data-i18n="keying.pending">確定待ち</span> <output id="keyingPending"></output></p>
+        <p><span data-i18n="table.code">符号</span> <output id="keyingMorse"></output></p>
+        <p><span data-i18n="table.char">文字</span> <output id="keyingText" aria-live="polite"></output></p>
+        <p data-i18n="keying.bars">押した長さ（直近10回、中央の線は2unitの境界）</p>
         <div id="keyingBars" class="keying-bars"></div>
-        <button type="button" id="keyingClear">クリア</button>
-        <button type="button" id="keyingToDecode" disabled>デコードへ送る</button>
+        <button type="button" id="keyingClear" data-i18n="keying.clear">クリア</button>
+        <button type="button" id="keyingToDecode" disabled data-i18n="keying.send">デコードへ送る</button>
         <div class="tree-controls">
           <fieldset class="layout-control">
-            <legend>木の見た目</legend>
-            <label><input type="radio" name="layout-keying" value="tree" checked><span>二分木</span></label>
-            <label><input type="radio" name="layout-keying" value="chart"><span>チャート</span></label>
+            <legend data-i18n="layout.legend">木の見た目</legend>
+            <label><input type="radio" name="layout-keying" value="tree" checked><span data-i18n="layout.tree">二分木</span></label>
+            <label><input type="radio" name="layout-keying" value="chart"><span data-i18n="layout.chart">チャート</span></label>
           </fieldset>
         </div>
         <div class="tree-scroll-wrapper"><div id="tree-container-keying"></div></div>
@@ -86,31 +88,31 @@
         aria-labelledby="tab-button-encode">
         <section>
           <div class="input-with-button">
-            <label for="inputText">テキスト入力：</label>
-            <textarea id="inputText" placeholder="HELLO などを入力" rows="2"></textarea>
-            <button id="startButton">エンコード＆表示</button>
+            <label for="inputText" data-i18n="encode.label">テキスト入力：</label>
+            <textarea id="inputText" placeholder="HELLO などを入力" data-i18n-placeholder="encode.placeholder" rows="2"></textarea>
+            <button id="startButton" data-i18n="encode.button">エンコード＆表示</button>
           </div>
           <div id="encodeError" class="error-message" role="alert"></div>
         </section>
         <div id="morseResult"></div>
-        <button type="button" id="encodeShare" disabled>共有URLをコピー</button>
+        <button type="button" id="encodeShare" disabled data-i18n="share.button">共有URLをコピー</button>
         <div class="playback" id="encode-playback">
-          <button type="button" data-action="play">▶ 再生</button>
-          <button type="button" data-action="pause">⏸ 一時停止</button>
-          <button type="button" data-action="stop">■ 停止</button>
-          <button type="button" data-action="previous" aria-label="前の符号">◀</button>
-          <button type="button" data-action="next" aria-label="次の符号">▶</button>
-          <label for="encode-char-wpm">文字速度（WPM）</label>
+          <button type="button" data-action="play" data-i18n="anim.play">▶ 再生</button>
+          <button type="button" data-action="pause" data-i18n="anim.pause">⏸ 一時停止</button>
+          <button type="button" data-action="stop" data-i18n="anim.stop">■ 停止</button>
+          <button type="button" data-action="previous" aria-label="前の符号" data-i18n-aria-label="anim.previous">◀</button>
+          <button type="button" data-action="next" aria-label="次の符号" data-i18n-aria-label="anim.next">▶</button>
+          <label for="encode-char-wpm" data-i18n="wpm.char">文字速度（WPM）</label>
           <select id="encode-char-wpm" data-setting="charWpm">
             <option>5</option><option>10</option><option>12</option><option selected>15</option><option>18</option><option>20</option><option>25</option>
           </select>
         </div>
-        <p class="tree-legend">点灯＝経路、破線の丸＝空き、黄色の破線＝慣用符号</p>
+        <p class="tree-legend" data-i18n="tree.legend">点灯＝経路、破線の丸＝空き、黄色の破線＝慣用符号</p>
         <div class="tree-controls">
           <fieldset class="layout-control">
-            <legend>木の見た目</legend>
-            <label><input type="radio" name="layout-encode" value="tree" checked><span>二分木</span></label>
-            <label><input type="radio" name="layout-encode" value="chart"><span>チャート</span></label>
+            <legend data-i18n="layout.legend">木の見た目</legend>
+            <label><input type="radio" name="layout-encode" value="tree" checked><span data-i18n="layout.tree">二分木</span></label>
+            <label><input type="radio" name="layout-encode" value="chart"><span data-i18n="layout.chart">チャート</span></label>
           </fieldset>
         </div>
         <div class="tree-scroll-wrapper">
@@ -123,42 +125,42 @@
         aria-labelledby="tab-button-decode" hidden>
         <section>
           <div class="input-with-button">
-            <label for="morseInput">モールス入力：</label>
-            <textarea id="morseInput" placeholder=".- ... または ・− ・・・（語の区切りは / ）" rows="1"></textarea>
-            <button id="decodeButton">デコード</button>
+            <label for="morseInput" data-i18n="decode.label">モールス入力：</label>
+            <textarea id="morseInput" placeholder=".- ... または ・− ・・・（語の区切りは / ）" data-i18n-placeholder="decode.placeholder" rows="1"></textarea>
+            <button id="decodeButton" data-i18n="decode.button">デコード</button>
           </div>
           <div id="decodeError" class="error-message" role="alert"></div>
           <div class="morse-input-buttons">
             <button type="button" class="morse-char-btn" data-char=".">・</button>
             <button type="button" class="morse-char-btn" data-char="-">−</button>
-            <button type="button" class="morse-char-btn" data-char=" ">スペース</button>
+            <button type="button" class="morse-char-btn" data-char=" " data-i18n="decode.space">スペース</button>
             <button type="button" class="morse-char-btn" data-char="/">/</button>
             <button type="button" class="sample-button" id="sampleButton" data-sample="ASDF GHJK">ASDF GHJK</button>
             <button type="button" class="sample-button" data-sample="SOS">SOS</button>
             <button type="button" class="sample-button" data-sample="HELLO WORLD">HELLO WORLD</button>
             <button type="button" class="sample-button" data-sample="CQ CQ DE JA1ABC">CQ CQ DE JA1ABC</button>
           </div>
-          <p class="input-hint">使用可能文字：・（ドット）、−（ダッシュ）、スペース（文字区切り）、/（単語区切り）</p>
+          <p class="input-hint" data-i18n="decode.hint">使用可能文字：・（ドット）、−（ダッシュ）、スペース（文字区切り）、/（単語区切り）</p>
         </section>
         <div id="decodeResult"></div>
-        <button type="button" id="decodeShare" disabled>共有URLをコピー</button>
+        <button type="button" id="decodeShare" disabled data-i18n="share.button">共有URLをコピー</button>
         <div class="playback" id="decode-playback">
-          <button type="button" data-action="play">▶ 再生</button>
-          <button type="button" data-action="pause">⏸ 一時停止</button>
-          <button type="button" data-action="stop">■ 停止</button>
-          <button type="button" data-action="previous" aria-label="前の符号">◀</button>
-          <button type="button" data-action="next" aria-label="次の符号">▶</button>
-          <label for="decode-char-wpm">文字速度（WPM）</label>
+          <button type="button" data-action="play" data-i18n="anim.play">▶ 再生</button>
+          <button type="button" data-action="pause" data-i18n="anim.pause">⏸ 一時停止</button>
+          <button type="button" data-action="stop" data-i18n="anim.stop">■ 停止</button>
+          <button type="button" data-action="previous" aria-label="前の符号" data-i18n-aria-label="anim.previous">◀</button>
+          <button type="button" data-action="next" aria-label="次の符号" data-i18n-aria-label="anim.next">▶</button>
+          <label for="decode-char-wpm" data-i18n="wpm.char">文字速度（WPM）</label>
           <select id="decode-char-wpm" data-setting="charWpm">
             <option>5</option><option>10</option><option>12</option><option selected>15</option><option>18</option><option>20</option><option>25</option>
           </select>
         </div>
-        <p class="tree-legend">点灯＝経路、破線の丸＝空き、黄色の破線＝慣用符号</p>
+        <p class="tree-legend" data-i18n="tree.legend">点灯＝経路、破線の丸＝空き、黄色の破線＝慣用符号</p>
         <div class="tree-controls">
           <fieldset class="layout-control">
-            <legend>木の見た目</legend>
-            <label><input type="radio" name="layout-decode" value="tree" checked><span>二分木</span></label>
-            <label><input type="radio" name="layout-decode" value="chart"><span>チャート</span></label>
+            <legend data-i18n="layout.legend">木の見た目</legend>
+            <label><input type="radio" name="layout-decode" value="tree" checked><span data-i18n="layout.tree">二分木</span></label>
+            <label><input type="radio" name="layout-decode" value="chart"><span data-i18n="layout.chart">チャート</span></label>
           </fieldset>
         </div>
         <div class="tree-scroll-wrapper">
@@ -170,32 +172,32 @@
     <div class="tab-content" id="tab-study" role="tabpanel"
         aria-labelledby="tab-button-study" hidden>
       <section>
-        <h2>学習モード</h2>
+        <h2 data-i18n="tab.study">学習モード</h2>
 
         <!-- 🟦 サブタブボタン -->
-        <div class="subtab-buttons" role="tablist" aria-label="学習方法">
+        <div class="subtab-buttons" role="tablist" aria-label="学習方法" data-i18n-aria-label="study.method">
           <button class="subtab-button active" data-subtab="manual" id="subtab-button-manual" role="tab"
-            aria-controls="subtab-manual" aria-selected="true" tabindex="0">文字確認</button>
+            aria-controls="subtab-manual" aria-selected="true" tabindex="0" data-i18n="study.manual">文字確認</button>
           <button class="subtab-button" data-subtab="random" id="subtab-button-random" role="tab"
-            aria-controls="subtab-random" aria-selected="false" tabindex="-1">ランダム出題</button>
+            aria-controls="subtab-random" aria-selected="false" tabindex="-1" data-i18n="study.random">ランダム出題</button>
         </div>
 
         <!-- 🔵 文字確認モード -->
         <div id="subtab-manual" class="subtab-content active" role="tabpanel"
           aria-labelledby="subtab-button-manual">
-          <label for="manualCharSelect">文字を選ぶ：</label>
+          <label for="manualCharSelect" data-i18n="study.select">文字を選ぶ：</label>
           <select id="manualCharSelect">
-            <option value="">選択してください</option>
+            <option value="" data-i18n="study.placeholder">選択してください</option>
             <!-- JSで埋め込み -->
           </select>
           <div id="studyResultManual"></div>
           <div class="playback" id="study-playback">
-            <button type="button" id="studyPlay" data-action="play">▶ 再生</button>
-            <button type="button" data-action="pause">⏸ 一時停止</button>
-            <button type="button" data-action="stop">■ 停止</button>
-            <button type="button" data-action="previous" aria-label="前の符号">◀</button>
-            <button type="button" data-action="next" aria-label="次の符号">▶</button>
-            <label for="study-char-wpm">文字速度（WPM）</label>
+            <button type="button" id="studyPlay" data-action="play" data-i18n="anim.play">▶ 再生</button>
+            <button type="button" data-action="pause" data-i18n="anim.pause">⏸ 一時停止</button>
+            <button type="button" data-action="stop" data-i18n="anim.stop">■ 停止</button>
+            <button type="button" data-action="previous" aria-label="前の符号" data-i18n-aria-label="anim.previous">◀</button>
+            <button type="button" data-action="next" aria-label="次の符号" data-i18n-aria-label="anim.next">▶</button>
+            <label for="study-char-wpm" data-i18n="wpm.char">文字速度（WPM）</label>
             <select id="study-char-wpm" data-setting="charWpm">
               <option>5</option><option>10</option><option>12</option><option selected>15</option><option>18</option><option>20</option><option>25</option>
             </select>
@@ -206,25 +208,25 @@
         <div id="subtab-random" class="subtab-content" role="tabpanel"
           aria-labelledby="subtab-button-random" hidden>
           <fieldset>
-            <legend>出題の方向</legend>
-            <label><input type="radio" name="quiz-direction" value="char" checked>符号 → 文字</label>
-            <label><input type="radio" name="quiz-direction" value="code">文字 → 符号</label>
+            <legend data-i18n="quiz.direction">出題の方向</legend>
+            <label><input type="radio" name="quiz-direction" value="char" checked><span data-i18n="quiz.to_char">符号 → 文字</span></label>
+            <label><input type="radio" name="quiz-direction" value="code"><span data-i18n="quiz.to_code">文字 → 符号</span></label>
           </fieldset>
           <fieldset>
-            <legend>出題範囲</legend>
-            <label><input type="checkbox" name="quiz-scope" value="letter" checked>英字</label>
-            <label><input type="checkbox" name="quiz-scope" value="digit" checked>数字</label>
-            <label><input type="checkbox" name="quiz-scope" value="punct">記号</label>
+            <legend data-i18n="quiz.scope">出題範囲</legend>
+            <label><input type="checkbox" name="quiz-scope" value="letter" checked><span data-i18n="group.letter">英字</span></label>
+            <label><input type="checkbox" name="quiz-scope" value="digit" checked><span data-i18n="group.digit">数字</span></label>
+            <label><input type="checkbox" name="quiz-scope" value="punct"><span data-i18n="group.punct">記号</span></label>
           </fieldset>
           <p id="quizScopeStatus" role="status"></p>
-          <button id="randomQuizBtn">ランダム出題</button>
+          <button id="randomQuizBtn" data-i18n="study.random">ランダム出題</button>
           <div id="quizContainer" hidden>
-            <p id="quizQuestion">この符号の文字を入力してください。</p>
+            <p id="quizQuestion" data-i18n="quiz.question_char">この符号の文字を入力してください。</p>
             <div id="quizCode"></div>
-            <label for="quizAnswer">回答</label>
+            <label for="quizAnswer" data-i18n="quiz.answer">回答</label>
             <input type="text" id="quizAnswer" maxlength="1" autocomplete="off" />
-            <button id="checkAnswerBtn">答え合わせ</button>
-            <button type="button" id="nextQuizBtn">次の問題</button>
+            <button id="checkAnswerBtn" data-i18n="quiz.check">答え合わせ</button>
+            <button type="button" id="nextQuizBtn" data-i18n="quiz.next">次の問題</button>
             <div id="quizFeedback" role="status"></div>
           </div>
           <p id="quizScore" role="status"></p>
@@ -232,12 +234,12 @@
         </div>
 
         <!-- モールスツリー共通 -->
-        <p class="tree-legend">点灯＝経路、破線の丸＝空き、黄色の破線＝慣用符号</p>
+        <p class="tree-legend" data-i18n="tree.legend">点灯＝経路、破線の丸＝空き、黄色の破線＝慣用符号</p>
         <div class="tree-controls">
           <fieldset class="layout-control">
-            <legend>木の見た目</legend>
-            <label><input type="radio" name="layout-study" value="tree" checked><span>二分木</span></label>
-            <label><input type="radio" name="layout-study" value="chart"><span>チャート</span></label>
+            <legend data-i18n="layout.legend">木の見た目</legend>
+            <label><input type="radio" name="layout-study" value="tree" checked><span data-i18n="layout.tree">二分木</span></label>
+            <label><input type="radio" name="layout-study" value="chart"><span data-i18n="layout.chart">チャート</span></label>
           </fieldset>
         </div>
         <div class="tree-scroll-wrapper">
@@ -250,8 +252,8 @@
 		<div class="tab-content" id="tab-table" role="tabpanel"
         aria-labelledby="tab-button-table" hidden>
   <section>
-    <h2>モールス信号 一覧表</h2>
-    <button type="button" id="printTable">🖨 印刷（PDFに保存）</button>
+    <h2 data-i18n="table.heading">モールス信号 一覧表</h2>
+    <button type="button" id="printTable" data-i18n="print.button">🖨 印刷（PDFに保存）</button>
     <div class="morse-table-wrapper">
       <!-- グループ表示は JSでここに挿入 -->
     </div>
@@ -259,17 +261,17 @@
 </div>
 
     <div class="tab-content" id="tab-trivia" role="tabpanel" aria-labelledby="tab-button-trivia" hidden>
-      <h2 data-message="trivia.heading">🔍 雑学 — 他の分野とのつながり</h2>
-      <p data-message="trivia.description">出所つき。数値はこのツールが実行時に計算しています。</p>
-      <div class="trivia-filters" role="group" aria-label="分野の絞り込み">
-        <button type="button" class="chip" data-field="all" aria-pressed="true" data-message="trivia.all">すべて</button>
-        <button type="button" class="chip" data-field="math" aria-pressed="false" data-message="trivia.math">数学</button>
-        <button type="button" class="chip" data-field="code" aria-pressed="false" data-message="trivia.code">符号・情報</button>
-        <button type="button" class="chip" data-field="crypto" aria-pressed="false" data-message="trivia.crypto">暗号</button>
-        <button type="button" class="chip" data-field="computer" aria-pressed="false" data-message="trivia.computer">コンピューター</button>
-        <button type="button" class="chip" data-field="network" aria-pressed="false" data-message="trivia.network">ネットワーク・通信</button>
-        <button type="button" class="chip" data-field="history" aria-pressed="false" data-message="trivia.history">歴史</button>
-        <button type="button" class="chip" data-field="survival" aria-pressed="false" data-message="trivia.survival">サバイバル</button>
+      <h2 data-i18n="trivia.heading">🔍 雑学 — 他の分野とのつながり</h2>
+      <p data-i18n="trivia.description">出所つき。数値はこのツールが実行時に計算しています。</p>
+      <div class="trivia-filters" role="group" aria-label="分野の絞り込み" data-i18n-aria-label="trivia.filter">
+        <button type="button" class="chip" data-field="all" aria-pressed="true" data-i18n="trivia.all">すべて</button>
+        <button type="button" class="chip" data-field="math" aria-pressed="false" data-i18n="trivia.math">数学</button>
+        <button type="button" class="chip" data-field="code" aria-pressed="false" data-i18n="trivia.code">符号・情報</button>
+        <button type="button" class="chip" data-field="crypto" aria-pressed="false" data-i18n="trivia.crypto">暗号</button>
+        <button type="button" class="chip" data-field="computer" aria-pressed="false" data-i18n="trivia.computer">コンピューター</button>
+        <button type="button" class="chip" data-field="network" aria-pressed="false" data-i18n="trivia.network">ネットワーク・通信</button>
+        <button type="button" class="chip" data-field="history" aria-pressed="false" data-i18n="trivia.history">歴史</button>
+        <button type="button" class="chip" data-field="survival" aria-pressed="false" data-i18n="trivia.survival">サバイバル</button>
       </div>
       <p id="triviaCount" aria-live="polite" role="status"></p>
       <div class="trivia-grid"></div>
@@ -278,122 +280,122 @@
     <!-- ヘルプモーダル -->
     <div id="helpModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="helpTitle" hidden>
       <div class="modal-content">
-        <button type="button" class="close-button" id="closeHelp" aria-label="ヘルプを閉じる">&times;</button>
-        <h2 id="helpTitle">MorseTree Visualizer ヘルプ</h2>
+        <button type="button" class="close-button" id="closeHelp" aria-label="ヘルプを閉じる" data-i18n-aria-label="help.close">&times;</button>
+        <h2 id="helpTitle" data-i18n="help.title">MorseTree Visualizer ヘルプ</h2>
         <div class="help-content">
-          <h3>📖 概要</h3>
+          <h3 data-i18n="help.overview">📖 概要</h3>
           <p>
-            モールス信号を視覚的に学習できるインタラクティブなWebツールです。<br>
-            バイナリツリー構造で符号化プロセスを可視化し、効率的な学習をサポートします。
+            <span data-i18n="help.intro">モールス信号を視覚的に学習できるインタラクティブなWebツールです。</span><br>
+            <span data-i18n="help.intro_tree">バイナリツリー構造で符号化プロセスを可視化し、効率的な学習をサポートします。</span>
           </p>
 
-          <h3>🎯 6つの主要機能</h3>
+          <h3 data-i18n="help.features">🎯 6つの主要機能</h3>
 
-          <h4>📝 英語 ⇒ モールス変換</h4>
+          <h4 data-i18n="help.encode">📝 英語 ⇒ モールス変換</h4>
           <ul>
-            <li>英語テキストを入力してモールス信号に変換</li>
-            <li>変換結果をワンクリックでクリップボードにコピー</li>
-            <li>文字速度は5／10／12／15／18／20／25WPM。全体速度を下げるとFarnsworth方式で文字間・語間が延びます</li>
-            <li>WPMは数値が小さいほどゆっくり、大きいほど速く再生します。20 WPMは10 WPMの2倍の速さです。</li>
-            <li>木の経路をゆっくり確認したいときは、5 WPMから試してください。変更後は「再生」で最初から再生します。</li>
-            <li>WPMの隣の「?」は、マウスを重ねる・タップ・キーボードのフォーカスで説明を表示します。Escで閉じられます。</li>
-            <li>再生・一時停止・停止・前後の手動ステップに対応</li>
+            <li data-i18n="help.encode_input">英語テキストを入力してモールス信号に変換</li>
+            <li data-i18n="help.copy">変換結果をワンクリックでクリップボードにコピー</li>
+            <li data-i18n="help.speeds">文字速度は5／10／12／15／18／20／25WPM。全体速度を下げるとFarnsworth方式で文字間・語間が延びます</li>
+            <li data-i18n="help.wpm">WPMは数値が小さいほどゆっくり、大きいほど速く再生します。20 WPMは10 WPMの2倍の速さです。</li>
+            <li data-i18n="help.wpm_start">木の経路をゆっくり確認したいときは、5 WPMから試してください。変更後は「再生」で最初から再生します。</li>
+            <li data-i18n="help.wpm_tip">WPMの隣の「?」は、マウスを重ねる・タップ・キーボードのフォーカスで説明を表示します。Escで閉じられます。</li>
+            <li data-i18n="help.playback">再生・一時停止・停止・前後の手動ステップに対応</li>
           </ul>
 
-          <h4>🔓 モールス ⇒ 英語復号</h4>
+          <h4 data-i18n="help.decode">🔓 モールス ⇒ 英語復号</h4>
           <ul>
-            <li>ASCIIの.-と・−を入力可能。表記の切り替えは結果とコピーにも反映</li>
-            <li>入力支援ボタン（・、−、スペース、/）で簡単入力</li>
-            <li>ASDF GHJK・SOS・HELLO WORLD・CQ CQ DE JA1ABCのサンプルで練習</li>
-            <li>文字間は空白、語間は/・改行・空白3つ。入力中の符号を木がリアルタイムに追従</li>
+            <li data-i18n="help.notation">ASCIIの.-と・−を入力可能。表記の切り替えは結果とコピーにも反映</li>
+            <li data-i18n="help.input_buttons">入力支援ボタン（・、−、スペース、/）で簡単入力</li>
+            <li data-i18n="help.samples">ASDF GHJK・SOS・HELLO WORLD・CQ CQ DE JA1ABCのサンプルで練習</li>
+            <li data-i18n="help.spacing">文字間は空白、語間は/・改行・空白3つ。入力中の符号を木がリアルタイムに追従</li>
           </ul>
 
-          <h4>📚 学習モード</h4>
+          <h4 data-i18n="help.study">📚 学習モード</h4>
           <ul>
-            <li><strong>文字確認</strong>：文字を選択してモールス信号と経路を確認</li>
-            <li><strong>ランダム出題</strong>：符号→文字／文字→符号を選び、英字・数字・記号から出題。正答数と連続正解を表示</li>
-            <li>各タブの木は独立。タブを切り替えると再生は一時停止</li>
+            <li><strong data-i18n="study.manual">文字確認</strong><span data-i18n="help.manual">：文字を選択してモールス信号と経路を確認</span></li>
+            <li><strong data-i18n="study.random">ランダム出題</strong><span data-i18n="help.quiz">：符号→文字／文字→符号を選び、英字・数字・記号から出題。正答数と連続正解を表示</span></li>
+            <li data-i18n="help.independent">各タブの木は独立。タブを切り替えると再生は一時停止</li>
           </ul>
 
-          <h4>📊 モールス信号一覧表</h4>
+          <h4 data-i18n="help.table">📊 モールス信号一覧表</h4>
           <ul>
-            <li>英字27・数字10・記号18の55文字（ITU 50・慣用5）</li>
-            <li>手続き符号9件（ITU 8・慣用1）を加えた64行を印刷可能</li>
-            <li>ITUと慣用符号（! &amp; ; _ $）はバッジと線種で区別</li>
-            <li>横スクロール対応でモバイルでも快適</li>
+            <li data-i18n="help.characters">英字27・数字10・記号18の55文字（ITU 50・慣用5）</li>
+            <li data-i18n="help.prosign_rows">手続き符号9件（ITU 8・慣用1）を加えた64行を印刷可能</li>
+            <li data-i18n="help.badges">ITUと慣用符号（! &amp; ; _ $）はバッジと線種で区別</li>
+            <li data-i18n="help.table_scroll">横スクロール対応でモバイルでも快適</li>
           </ul>
 
-          <h4>⌨ 打鍵</h4>
-          <p>キーのボタンかSpaceキーを短く押すとドット、長く押すとダッシュです。入力欄やセレクト上のSpaceは打鍵に使いません。</p>
-          <p>1unitの2倍がドットとダッシュの境界です。離して2unit後に確定待ちを表示し、5unit後に文字、10unit後に語の区切りを確定します。</p>
-          <p>文字確定時に木は消灯します。「デコードへ送る」で入力した符号を移せます。側音は音量・周波数・音のオン／オフを再生設定と共有します。</p>
+          <h4 data-i18n="tab.keying">⌨ 打鍵</h4>
+          <p data-i18n="help.keying_press">キーのボタンかSpaceキーを短く押すとドット、長く押すとダッシュです。入力欄やセレクト上のSpaceは打鍵に使いません。</p>
+          <p data-i18n="help.keying_time">1unitの2倍がドットとダッシュの境界です。離して2unit後に確定待ちを表示し、5unit後に文字、10unit後に語の区切りを確定します。</p>
+          <p data-i18n="help.keying_commit">文字確定時に木は消灯します。「デコードへ送る」で入力した符号を移せます。側音は音量・周波数・音のオン／オフを再生設定と共有します。</p>
 
-          <h4>🔍 雑学</h4>
-          <p>数学・符号・暗号など7分野の16枚のカードを、分野のボタンで絞り込めます。各カードの「出所」から資料を開けます。</p>
-          <p>平均符号長や組み合わせの数は、文字表と文字頻度から実行時に計算します。「ツールで試す」は入力と変換まで行い、再生は始めません。</p>
+          <h4 data-i18n="trivia.tab">🔍 雑学</h4>
+          <p data-i18n="help.trivia_cards">数学・符号・暗号など7分野の16枚のカードを、分野のボタンで絞り込めます。各カードの「出所」から資料を開けます。</p>
+          <p data-i18n="help.trivia_compute">平均符号長や組み合わせの数は、文字表と文字頻度から実行時に計算します。「ツールで試す」は入力と変換まで行い、再生は始めません。</p>
 
-          <h3>📡 手続き符号と共有</h3>
-          <p>&lt;AR&gt;や&lt;SK&gt;の形で入力できます。木の「手続き符号を表示」で別名を確認できます。HHとSOSは木の外で、SOSは慣用です。</p>
-          <p>共有URLには入力した平文・符号が含まれます。共有したい場合だけ使ってください。上限は1,000字です。</p>
+          <h3 data-i18n="help.prosign_share">📡 手続き符号と共有</h3>
+          <p data-i18n="help.prosign_input">&lt;AR&gt;や&lt;SK&gt;の形で入力できます。木の「手続き符号を表示」で別名を確認できます。HHとSOSは木の外で、SOSは慣用です。</p>
+          <p data-i18n="help.share">共有URLには入力した平文・符号が含まれます。共有したい場合だけ使ってください。上限は1,000字です。</p>
 
-          <h3>🔊 音・速度・ランプ</h3>
-          <p>文字速度は符号自体の速さ、全体速度は文字間・語間を含む速さです。全体速度を下げると、考える間隔を長くできます。</p>
-          <p>音は再生操作のあとに開始します。ランプは既定でオフです。WCAG 2.3.1の点滅への配慮として40px角に抑え、動きを減らす設定では表示しません。</p>
+          <h3 data-i18n="help.audio">🔊 音・速度・ランプ</h3>
+          <p data-i18n="help.farnsworth">文字速度は符号自体の速さ、全体速度は文字間・語間を含む速さです。全体速度を下げると、考える間隔を長くできます。</p>
+          <p data-i18n="help.light">音は既定でオフです。「🔊 音」をオンにしてから再生してください。ランプも既定でオフです。WCAG 2.3.1の点滅への配慮として40px角に抑え、動きを減らす設定では表示しません。</p>
 
-          <h3>🌳 モールスツリーの見方</h3>
-          <p>「木の見た目」で二分木とチャートを切り替えられます。4つの木の設定は共通で、切り替えると点灯と再生を停止します。</p>
-          <p>チャートは左がダッシュ側、右がドット側です。丸はドット、長方形はダッシュを表し、下へ進むと反対の符号を追加します。</p>
-          <p>チャートの手続き符号を隠すと64節、表示すると66節が見えます。以下は二分木の読み方です。</p>
+          <h3 data-i18n="help.tree">🌳 モールスツリーの見方</h3>
+          <p data-i18n="help.layout">「木の見た目」で二分木とチャートを切り替えられます。4つの木の設定は共通で、切り替えると点灯と再生を停止します。</p>
+          <p data-i18n="help.chart">チャートは左がダッシュ側、右がドット側です。丸はドット、長方形はダッシュを表し、下へ進むと反対の符号を追加します。</p>
+          <p data-i18n="help.chart_count">チャートの手続き符号を隠すと64節、表示すると66節が見えます。以下は二分木の読み方です。</p>
           <ul>
-            <li><strong>左の枝</strong>：・（ドット）を表す</li>
-            <li><strong>右の枝</strong>：−（ダッシュ）を表す</li>
-            <li><strong>ルートから葉</strong>：符号化プロセスを表示</li>
-            <li><strong>点灯</strong>：経路。破線の丸は空き、黄色の破線は慣用符号</li>
-            <li>$は7符号で木の外。詳細表には表示されますが、木は光りません</li>
+            <li><strong data-i18n="help.left">左の枝</strong><span data-i18n="help.left_note">：・（ドット）を表す</span></li>
+            <li><strong data-i18n="help.right">右の枝</strong><span data-i18n="help.right_note">：−（ダッシュ）を表す</span></li>
+            <li><strong data-i18n="help.root">ルートから葉</strong><span data-i18n="help.root_note">：符号化プロセスを表示</span></li>
+            <li><strong data-i18n="help.highlight">点灯</strong><span data-i18n="help.highlight_note">：経路。破線の丸は空き、黄色の破線は慣用符号</span></li>
+            <li data-i18n="help.dollar">$は7符号で木の外。詳細表には表示されますが、木は光りません</li>
           </ul>
 
-          <h3>💡 効果的な使い方</h3>
+          <h3 data-i18n="help.practice">💡 効果的な使い方</h3>
           <ol>
-            <li><strong>一覧表で全体把握</strong>：まずモールス信号表で文字と符号の対応を確認</li>
-            <li><strong>エンコードで練習</strong>：知っている単語をモールス信号に変換</li>
-            <li><strong>デコードで確認</strong>：変換した信号を逆変換して正確性をチェック</li>
-            <li><strong>学習モードで習熟</strong>：ランダム出題で記憶定着を図る</li>
+            <li><strong data-i18n="help.practice_table">一覧表で全体把握</strong><span data-i18n="help.practice_table_note">：まずモールス信号表で文字と符号の対応を確認</span></li>
+            <li><strong data-i18n="help.practice_encode">エンコードで練習</strong><span data-i18n="help.practice_encode_note">：知っている単語をモールス信号に変換</span></li>
+            <li><strong data-i18n="help.practice_decode">デコードで確認</strong><span data-i18n="help.practice_decode_note">：変換した信号を逆変換して正確性をチェック</span></li>
+            <li><strong data-i18n="help.practice_quiz">学習モードで習熟</strong><span data-i18n="help.practice_quiz_note">：ランダム出題で記憶定着を図る</span></li>
           </ol>
 
-          <h3>⚡ ショートカット・Tips</h3>
+          <h3 data-i18n="help.shortcuts">⚡ ショートカット・Tips</h3>
           <ul>
-            <li>タブは←→・Home・End、ヘルプはEscで閉じる</li>
-            <li>エンコード結果の「📋 コピー」で他アプリに貼り付け</li>
-            <li>モールス入力は文字ボタンで楽々入力</li>
-            <li>デコード欄はEnterで実行、Shift+Enterで改行。クイズはEnterで回答し、再度Enterで次の問題</li>
-            <li>エラーメッセージで入力ミスを素早く確認</li>
+            <li data-i18n="help.shortcut_tabs">タブは←→・Home・End、ヘルプはEscで閉じる</li>
+            <li data-i18n="help.shortcut_copy">エンコード結果の「📋 コピー」で他アプリに貼り付け</li>
+            <li data-i18n="help.shortcut_input">モールス入力は文字ボタンで楽々入力</li>
+            <li data-i18n="help.shortcut_enter">デコード欄はEnterで実行、Shift+Enterで改行。クイズはEnterで回答し、再度Enterで次の問題</li>
+            <li data-i18n="help.shortcut_error">エラーメッセージで入力ミスを素早く確認</li>
           </ul>
 
-          <h3>🎨 配色と印刷</h3>
-          <p>ヘッダーの配色ボタンはライト→ダーク→システム連動の順に切り替わります。一覧表の印刷ボタンから、ブラウザーの印刷ダイアログで「PDFに保存」を選べます。</p>
+          <h3 data-i18n="help.theme_print">🎨 配色と印刷</h3>
+          <p data-i18n="help.theme_print_note">ヘッダーの配色ボタンはライト→ダーク→システム連動の順に切り替わります。一覧表の印刷ボタンから、ブラウザーの印刷ダイアログで「PDFに保存」を選べます。</p>
 
-          <h3>📱 動作環境</h3>
+          <h3 data-i18n="help.environment">📱 動作環境</h3>
           <p>
-            モダンブラウザー（Chrome、Firefox、Safari、Edge）で動作します。<br>
-            HTTPで配信して開いてください。file://ではES moduleを読み込めません。
+            <span data-i18n="help.browsers">モダンブラウザー（Chrome、Firefox、Safari、Edge）で動作します。</span><br>
+            <span data-i18n="help.http">HTTPで配信して開いてください。file://ではES moduleを読み込めません。</span>
           </p>
         </div>
       </div>
     </div>
 
     </main>
-    <section id="printSheet" hidden aria-label="印刷用の符号表"></section>
+    <section id="printSheet" hidden aria-label="印刷用の符号表" data-i18n-aria-label="print.label"></section>
 
     <!-- フッター -->
     <footer>
       <div class="footer">
-        🔗 GitHubリポジトリはこちら（
+        <span data-i18n="footer.github">🔗 GitHubリポジトリはこちら（</span>
         <a
           href="https://github.com/ipusiron/morse-tree-visualizer"
           target="_blank" rel="noopener noreferrer"
         >
           ipusiron/morse-tree-visualizer </a
-        >）
+        ><span data-i18n="footer.close">）</span>
       </div>
     </footer>
 

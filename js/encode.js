@@ -1,9 +1,9 @@
 import { createTreeView } from './treeRenderer.js';
 import { createAnimator } from './animator.js';
 import { encode } from './morseCodec.js';
-import { t } from './messages.js';
 import { settings, bindSettings, describeChars, renderResult, bindPlayback } from './utils.js';
 import { bindShareButton } from './utils.js';
+import { setMessage } from './i18n.js';
 
 export function initEncodeTab() {
   // モールスツリーを描画
@@ -23,17 +23,17 @@ export function initEncodeTab() {
   function convert(autoplay = true) {
     animator.stop();
     rendered = true;
-    errorDiv.textContent = '';
+    setMessage(errorDiv, null);
     resultDiv.replaceChildren();
     canonical = '';
     const result = encode(inputText.value, settings.notation);
     if (!result.ok) {
-      errorDiv.textContent = result.unknownProsign ? t('prosign.unknown', { label: result.unknownProsign })
-        : t('error.unsupported_chars', { list: describeChars(result.unsupported) });
+      if (result.unknownProsign) setMessage(errorDiv, 'prosign.unknown', { label: result.unknownProsign });
+      else setMessage(errorDiv, 'error.unsupported_chars', { list: describeChars(result.unsupported) });
       return;
     }
     if (!result.items.length) {
-      errorDiv.textContent = t('error.empty_text');
+      setMessage(errorDiv, 'error.empty_text');
       return;
     }
     canonical = encode(inputText.value, 'ascii').morse;

@@ -26,5 +26,6 @@ export function initTheme() {
     writeTheme(choice);
     render();
   });
+  document.addEventListener('language-change', render);
   render();
 }

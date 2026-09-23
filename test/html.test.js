@@ -8,7 +8,7 @@ test('four independently named layout controls have legends and both modes', () 
   assert.equal(controls.length, 4);
   const names = new Set();
   for (const control of controls) {
-    assert.match(control, /<legend>木の見た目<\/legend>/);
+    assert.match(control, /<legend(?:\sdata-i18n(?:-[a-z-]+)?="[^"]*")*>木の見た目<\/legend>/);
     const inputs = [...control.matchAll(/<input type="radio" name="([^"]+)" value="([^"]+)"/g)];
     assert.deepEqual(inputs.map(m => m[2]), ['tree', 'chart']);
     assert.equal(inputs[0][1], inputs[1][1]);
@@ -22,7 +22,7 @@ test('secure markup, main and nested tabs, dialog and real label targets', () =>
   assert.match(html, /http-equiv="Content-Security-Policy"/);
   assert.doesNotMatch(html, /unsafe-inline|frame-ancestors|\sstyle\s*=|\son\w+\s*=/i);
   assert.match(html, /name="referrer" content="no-referrer"/);
-  assert.match(html, /<noscript>/);
+  assert.match(html, /<noscript(?:\sdata-i18n(?:-[a-z-]+)?="[^"]*")*>/);
   assert.match(html, /name="color-scheme" content="light dark"/);
   for (const id of ['themeToggle', 'printSheet', 'printTable', 'encodeShare', 'decodeShare']) {
     assert.ok(html.includes(`id="${id}"`));

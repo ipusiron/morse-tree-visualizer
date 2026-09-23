@@ -2,8 +2,8 @@ import { createTreeView } from './treeRenderer.js';
 import { createAnimator } from './animator.js';
 import { decode, encode, normalizeMorse } from './morseCodec.js';
 import { NOTATIONS } from './morseMap.js';
-import { t } from './messages.js';
 import { settings, describeChars, renderResult, bindPlayback, bindShareButton } from './utils.js';
+import { setMessage } from './i18n.js';
 
 export function initDecodeTab() {
   // モールスツリーを描画
@@ -49,12 +49,13 @@ export function initDecodeTab() {
     animator.stop();
     rendered = true;
     canonical = '';
-    errorDiv.textContent = '';
+    setMessage(errorDiv, null);
     resultDiv.replaceChildren();
     const result = decode(morseInput.value);
     if (!result.ok) {
-      errorDiv.textContent = result.unknown ? t('error.unknown_symbols', { list: describeChars(result.unknown) })
-        : result.empty ? t('error.empty_morse') : t('error.invalid_codes', { list: result.invalid.join(', ') });
+      if (result.unknown) setMessage(errorDiv, 'error.unknown_symbols', { list: describeChars(result.unknown) });
+      else if (result.empty) setMessage(errorDiv, 'error.empty_morse');
+      else setMessage(errorDiv, 'error.invalid_codes', { list: result.invalid.join(', ') });
       return;
     }
     canonical = result.canonical;

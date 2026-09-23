@@ -2,11 +2,12 @@ import { initStudyMode } from './study.js';
 import { initMorseTable } from './table.js';
 import { initKeying } from './keying.js';
 import { parseShare } from './share.js';
-import { t } from './messages.js';
+import { t, getLang } from './messages.js';
+import { initialLang, applyLanguage, writeLang, setMessage } from './i18n.js';
 import { initTheme } from './theme.js';
 import { initLayout, changeLayout } from './layout.js';
 import { TRIVIA_CARDS, formatTrivia, fillTriviaBody } from './trivia.js';
-import { el, settings } from './utils.js';
+import { el, msg, settings } from './utils.js';
 
 import { initEncodeTab } from './encode.js';
 import { initDecodeTab } from './decode.js';
@@ -19,9 +20,16 @@ let keyingInitialized = false;
 let triviaInitialized = false;
 
 document.addEventListener('DOMContentLoaded', () => {
+  const lang = initialLang(location.search, navigator.language);
+  settings.notation = lang === 'en' ? 'ascii' : 'ja';
+  document.querySelectorAll('[name="notation"]').forEach(input => { input.checked = input.value === settings.notation; });
+  applyLanguage(lang);
+  document.getElementById('langToggle').addEventListener('click', () => {
+    applyLanguage(getLang() === 'ja' ? 'en' : 'ja');
+    writeLang(getLang());
+  });
   initTheme();
   initLayout();
-  document.querySelectorAll('[data-message]').forEach(node => { node.textContent = t(node.dataset.message); });
   const tabButtons = document.querySelectorAll('.tab-button');
 
   switchTab('encode');
@@ -36,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const share = parseShare(location.search);
   if (share.ok) {
     applyInput(share.kind, share.value);
-  } else if (share.errorKey !== 'share.none') document.getElementById('shareStatus').textContent = t(share.errorKey);
+  } else if (share.errorKey !== 'share.none') setMessage(document.getElementById('shareStatus'), share.errorKey);
 
   // ヘルプモーダル開閉処理
   const helpButton = document.getElementById('helpBtn');
@@ -148,24 +156,31 @@ function tryTrivia(action) {
   document.getElementById('tab-button-' + action.tab).focus();
 }
 
-function initTriviaTab() {
+export function initTriviaTab() {
   const panel = document.getElementById('tab-trivia');
   const grid = panel.querySelector('.trivia-grid');
   const count = document.getElementById('triviaCount');
-  const values = formatTrivia();
+  const localize = [];
   const cards = TRIVIA_CARDS.map(card => {
+    const heading = el('h3');
+    const paragraphs = card.body.map(() => el('p'));
     const article = el('article', { class: 'trivia-card', 'data-field': card.field, 'data-id': card.id }, [
-      el('span', { class: 'trivia-field' }, t('trivia.' + card.field)), el('h3', {}, card.title),
-      ...fillTriviaBody(card, values).map(paragraph => el('p', {}, paragraph))
+      msg('span', 'trivia.' + card.field, {}, { class: 'trivia-field' }), heading, ...paragraphs
     ]);
-    const source = el('p', { class: 'trivia-source' }, t('trivia.source'));
+    localize.push(values => {
+      heading.textContent = getLang() === 'en' ? card.titleEn : card.title;
+      fillTriviaBody(card, values).forEach((text, index) => { paragraphs[index].textContent = text; });
+    });
+    const source = el('p', { class: 'trivia-source' }, msg('span', 'trivia.source'));
     [card.source, card.source.secondary].filter(Boolean).forEach((entry, index) => {
       if (index) source.append(document.createTextNode(' / '));
-      source.append(el('a', { href: entry.url, target: '_blank', rel: 'noopener noreferrer' }, entry.label));
+      const link = el('a', { href: entry.url, target: '_blank', rel: 'noopener noreferrer' });
+      source.append(link);
+      localize.push(() => { link.textContent = getLang() === 'en' ? entry.labelEn : entry.label; });
     });
     article.append(source);
     if (card.action) {
-      const button = el('button', { type: 'button', class: 'trivia-try' }, t('trivia.try'));
+      const button = msg('button', 'trivia.try', {}, { type: 'button', class: 'trivia-try' });
       button.addEventListener('click', () => tryTrivia(card.action));
       article.append(button);
     }
@@ -173,13 +188,25 @@ function initTriviaTab() {
     return article;
   });
   const chips = [...panel.querySelectorAll('.chip')];
+  let currentField = 'all';
+  function updateCount() {
+    setMessage(count, 'trivia.count', { field: t('trivia.' + currentField), count: cards.filter(card => !card.hidden).length });
+  }
   function filter(field) {
+    currentField = field;
     for (const chip of chips) chip.setAttribute('aria-pressed', String(chip.dataset.field === field));
     for (const article of cards) article.hidden = field !== 'all' && article.dataset.field !== field;
-    count.textContent = t('trivia.count', { field: t('trivia.' + field), count: cards.filter(card => !card.hidden).length });
+    updateCount();
   }
+  function localizeCards() {
+    const values = formatTrivia();
+    localize.forEach(update => update(values));
+    updateCount();
+  }
+  document.addEventListener('language-change', localizeCards);
   chips.forEach(chip => chip.addEventListener('click', () => filter(chip.dataset.field)));
   filter('all');
+  localizeCards();
 }
 
 // 同じキーボード規則をメインタブとサブタブに適用する。
