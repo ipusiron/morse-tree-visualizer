@@ -85,8 +85,19 @@ export function createTreeView(container, { layout = readLayout() } = {}) {
         const h = empty ? 18 : 30;
         group.append(make('rect', { x: n.x - w / 2, y: n.y - h / 2, width: w, height: h, rx: 3 }));
       } else group.append(make('circle', { cx: n.x, cy: n.y, r: empty ? 8 : chart && n.depth ? 15 : 13 }));
-      group.append(make('text', { x: n.x, y: n.y + 4, 'text-anchor': 'middle', 'font-size': entry?.kind === 'mark' ? 20 : n.depth ? 13 : 10,
-        class: inside ? 'chart-prosign' : 'node-label' }, n.depth ? n.char || (inside ? n.prosign : '') : 'start'));
+      if (wabun && entry?.kind === 'mark') {
+        // Draw spacing voicing marks independently of the font's glyph metrics.
+        const mark = make('g', { class: 'voicing-mark', 'aria-hidden': 'true' });
+        if (entry.name === 'wabun.dakuten') {
+          for (const offset of [0, 4]) {
+            mark.append(make('line', { x1: n.x - 2 + offset, y1: n.y - 6, x2: n.x + 2 + offset, y2: n.y - 2 }));
+          }
+        } else mark.append(make('circle', { cx: n.x, cy: n.y, r: 4 }));
+        group.append(mark);
+      } else {
+        group.append(make('text', { x: n.x, y: n.y + 4, 'text-anchor': 'middle', 'font-size': n.depth ? 13 : 10,
+          class: inside ? 'chart-prosign' : 'node-label' }, n.depth ? n.char || (inside ? n.prosign : '') : 'start'));
+      }
       group.append(make('title', {}, nodeTitle(n)));
       if (n.prosign && !inside) {
         group.append(make('text', { x: n.x + 13, y: n.y + 19, class: 'prosign-label', 'font-size': 11 }, n.prosign));

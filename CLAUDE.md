@@ -198,7 +198,8 @@ The application uses ES6 modules with the following architecture:
     Do not start sound on code/language/layout changes or shared-URL loads. Default sound stays off.
     Wabun binary trees have 67 nodes/33 leaves in the unchanged -50 -30 1080 470 viewBox.
     Wabun charts have 66 nodes, rows 0..15 and viewBox 0 0 720 920. No International/customary/prosign markers.
-    Use 20px labels and translated titles for the two voicing marks. Rebuild all four tree views on code changes.
+    Draw voicing marks as SVG shapes instead of text: two short diagonal strokes for dakuten, a centered radius-4 ring for handakuten.
+    Use unfilled 2px strokes with --node-text / --node-hl-text colors and retain translated titles. Rebuild all four tree views on code changes.
 
     Study has kana/mark/digit/symbol ranges; reset the quiz session on code changes without clearing typed inputs.
     Wabun tables have groups of 48/2/10/5 and Character/Code/Name columns; kana names are romaji in English.

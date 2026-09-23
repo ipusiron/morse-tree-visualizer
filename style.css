@@ -1036,6 +1036,15 @@ svg:not(.show-prosigns) .prosign-extension {
   stroke: var(--hl-stroke);
   stroke-width: 4;
 }
+.tree-node .voicing-mark line, .tree-node .voicing-mark circle {
+  fill: none;
+  stroke: var(--node-text);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.tree-node.highlight .voicing-mark line, .tree-node.highlight .voicing-mark circle {
+  stroke: var(--node-hl-text);
+}
 .direction-label {
   fill: var(--text);
 }

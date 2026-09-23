@@ -328,7 +328,8 @@ test('all four tree views rebuild to 67 binary or 66 chart nodes with no Wabun p
       assert.equal(view.svg.querySelectorAll('.prosign-only').length, 0);
       for (const code of ['..', '..--.']) {
         const mark = view.svg.querySelectorAll('.tree-node').find(node => node.dataset.code === code);
-        assert.equal(mark.querySelector('text').getAttribute('font-size'), '20');
+        assert.equal(mark.querySelectorAll('text').length, 0);
+        assert.equal(mark.querySelectorAll('.voicing-mark').length, 1);
         assert.match(mark.querySelector('title').textContent, /濁点/);
       }
       view.setLayout('chart');
@@ -342,6 +343,80 @@ test('all four tree views rebuild to 67 binary or 66 chart nodes with no Wabun p
     assert.ok(dom.doc.querySelectorAll('.check-control').every(node => !node.hidden));
     for (const view of views) assert.equal(view.svg.getAttribute('viewBox'), '0 0 720 808');
   } finally { views.forEach(view => view.destroy()); dom.restore(); }
+});
+
+test('Wabun voicing nodes use SVG strokes and a ring in both layouts, retaining translated titles and highlight state', () => {
+  const dom = installDOM();
+  const views = [];
+  try {
+    settings.system = 'wabun';
+    for (const layout of ['tree', 'chart']) {
+      const host = el('div');
+      dom.doc.body.append(el('div', {}, host));
+      const view = createTreeView(host, { layout });
+      views.push(view);
+      for (const [code, ja, en] of [['..', '濁点', 'dakuten (voiced mark)'],
+        ['..--.', '半濁点', 'handakuten (semi-voiced mark)']]) {
+        const node = view.svg.querySelectorAll('.tree-node').find(node => node.dataset.code === code);
+        const mark = node.querySelector('.voicing-mark');
+        const boundary = node.children[0];
+        const x = Number(boundary.getAttribute('cx'));
+        const y = Number(boundary.getAttribute('cy'));
+        assert.equal(boundary.tagName, 'CIRCLE');
+        assert.equal(boundary.getAttribute('r'), layout === 'tree' ? '13' : '15');
+        assert.equal(node.querySelectorAll('text').length, 0);
+        assert.equal(mark.textContent, '');
+        assert.equal(mark.getAttribute('aria-hidden'), 'true');
+        if (code === '..') {
+          assert.equal(mark.querySelectorAll('circle').length, 0);
+          assert.deepEqual(mark.children.map(line => [line.tagName,
+            ...['x1', 'y1', 'x2', 'y2'].map(key => Number(line.getAttribute(key)))]),
+          [['LINE', x - 2, y - 6, x + 2, y - 2], ['LINE', x + 2, y - 6, x + 6, y - 2]]);
+        } else {
+          assert.equal(mark.querySelectorAll('line').length, 0);
+          assert.equal(mark.children.length, 1);
+          const ring = mark.querySelector('circle');
+          assert.deepEqual(['cx', 'cy', 'r'].map(key => Number(ring.getAttribute(key))), [x, y, 4]);
+        }
+        applyLanguage('ja');
+        assert.ok(node.querySelector('title').textContent.includes(ja));
+        view.highlight(code);
+        view.setCurrent(code);
+        assert.ok(node.classList.contains('highlight'));
+        assert.ok(node.classList.contains('current'));
+        applyLanguage('en');
+        assert.ok(node.querySelector('title').textContent.includes(en));
+        assert.equal(node.querySelector('.voicing-mark'), mark);
+        assert.ok(node.classList.contains('highlight'));
+        assert.ok(node.classList.contains('current'));
+        view.clear();
+        assert.ok(!node.classList.contains('highlight'));
+        assert.ok(!node.classList.contains('current'));
+      }
+    }
+    changeSystem('intl');
+    for (const view of views) {
+      assert.equal(view.svg.querySelectorAll('.voicing-mark').length, 0);
+      const letter = view.svg.querySelectorAll('.tree-node').find(node => node.dataset.code === '..');
+      assert.equal(letter.querySelector('text').textContent, 'I');
+    }
+  } finally { views.forEach(view => view.destroy()); dom.restore(); }
+});
+
+test('voicing strokes override node and edge styles with an unfilled 2px line and the normal or highlighted text color', () => {
+  const css = readFileSync(new URL('../style.css', import.meta.url), 'utf8');
+  const normalSelector = '.tree-node .voicing-mark line, .tree-node .voicing-mark circle';
+  const highlightedSelector = '.tree-node.highlight .voicing-mark line, .tree-node.highlight .voicing-mark circle';
+  const normal = css.slice(css.indexOf(normalSelector)).match(/\{([^}]+)\}/)[1];
+  const highlighted = css.slice(css.indexOf(highlightedSelector)).match(/\{([^}]+)\}/)[1];
+  assert.match(normal, /fill: none;/);
+  assert.match(normal, /stroke: var\(--node-text\);/);
+  assert.match(normal, /stroke-width: 2;/);
+  assert.match(highlighted, /stroke: var\(--node-hl-text\);/);
+  for (const selector of ['.tree-node.highlight circle', '.tree-node.current circle', '.tree-box line.highlight']) {
+    assert.ok(css.indexOf(normalSelector) > css.indexOf(selector));
+  }
+  assert.ok(css.indexOf(highlightedSelector) > css.indexOf(normalSelector));
 });
 
 test('system changes cancel pending playback and reset old animation events', () => {

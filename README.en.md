@@ -259,7 +259,7 @@ The tool switches code systems through the Code control; interpreting switching 
 International prosigns and the Show prosigns control are unavailable in Wabun.
 
 The Wabun binary tree has 67 nodes and 33 leaves; its chart has 66 nodes at 720×920 px (11 columns × 16 rows).
-Voicing marks use 20 px labels and descriptive titles.
+Voicing marks use SVG shapes (two short diagonal strokes for dakuten and a ring for handakuten) and descriptive titles.
 Changing code preserves input, stops playback, and reconverts the visible conversion tab without starting sound.
 Hidden conversion tabs refresh when next opened.
 Study offers kana, voicing marks, digits, and symbols; changing code resets the score.
