@@ -302,6 +302,7 @@ International share URLs keep their original format; specify `code=intl` to over
 The header theme button cycles through light, dark, and system themes.
 The default is system, and the choice is saved in localStorage.
 Switching still works when storage is blocked.
+The saved theme is applied before rendering to prevent a flash of the wrong colors when the page opens.
 
 ## 🖨️ Printing (save as PDF)
 
@@ -608,6 +609,7 @@ morse-tree-visualizer/              # Learn Morse code as tree paths
 │   ├── system.js                   # Code selection, storage, and the current code table
 │   ├── table.js                    # ITU/customary reference table
 │   ├── theme.js                    # Light/dark/system themes and storage
+│   ├── theme-early.js              # Apply the saved theme before rendering
 │   ├── treeRenderer.js             # Per-view SVG rendering, highlighting, and following
 │   ├── trivia.js                   # 16 cards, sources, calculations, and body formatting
 │   ├── utils.js                    # Safe DOM creation and shared controls

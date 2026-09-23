@@ -49,6 +49,7 @@ The application uses ES6 modules with the following architecture:
   - `js/keying.js` - Pointer/Space input, duration meters, pending symbols and decoded state
   - `js/share.js` - Pure bounded URL parsing/formatting; text and morse are mutually exclusive
   - `js/theme.js` - Light/dark/system choice and guarded localStorage access
+  - `js/theme-early.js` - Synchronous classic head script applying saved light/dark before the stylesheet; guarded storage, root attribute only
   - `js/layout.js` - Shared tree/chart choice, guarded storage and layout-change events
   - `js/i18n.js` - Initial language, guarded storage, data-i18n updates and language-change events
   - `js/system.js` - Code selection/storage, current table/codec, and silent system-change reconversion

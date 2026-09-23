@@ -27,7 +27,8 @@ test('secure markup, main and nested tabs, dialog and real label targets', () =>
   for (const id of ['themeToggle', 'printSheet', 'printTable', 'encodeShare', 'decodeShare']) {
     assert.ok(html.includes(`id="${id}"`));
   }
-  assert.deepEqual([...html.matchAll(/<script[^>]*>/g)].map(m => m[0]), ['<script type="module" src="js/script.js">']);
+  assert.deepEqual([...html.matchAll(/<script[^>]*>/g)].map(m => m[0]),
+    ['<script src="js/theme-early.js">', '<script type="module" src="js/script.js">']);
   // Six main tabs plus two nested study tabs.
   assert.equal([...html.matchAll(/role="tablist"/g)].length, 2);
   assert.equal([...html.matchAll(/class="tab-button[^>]+role="tab"/g)].length, 6);
