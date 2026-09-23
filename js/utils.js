@@ -38,7 +38,7 @@ export function bindShareButton(button, input, kind) {
   document.addEventListener('share-loaded', update);
   button.addEventListener('click', () => {
     if (input.value.length > 1000) { setMessage(status, 'share.too_long'); return; }
-    copyText(location.origin + location.pathname + formatShare(kind, input.value), status);
+    copyText(location.origin + location.pathname + formatShare(kind, input.value, settings.system), status);
   });
   update();
 }

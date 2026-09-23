@@ -1,11 +1,20 @@
 import { MORSE_TABLE, PROSIGNS, formatCode } from './morseMap.js';
-import { pathFor, normalizeMorse, timeline } from './morseCodec.js';
+import { pathFor, normalizeMorse, normalizeWabun } from './morseCodec.js';
+import { currentTable } from './system.js';
 import { createTreeView } from './treeRenderer.js';
 import { createAnimator } from './animator.js';
 import { t } from './messages.js';
-import { el, settings, bindPlayback } from './utils.js';
+import { el, msg, settings, bindPlayback } from './utils.js';
 import { bindTabKeys } from './script.js';
 import { setMessage } from './i18n.js';
+
+export function quizPool(kinds, system = settings.system) {
+  return currentTable(system).filter(e => kinds.includes(system === 'intl' && e.char === 'É' ? 'punct' : e.kind));
+}
+
+export function normalizeQuizCharacter(value, system = settings.system) {
+  return system === 'wabun' ? normalizeWabun(value) : value.normalize('NFKC').toUpperCase();
+}
 
 export function initStudyMode() {
   const view = createTreeView(document.getElementById('tree-container-study'));
@@ -37,18 +46,28 @@ export function initStudyMode() {
   // 文字確認。文字表と同じ順を保つ。
   const select = document.getElementById('manualCharSelect');
   const resultManual = document.getElementById('studyResultManual');
-  const manualEntries = [...MORSE_TABLE, ...PROSIGNS.map(p => ({ ...p, char: `<${p.label}>` }))];
-  for (const [key, predicate] of [
-    ['group.letter', e => e.kind === 'letter'], ['group.digit', e => e.kind === 'digit'],
-    ['group.itu', e => e.kind === 'punct' && e.itu], ['group.custom', e => !e.itu]
-  ]) {
-    const group = el('optgroup', { label: t(key), 'data-i18n-label': key });
-    MORSE_TABLE.filter(predicate).forEach(e => group.append(el('option', { value: e.char }, e.char)));
-    select.append(group);
+  let manualEntries;
+  function renderManualOptions() {
+    const wabun = settings.system === 'wabun';
+    manualEntries = wabun ? currentTable() : [...MORSE_TABLE, ...PROSIGNS.map(p => ({ ...p, char: `<${p.label}>` }))];
+    select.replaceChildren();
+    const groups = wabun ? ['kana', 'mark', 'digit', 'symbol'].map(kind => ['group.' + kind, e => e.kind === kind]) : [
+      ['group.letter', e => e.kind === 'letter'], ['group.digit', e => e.kind === 'digit'],
+      ['group.itu', e => e.kind === 'punct' && e.itu], ['group.custom', e => !e.itu]
+    ];
+    for (const [key, predicate] of groups) {
+      const group = el('optgroup', { label: t(key), 'data-i18n-label': key });
+      currentTable().filter(predicate).forEach(e => group.append(el('option', { value: e.char }, e.char)));
+      select.append(group);
+    }
+    if (!wabun) {
+      const group = el('optgroup', { label: t('group.prosign'), 'data-i18n-label': 'group.prosign' });
+      PROSIGNS.forEach(p => group.append(el('option', { value: `<${p.label}>` }, `<${p.label}>`)));
+      select.append(group);
+    }
+    select.value = manualEntries[0].char;
   }
-  const prosignGroup = el('optgroup', { label: t('group.prosign'), 'data-i18n-label': 'group.prosign' });
-  PROSIGNS.forEach(p => prosignGroup.append(el('option', { value: `<${p.label}>` }, `<${p.label}>`)));
-  select.append(prosignGroup);
+  renderManualOptions();
   function showManual({ preserveView = false } = {}) {
     if (!preserveView) animator.stop();
     resultManual.replaceChildren();
@@ -60,7 +79,7 @@ export function initStudyMode() {
     }
     for (const [key, value] of [['table.char', entry.char], ['table.code', formatCode(entry.code, settings.notation)],
       ['study.path', pathFor(entry.code).map(d => t(d === 'left' ? 'study.left' : 'study.right')).join(' › ')],
-      ['table.kind', t(entry.itu ? 'table.itu' : 'table.custom')]]) {
+      ['table.kind', t(settings.system === 'wabun' ? 'wabun.standard' : entry.itu ? 'table.itu' : 'table.custom')]]) {
       resultManual.append(el('p', {}, [el('strong', {}, t(key) + ': '), value]));
     }
     if (entry.code.length > 6) resultManual.append(el('p', {}, t('tree.outside', { n: entry.code.length })));
@@ -79,7 +98,7 @@ export function initStudyMode() {
   const direction = () => document.querySelector('[name="quiz-direction"]:checked').value;
   function pool() {
     const kinds = [...document.querySelectorAll('[name="quiz-scope"]:checked')].map(e => e.value);
-    return MORSE_TABLE.filter(e => kinds.includes(e.char === 'É' ? 'punct' : e.kind));
+    return quizPool(kinds);
   }
   function updateScore() {
     setMessage(score, 'quiz.score', { correct, total, streak });
@@ -122,7 +141,7 @@ export function initStudyMode() {
     }
     const normalized = normalizeMorse(input.value);
     const good = direction() === 'char'
-      ? input.value.normalize('NFKC').toUpperCase() === currentQuizAnswer.char
+      ? normalizeQuizCharacter(input.value) === currentQuizAnswer.char
       : !normalized.unknown.length && normalized.canonical === currentQuizAnswer.code;
     answered = true;
     if (good) { correct++; streak++; } else streak = 0;
@@ -144,7 +163,18 @@ export function initStudyMode() {
       if (answered) nextQuestion(); else checkAnswer();
     }
   });
-  document.querySelectorAll('[name="quiz-scope"]').forEach(e => e.addEventListener('change', updateScope));
+  const scope = document.querySelector('[name="quiz-scope"]').closest('fieldset');
+  function renderScope() {
+    const kinds = settings.system === 'wabun' ? ['kana', 'mark', 'digit', 'symbol'] : ['letter', 'digit', 'punct'];
+    scope.replaceChildren(msg('legend', 'quiz.scope'));
+    for (const kind of kinds) {
+      const check = el('input', { type: 'checkbox', name: 'quiz-scope', value: kind });
+      check.checked = !['punct', 'symbol'].includes(kind);
+      check.addEventListener('change', updateScope);
+      scope.append(el('label', {}, [check, msg('span', 'group.' + kind)]));
+    }
+    updateScope();
+  }
   document.querySelectorAll('[name="quiz-direction"]').forEach(e => e.addEventListener('change', () => {
     currentQuizAnswer = null;
     quizContainer.hidden = true;
@@ -155,6 +185,18 @@ export function initStudyMode() {
     if (resultManual.childNodes.length) showManual({ preserveView: true });
     displayQuestion();
   });
-  updateScope();
+  document.addEventListener('system-change', () => {
+    animator.reset();
+    renderManualOptions();
+    resultManual.replaceChildren();
+    currentQuizAnswer = null;
+    answered = false;
+    total = correct = streak = 0;
+    quizContainer.hidden = true;
+    setMessage(feedback, null);
+    renderScope();
+    updateScore();
+  });
+  renderScope();
   updateScore();
 }

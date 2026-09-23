@@ -494,6 +494,12 @@ Object.assign(DICTIONARIES.en, {
 
 Object.assign(MESSAGES, {
   "system.legend": "符号",
+  "group.kana": "仮名",
+  "group.mark": "濁点・半濁点",
+  "group.symbol": "記号",
+  "wabun.name": "名前",
+  "wabun.print_title": "和文モールス符号表（無線局運用規則 別表第一号）",
+  "wabun.print_note": "仮名48、濁点と半濁点2、数字10、記号5の65件。濁点と半濁点は独立した符号です。",
   "system.intl": "欧文",
   "system.wabun": "和文",
   "wabun.tab.encode": "和文 ⇒ モールス信号",
@@ -515,6 +521,12 @@ Object.assign(MESSAGES, {
 });
 Object.assign(DICTIONARIES.en, {
   "system.legend": "Code",
+  "group.kana": "Kana",
+  "group.mark": "Voicing marks",
+  "group.symbol": "Symbols",
+  "wabun.name": "Name",
+  "wabun.print_title": "Wabun Morse code table (Radio Station Operation Regulations, Appended Table 1)",
+  "wabun.print_note": "65 entries: 48 kana, 2 voicing marks, 10 digits, and 5 symbols. Voicing marks have their own codes.",
   "system.intl": "International",
   "system.wabun": "Wabun (Japanese)",
   "wabun.tab.encode": "Wabun text ⇒ Morse",

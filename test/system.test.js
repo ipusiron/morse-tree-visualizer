@@ -10,6 +10,119 @@ import { DICTIONARIES, setLang } from '../js/messages.js';
 import { applyLanguage } from '../js/i18n.js';
 import { createTreeView } from '../js/treeRenderer.js';
 import { createAnimator } from '../js/animator.js';
+import { tableGroups, initMorseTable } from '../js/table.js';
+import { formatShare, parseShare } from '../js/share.js';
+
+test('Wabun table groups retain the 48, 2, 10, 5 entries in specified order', () => {
+  const groups = tableGroups('wabun');
+  assert.deepEqual(groups.map(group => [group.kind, group.entries.length]),
+    [['kana', 48], ['mark', 2], ['digit', 10], ['symbol', 5]]);
+  assert.deepEqual(groups.flatMap(group => group.entries), WABUN_TABLE);
+  assert.equal(tableGroups('intl').flatMap(group => group.entries).length, 64);
+});
+
+test('Wabun table and print render all 65 rows and translate names in place', () => {
+  const dom = installDOM();
+  try {
+    settings.system = 'wabun';
+    const wrapper = el('div', { class: 'morse-table-wrapper' });
+    const print = el('section', { id: 'printSheet' });
+    dom.doc.body.append(el('section', { id: 'tab-table' }, wrapper), el('button', { id: 'printTable' }), print);
+    initMorseTable();
+    assert.deepEqual(wrapper.querySelectorAll('h3').map(node => node.textContent),
+      ['仮名 (48)', '濁点・半濁点 (2)', '数字 (10)', '記号 (5)']);
+    const rows = wrapper.querySelectorAll('[data-char]');
+    const printed = print.querySelectorAll('tr');
+    assert.equal(rows.length, 65);
+    assert.equal(printed.length, 65);
+    assert.deepEqual(rows.map(row => row.dataset.char), WABUN_TABLE.map(entry => entry.char));
+    assert.equal(print.querySelector('h1').textContent, '和文モールス符号表（無線局運用規則 別表第一号）');
+    assert.deepEqual(print.querySelector('.print-columns').children.map(col => col.querySelectorAll('tr').length), [33, 32]);
+    assert.ok(rows.every(row => row.children.length === 3));
+    applyLanguage('en');
+    assert.deepEqual(wrapper.querySelectorAll('h3').map(node => node.textContent),
+      ['Kana (48)', 'Voicing marks (2)', 'Digits (10)', 'Symbols (5)']);
+    assert.equal(rows[0].children[2].textContent, 'i');
+    assert.equal(rows[7].children[2].textContent, 'chi');
+    assert.equal(rows[48].children[2].textContent, 'dakuten (voiced mark)');
+    assert.equal(rows[49].children[2].textContent, 'handakuten (semi-voiced mark)');
+    assert.equal(rows[60].children[2].textContent, 'Long vowel mark');
+    assert.equal(print.querySelector('h1').textContent,
+      'Wabun Morse code table (Radio Station Operation Regulations, Appended Table 1)');
+    assert.ok(wrapper.querySelectorAll('th').filter((_, i) => i % 3 === 2).every(node => node.textContent === 'Name'));
+    assert.ok(rows.every((row, i) => row === wrapper.querySelectorAll('[data-char]')[i]));
+    assert.ok(printed.every((row, i) => row === print.querySelectorAll('tr')[i]));
+    dom.win.dispatchEvent(new Event('beforeprint'));
+    assert.equal(print.querySelectorAll('tr').length, 65);
+    assert.match(print.textContent, /dakuten/);
+    changeSystem('intl');
+    assert.equal(wrapper.querySelectorAll('[data-char]').length, 64);
+    assert.equal(print.querySelectorAll('tr').length, 64);
+    assert.equal(wrapper.querySelectorAll('h3')[0].textContent, 'Letters (27)');
+    changeSystem('wabun');
+    assert.equal(wrapper.querySelectorAll('[data-char]').length, 65);
+    assert.equal(print.querySelectorAll('tr').length, 65);
+  } finally { dom.restore(); }
+});
+
+test('Wabun quiz categories and answer normalization use kana, marks, digits and symbols', async () => {
+  const dom = installDOM();
+  const { quizPool, normalizeQuizCharacter } = await import('../js/study.js');
+  dom.restore();
+  for (const [kind, count] of [['kana', 48], ['mark', 2], ['digit', 10], ['symbol', 5]]) {
+    assert.equal(quizPool([kind], 'wabun').length, count);
+  }
+  assert.equal(quizPool([], 'wabun').length, 0);
+  assert.equal(quizPool(['kana', 'mark', 'digit', 'symbol'], 'wabun').length, 65);
+  assert.equal(normalizeQuizCharacter('い', 'wabun'), 'イ');
+  assert.equal(normalizeQuizCharacter('゛', 'wabun'), '゛');
+  assert.equal(normalizeQuizCharacter('゜', 'wabun'), '゜');
+  assert.equal(normalizeQuizCharacter('(', 'wabun'), '（');
+  assert.equal(normalizeQuizCharacter('a', 'intl'), 'A');
+  const source = readFileSync(new URL('../js/study.js', import.meta.url), 'utf8');
+  const reset = source.match(/system-change', \(\) => \{([\s\S]*?)\n  \}\)/)[1];
+  for (const part of ['animator.reset()', 'renderManualOptions()', 'total = correct = streak = 0',
+    'currentQuizAnswer = null', 'quizContainer.hidden = true', 'renderScope()', 'updateScore()']) assert.ok(reset.includes(part));
+  assert.doesNotMatch(reset, /\.play\(|run\(|input.value =/);
+});
+
+test('keying composes only valid Wabun voicing pairs and keeps International aliases', async () => {
+  const dom = installDOM();
+  const { keyingCharacter, keyingText } = await import('../js/keying.js');
+  dom.restore();
+  assert.equal(keyingText(['.-..', '..'], 'wabun'), 'ガ');
+  assert.equal(keyingText(['-...', '..--.'], 'wabun'), 'パ');
+  assert.equal(keyingText(['.-.-.', '..'], 'wabun'), 'ン゛');
+  assert.equal(keyingText(['.-..', '/', '..'], 'wabun'), 'カ ゛');
+  assert.equal(keyingText(['..'], 'wabun'), '゛');
+  assert.equal(keyingText(['.-..', '..'], 'intl'), 'LI');
+  assert.equal(keyingText(['...', '---', '...'], 'intl'), 'SOS');
+  assert.equal(keyingCharacter('.-.-.', 'intl'), '+');
+  assert.equal(keyingCharacter('...-.-', 'wabun'), '?');
+  assert.equal(keyingCharacter('...-.-', 'intl'), '<SK>');
+  try {
+    settings.system = 'wabun';
+    assert.equal(keyingCharacter('.-'), 'イ');
+    settings.system = 'intl';
+    assert.equal(keyingCharacter('.-'), 'A');
+  } finally { settings.system = 'intl'; }
+});
+
+test('Wabun shared text and Morse preserve bounded input and include the code selection', () => {
+  for (const [kind, value] of [['text', 'モールス'], ['morse', '-..-. .--.- -.--. ---.-']]) {
+    const url = formatShare(kind, value, 'wabun');
+    assert.equal(new URLSearchParams(url).get('code'), 'wabun');
+    assert.equal(initialSystem(url), 'wabun');
+    assert.deepEqual(parseShare(url), { ok: true, kind, value });
+  }
+  assert.equal(formatShare('text', 'SOS', 'intl'), '?text=SOS');
+  assert.equal(formatShare('morse', '... --- ...', 'intl'), '?morse=...%20---%20...');
+  assert.throws(() => formatShare('text', 'モ'.repeat(1001), 'wabun'));
+  assert.throws(() => formatShare('text', 'SOS', 'invalid'));
+  assert.equal(parseShare('?code=wabun&text=モールス').value, 'モールス');
+  assert.deepEqual(parseShare('?code=wabun&text=モ&morse=.-'), { ok: false, errorKey: 'share.both' });
+});
+
 
 function override(values) {
   const originals = Object.keys(values).map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]);
@@ -117,6 +230,7 @@ function installDOM() {
     getAttribute(key) { return this.attributes[key] ?? null; }
     removeAttribute(key) { delete this.attributes[key]; }
     append(...nodes) { nodes.forEach(node => { node.parentElement = this; this.childNodes.push(node); }); }
+    appendChild(node) { this.append(node); return node; }
     replaceChildren(...nodes) { this._text = ''; this.childNodes = []; this.append(...nodes); }
     before(node) {
       node.parentElement = this.parentElement;
@@ -248,4 +362,3 @@ test('system changes cancel pending playback and reset old animation events', ()
     assert.equal(animator.isPlaying, false);
   } finally { restore(); }
 });
-

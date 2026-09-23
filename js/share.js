@@ -9,8 +9,9 @@ export function parseShare(search) {
   return { ok: true, kind: text !== null ? 'text' : 'morse', value };
 }
 
-export function formatShare(kind, value) {
+export function formatShare(kind, value, system = 'intl') {
   if (!['text', 'morse'].includes(kind)) throw new RangeError('Invalid share kind');
   if (typeof value !== 'string' || value.length > 1000) throw new RangeError('Invalid share value');
-  return `?${kind}=${encodeURIComponent(value)}`;
+  if (!['intl', 'wabun'].includes(system)) throw new RangeError('Invalid code system');
+  return `?${kind}=${encodeURIComponent(value)}${system === 'wabun' ? '&code=wabun' : ''}`;
 }
