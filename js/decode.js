@@ -1,6 +1,7 @@
 import { createTreeView } from './treeRenderer.js';
 import { createAnimator } from './animator.js';
-import { decode, encode, normalizeMorse } from './morseCodec.js';
+import { normalizeMorse } from './morseCodec.js';
+import { encodeCurrent as encode, decodeCurrent as decode, bindSystemConversion } from './system.js';
 import { NOTATIONS } from './morseMap.js';
 import { settings, describeChars, renderResult, bindPlayback, bindShareButton } from './utils.js';
 import { setMessage } from './i18n.js';
@@ -79,4 +80,5 @@ export function initDecodeTab() {
   }
   document.addEventListener('notation-change', updateNotation);
   updateNotation();
+  bindSystemConversion(document.getElementById('tab-decode'), convert);
 }

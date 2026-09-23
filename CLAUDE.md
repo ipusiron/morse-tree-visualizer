@@ -25,12 +25,14 @@ The site is automatically deployed to GitHub Pages when pushing to the main bran
 ### Tests
 Run `npm test` with Node 22 or newer. No dependencies or install step are needed.
 GitHub Actions runs the same `node --test` suite on push and pull_request.
-The eighteen test files cover codec boundaries and round-trips, the 55-entry character table,
+The twenty test files cover codec boundaries and round-trips, the 55-entry International character table,
 tree geometry, timing, messages, HTML security/ARIA, contrast, formatting, README consistency,
 keying, nine prosigns, shared URLs, theme storage and static print/security constraints.
 Phase three adds chart coordinates/storage, English letter frequencies and executable trivia/card checks.
 Phase four-a adds JA/EN dictionaries, language selection/storage, state-preserving translation,
 English trivia/print formatting and matching Japanese/English README content, trees and image references.
+Phase four-b adds the full 65-entry Wabun table, normalization/decoding, 67-node binary and 66-node chart references,
+code selection/storage, silent switching, Wabun study, table/print rows, keying composition, and shared URLs.
 
 ## Architecture
 
@@ -49,8 +51,10 @@ The application uses ES6 modules with the following architecture:
   - `js/theme.js` - Light/dark/system choice and guarded localStorage access
   - `js/layout.js` - Shared tree/chart choice, guarded storage and layout-change events
   - `js/i18n.js` - Initial language, guarded storage, data-i18n updates and language-change events
+  - `js/system.js` - Code selection/storage, current table/codec, and silent system-change reconversion
 - **Data & Visualization**:
   - `js/morseMap.js` - MORSE_TABLE: 55 characters (ITU 50 + customary 5); PROSIGNS: 9 (ITU 8 + customary SOS)
+  - `js/wabunMap.js` - WABUN_TABLE: 65 entries in iroha order, romanization, name keys, and kana samples
   - `js/morseTree.js` - buildTree, completeTo, layoutTree and layoutChart, generated from MORSE_TABLE
   - `js/frequency.js` - Rounded A-Z frequencies from Day018 CipherClimb's Gutenberg corpus
   - `js/trivia.js` - DOM-free computeTrivia, text formatting and 16 sourced cards in seven fields
@@ -113,7 +117,7 @@ The application uses ES6 modules with the following architecture:
 7. **Input and messages**: English input uses NFKC, uppercase and collapsed whitespace.
    Internal codes are ASCII; format only at display/copy time. Decoder accepts dot/dash variants,
    slash, vertical bar, newlines and three or more spaces as word separators.
-   Put dynamic UI text in messages.js and call t(). The only Japanese-literal exception is trivia.js card data/formatting;
+   Put dynamic UI text in messages.js and call t(). Japanese-literal exceptions are trivia.js card data/formatting and wabunMap.js data;
    use Unicode escapes for the Japanese notation constants. No persistent quiz scores.
 
 8. **Keying**: u=1200/WPM; a press shorter than 2u is a dot, otherwise a dash.
@@ -171,7 +175,36 @@ The application uses ES6 modules with the following architecture:
     Update README.md and README.en.md together, with matching sections, examples, numbers and directory inventories.
     Japanese images stay in assets/; English images stay in assets/en/. Do not overwrite the Japanese images.
     Only the required Japanese-language link on README.en.md's first line is exempt from its Japanese-text check.
-    Wabun belongs to phase four-b: do not implement it ahead of separate approval.
+    Phase four-b adds Wabun under separate approval; interface language and code system remain independent.
+
+14. **Wabun (phase four-b)**: Source: Japan's Radio Station Operation Regulations, Appended Table 1, part 1,
+    https://laws.e-gov.go.jp/law/325M50080000017 (e-Gov law 325M50080000017).
+    Keep all 65 entries in published iroha order: 48 kana, 2 voicing marks, 10 digits, 5 symbols.
+    The International conversion results, timing, and coordinates must retain all original numeric expectations.
+    Do not add the HORE/RATA switching signals to the 65-character table: this tool switches via the Code control,
+    not by interpreting switching signals embedded in a transmission. Wabun has no International prosign overlay.
+
+    Tool-specific normalization, not rules prescribed by the regulation: NFKC; hiragana U+3041..U+3096 to katakana;
+    NFD; combining marks U+3099/U+309A to spacing marks U+309B/U+309C; expand small kana;
+    restore ASCII parentheses to U+FF08/U+FF09; spaces separate words.
+    Reject unsupported text, including Latin letters and U+3002. Never replace U+3002 with U+3001.
+    Decoder dot aliases remain unchanged. Compose voicing marks with the preceding character only if NFC yields one character;
+    otherwise retain the spacing mark. Keying uses the same composition function.
+
+    settings.system defaults to intl. Priority: valid URL code=wabun|intl, guarded morse-tree-system storage, then intl.
+    currentTable() and current codecs route every conversion feature; never mutate MORSE_TABLE or WABUN_TABLE.
+    system-change stops all playback, invalidates pending AudioContext work, and resets old animation events.
+    Preserve inputs; convert only the visible conversion panel with convert(false), deferring hidden panels until tab-activated.
+    Do not start sound on code/language/layout changes or shared-URL loads. Default sound stays off.
+    Wabun binary trees have 67 nodes/33 leaves in the unchanged -50 -30 1080 470 viewBox.
+    Wabun charts have 66 nodes, rows 0..15 and viewBox 0 0 720 920. No International/customary/prosign markers.
+    Draw voicing marks as SVG shapes instead of text: two short diagonal strokes for dakuten, a centered radius-4 ring for handakuten.
+    Use unfilled 2px strokes with --node-text / --node-hl-text colors and retain translated titles. Rebuild all four tree views on code changes.
+
+    Study has kana/mark/digit/symbol ranges; reset the quiz session on code changes without clearing typed inputs.
+    Wabun tables have groups of 48/2/10/5 and Character/Code/Name columns; kana names are romaji in English.
+    Print all 65 rows across 33/32-row columns; allow long English names to wrap. Browser-check A4 portrait pagination.
+    Wabun share URLs append code=wabun; keep existing International URL formatting and the 1000-character limit unchanged.
 
 ### Development Notes
 
@@ -179,7 +212,7 @@ The application uses ES6 modules with the following architecture:
 - The UI and documentation support Japanese and English
 - Initial notation follows the UI language: Japanese U+30FB/U+2212 or English ASCII `.` and `-`
 - Word separation uses / and character separation uses space
-- JA/EN and README.en.md are phase four-a. Wabun (four-b) requires separate approval; PNG export remains deferred.
+- JA/EN and README.en.md are phase four-a; Wabun is phase four-b. PNG export remains deferred.
 - HTTP is required for ES modules; file:// is not supported
 
 ### Staged development record
@@ -234,3 +267,17 @@ Nagisa supplies browser verification and all nine English PNGs, captured from 64
 Keep the original Japanese PNGs unchanged. Record dimensions and byte sizes for the English copies.
 Codex gates each commit on npm test and git diff --check; do not claim automated/static tests are browser checks.
 Push the branch, create the PR, and wait for successful Test CI. Stop there; do not merge until explicitly instructed.
+
+### Phase four-b staged development
+
+1. Full Wabun table and codec, binary/chart reference tests; no UI changes
+2. Code selection/storage, current encoding/decoding, and all four tree/chart views
+3. Wabun study, reference table, keying, 65-row printing, and shared URLs
+4. Matching Wabun sections in both READMEs, development guidance, and screenshots 10/11 in both languages
+
+Nagisa performs browser checks at the stage commits and supplies four new PNGs after stage three.
+Keep all previous Japanese and English images unchanged. Record the supplied image dimensions and byte sizes.
+Each stage requires npm test and git diff --check before an explicit-file Japanese commit.
+The user approved specification-driven extensions to existing counts/lists/settings tests; record each in report4b.
+Never adjust International conversion, time, or coordinate expectations to pass tests.
+Publish only as far as creating a PR and successful Test CI; do not merge until instructed.

@@ -46,10 +46,17 @@ Encoding, decoding, and hands-on practice help connect the characters, signals, 
 ![The three Math trivia cards](assets/en/screenshot9.png)
 > *The cards on average code length, Huffman coding, and combinations, with their sources. 1280×1100 px, 79,372 bytes.*
 
+![Wabun paths in the binary tree](assets/en/screenshot10.png)
+> *The four kana of moorusu encoded with all paths highlighted in the binary tree. 1280×1100 px, 83,517 bytes.*
+
+![Wabun paths in Chart view](assets/en/screenshot11.png)
+> *The Wabun paths for moorusu highlighted in Chart view. 1280×1100 px, 57,573 bytes.*
+
 ## ✨ Features
 
 - Six tabs: Text ⇒ Morse, Morse ⇒ Text, Study, Morse Table, Keying, and Trivia
 - Japanese/English interface switching, saved language choice, and `?lang=ja` / `?lang=en` links
+- International/Wabun code switching, 65 Wabun entries for conversion and study, saved code choice, and `?code=wabun` links
 - Binary tree / Chart views, synchronized across four diagrams with a saved preference
 - 16 sourced trivia cards in seven fields, runtime calculations, and Try in the tool actions
 - Input, display, and copying in ASCII `.-` or `・−` notation
@@ -65,6 +72,10 @@ Encoding, decoding, and hands-on practice help connect the characters, signals, 
 - Keyboard and mobile support: the tree scrolls inside its container instead of shrinking
 
 ## 📖 Usage
+
+Choose International or Wabun in Code at the top of the page.
+The English-text examples and prosigns below use International.
+Wabun offers kana samples for moorusu, iroha, gakkou, and sakura saku.
 
 ### 📝 Text ⇒ Morse encoding
 
@@ -91,6 +102,8 @@ Encoding, decoding, and hands-on practice help connect the characters, signals, 
 
 Look up 27 letters, 10 digits, 18 punctuation characters, and nine prosigns.
 ITU and customary badges distinguish the entries, and the selected notation applies to the table.
+Wabun instead has four groups: 48 kana, two voicing marks, 10 digits, and five symbols, with names replacing the Type column.
+In the English interface, the kana Name cells show Hepburn romanization.
 
 ### ⌨ Keying
 
@@ -149,7 +162,7 @@ When a card provides an example, it fills and converts the input without startin
 
 ## 📐 Interface
 
-The top of the page contains six tabs and the notation selector.
+The top of the page contains six tabs, the notation selector, and the Code selector.
 Each conversion tab contains input, results, playback controls, and a diagram.
 Study is split into character lookup and random quizzes. Open Help with ? at the top right.
 
@@ -214,7 +227,46 @@ Space does not key Morse while an input or select control has focus.
 Sidetone shares volume, frequency, and the Sound setting with the playback tabs.
 It is silent by default too. After Sound is enabled, keying produces sound only when Sidetone is also enabled.
 
+## 🇯🇵 Wabun (Japanese) Morse
+
+Wabun code assigns Morse patterns to Japanese kana rather than Latin letters; it is not a romanized-text encoding.
+Select Wabun under Code to enter Japanese kana, including hiragana and half-width katakana.
+For example, gakkou is normalized to ka + dakuten + tsu + ko + u and encoded as `.-.. .. .--. ---- ..-`.
+The table follows [Japan's Radio Station Operation Regulations, Appended Table 1, part 1](https://laws.e-gov.go.jp/law/325M50080000017).
+It contains 65 entries in the published iroha order: 48 kana, two voicing marks, 10 digits, and five symbols.
+
+35 patterns mean different characters in the International and Wabun tables, so select the code before converting.
+For example, `.-` is International A but Wabun i.
+The choice is saved as `morse-tree-system`; startup priority is a valid `?code=wabun` / `?code=intl`, then storage, then International.
+Interface language and code system are independent: the English interface can use Wabun.
+
+The following normalization rules are specific to this tool, not prescribed by the regulation:
+
+1. Apply NFKC to normalize full-width and half-width forms.
+2. Convert hiragana to katakana.
+3. Apply NFD and replace combining voicing marks with spacing dakuten U+309B or handakuten U+309C (ga to ka + dakuten, pa to ha + handakuten, vu to u + dakuten).
+4. Expand small a/i/u/e/o/tsu/ya/yu/yo/wa/ka/ke to their full-size kana.
+5. Restore parentheses narrowed by NFKC to the table's full-width U+FF08 / U+FF09 forms.
+6. Treat ordinary and full-width spaces as word separators.
+
+Unsupported characters, including Latin letters and the Japanese full stop U+3002, are errors; U+3002 is not replaced with the separator U+3001.
+This applies to text encoding, separately from the decoder's acceptance of U+3002 as a dot symbol.
+Decoding and keying compose a voicing mark with its preceding character only when NFC yields one character.
+Thus `.-.. ..` becomes ga, whereas `.-.-. ..` remains n followed by a separate dakuten.
+
+The HORE / RATA switching signals are not added to this 65-entry character table.
+The tool switches code systems through the Code control; interpreting switching signals within a transmission is outside its scope.
+International prosigns and the Show prosigns control are unavailable in Wabun.
+
+The Wabun binary tree has 67 nodes and 33 leaves; its chart has 66 nodes at 720×920 px (11 columns × 16 rows).
+Voicing marks use SVG shapes (two short diagonal strokes for dakuten and a ring for handakuten) and descriptive titles.
+Changing code preserves input, stops playback, and reconverts the visible conversion tab without starting sound.
+Hidden conversion tabs refresh when next opened.
+Study offers kana, voicing marks, digits, and symbols; changing code resets the score.
+
 ## 📡 Prosigns
+
+These prosigns apply when International is selected.
 
 | Name | ASCII code | Meaning | Type | Character with the same code |
 |---|---|---|---|---|
@@ -241,6 +293,9 @@ Opening `?text=SOS` or `?morse=...%20---%20...` fills the corresponding tab and 
 Supplying both parameters is an error.
 Opening a shared URL does not start sound.
 The input remains in the URL, so do not share secret text.
+Wabun share URLs include `code=wabun`.
+For example, `?code=wabun&text=%E3%83%A2%E3%83%BC%E3%83%AB%E3%82%B9` opens and converts moorusu in Wabun without playback.
+International share URLs keep their original format; specify `code=intl` to override a recipient's saved Wabun choice.
 
 ## 🎨 Themes
 
@@ -254,7 +309,9 @@ Select Print (save as PDF) in Morse Table, then choose Save as PDF in the browse
 The sheet has 64 rows in two columns: 27 letters + 10 digits + 18 punctuation characters + nine prosigns.
 It includes both ASCII and `・−` notation.
 Printing always uses light colors, even with the dark theme selected.
-The sheet has been checked to fit one A4 portrait page in Chromium.
+Wabun prints the current 65 entries in columns of 33 and 32 rows, with its own heading and names.
+The International sheet has been checked to fit one A4 portrait page in Chromium.
+Wabun uses the same A4 portrait single-page print area.
 
 ## 🧭 Chart view
 
@@ -273,7 +330,7 @@ Follow the code from start in the center.
 
 A downward child is placed on the shallowest row where its subtree and vertical connector do not collide with other nodes.
 Row numbers are not code lengths.
-The layout is 11 columns × 14 rows, 720×808 px, with 64 visible nodes when prosigns are hidden and 66 when shown.
+The International layout is 11 columns × 14 rows, 720×808 px, with 64 visible nodes when prosigns are hidden and 66 when shown.
 Hiding SN and SK does not move the other nodes.
 KA uses a node on a punctuation path; AR, BT, AS, and K share nodes with characters.
 Small dashed nodes are empty; yellow dashed nodes are customary codes.
@@ -309,7 +366,8 @@ The supporting material for every card is also listed under References below.
 
 ### Character table and binary tree
 
-`MORSE_TABLE` is the single character source: 27 letters (A–Z and É), 10 digits, and 18 punctuation characters (13 ITU + five customary), for 55 characters total.
+`MORSE_TABLE` is the International character source: 27 letters (A–Z and É), 10 digits, and 18 punctuation characters (13 ITU + five customary), for 55 characters total.
+Wabun has 65 entries in `WABUN_TABLE`; `currentTable()` returns the selected table.
 It contains 50 ITU and five customary characters.
 The binary tree is generated from this table, filling empty nodes through depth 5.
 With prosigns included, it has 76 nodes through depth 6, 34 leaves, and 13 depth-6 nodes.
@@ -348,7 +406,7 @@ Enter `&` as a character or `<AS>` as a prosign.
 ### Chart layout and trivia calculations
 
 `layoutTree` generates binary-tree coordinates; `layoutChart` generates chart coordinates.
-The chart does not use `completeTo` and always lays out all 66 nodes, including prosigns.
+The chart does not use `completeTo`; International always lays out all 66 nodes, including prosigns.
 It memoizes subtree shapes and cells crossed by vertical connectors, placing the horizontal child first and the downward child on the shallowest collision-free row.
 Columns range from −5 to 5 and rows from 0 to 13, with `x=360+col×64` and `y=40+row×56`.
 Both layouts use the same `data-code` values for highlighting, playback, keying, and quizzes.
@@ -407,7 +465,7 @@ Input is rendered with `textContent`, never interpreted as HTML.
 There are no inline event handlers or style attributes, and a meta CSP restricts scripts and CSS to the same origin.
 The referrer policy is `no-referrer`, and external links use `noopener noreferrer`.
 Opening and using the page produced zero requests to external hosts in Chromium checks.
-Theme, layout, and language choices are saved; input and scores are not saved automatically.
+Theme, layout, language, and code choices are saved; input and scores are not saved automatically.
 Share URLs explicitly contain input, which can remain with recipients or in browser history.
 
 A meta CSP cannot prevent clickjacking: `frame-ancestors` requires an HTTP header, and GitHub Pages does not support arbitrary response headers.
@@ -420,7 +478,7 @@ Opening a GitHub or card-source link connects to that site; merely displaying a 
 - Accented characters other than É are not supported
 - Customary codes can differ between communication contexts
 - iOS requires a tap to start sound; physical iOS devices have not been tested
-- Wabun (Japanese Morse) and PNG export are not supported
+- PNG export is not supported
 
 ## ❓ FAQ
 
@@ -438,7 +496,7 @@ Press Decode or Enter to update the decoded result.
 
 ### Wide diagrams on a phone
 
-To keep characters legible, the binary tree is 1080×470 px and the chart is 720×808 px.
+To keep characters legible, the binary tree is 1080×470 px; the chart is 720×808 px for International or 720×920 px for Wabun.
 Scroll inside the diagram container rather than scrolling the whole page horizontally.
 
 ## 🔗 References
@@ -490,6 +548,8 @@ README examples, tables, and image references are also checked.
 | share.test.js | URL parsing, the 1,000-character limit, and URL generation |
 | theme.test.js | Storage failures and theme variable sets |
 | static.test.js | Print CSS and prohibited network APIs |
+| wabun.test.js | All 65 Wabun entries, conversion, decoding, 67 binary nodes, and all 66 chart coordinates |
+| system.test.js | Code choice/storage, silent switching, four diagrams, quiz categories, 65 table/print rows, keying, and sharing |
 
 ## 📁 Directory structure
 
@@ -514,7 +574,9 @@ morse-tree-visualizer/              # Learn Morse code as tree paths
 │   │   ├── screenshot6.png         # SK details and prosign labels
 │   │   ├── screenshot7.png         # Dark-theme SOS and sound settings
 │   │   ├── screenshot8.png         # Chart with SOS and prosigns
-│   │   └── screenshot9.png         # Trivia filtered to three Math cards
+│   │   ├── screenshot9.png         # Trivia filtered to three Math cards
+│   │   ├── screenshot10.png        # Wabun moorusu highlighted in the binary tree
+│   │   └── screenshot11.png        # Wabun moorusu highlighted in Chart view
 │   ├── screenshot.png              # SOS result with S and O paths highlighted
 │   ├── screenshot2.png             # LOVE decoding result and details
 │   ├── screenshot3.png             # Correct Q answer and score
@@ -523,7 +585,9 @@ morse-tree-visualizer/              # Learn Morse code as tree paths
 │   ├── screenshot6.png             # SK details and prosign labels
 │   ├── screenshot7.png             # Dark-theme SOS and sound settings
 │   ├── screenshot8.png             # Chart with SOS and prosigns
-│   └── screenshot9.png             # Trivia filtered to three Math cards
+│   ├── screenshot9.png             # Trivia filtered to three Math cards
+│   ├── screenshot10.png            # Wabun moorusu highlighted in the binary tree
+│   └── screenshot11.png            # Wabun moorusu highlighted in Chart view
 ├── index.html                      # Six tabs, Help, and CSP markup
 ├── js/                             # JavaScript ES modules
 │   ├── animator.js                 # Element playback, pause, and manual steps
@@ -541,11 +605,13 @@ morse-tree-visualizer/              # Learn Morse code as tree paths
 │   ├── script.js                   # Startup, tabs, and Help controls
 │   ├── share.js                    # Shared-input URL parsing and generation
 │   ├── study.js                    # Character lookup, quizzes, and scores
+│   ├── system.js                   # Code selection, storage, and the current code table
 │   ├── table.js                    # ITU/customary reference table
 │   ├── theme.js                    # Light/dark/system themes and storage
 │   ├── treeRenderer.js             # Per-view SVG rendering, highlighting, and following
 │   ├── trivia.js                   # 16 cards, sources, calculations, and body formatting
-│   └── utils.js                    # Safe DOM creation and shared controls
+│   ├── utils.js                    # Safe DOM creation and shared controls
+│   └── wabunMap.js                 # 65 Wabun entries with romanization and translation keys
 ├── package.json                    # Dependency-free npm test definition
 ├── style.css                       # Color variables, mobile layout, and diagrams
 └── test/                           # Dependency-free automated tests
@@ -562,11 +628,13 @@ morse-tree-visualizer/              # Learn Morse code as tree paths
     ├── readme.test.js              # JA/EN tables, examples, sections, images, inventory, and YAML
     ├── share.test.js               # Shared URL parsing and length limits
     ├── static.test.js              # Print CSS and absence of network clients
+    ├── system.test.js              # Code selection, storage, reconversion, and tree switching
     ├── table.test.js               # Character-table counts, order, and codes
     ├── theme.test.js               # Theme storage and variable sets
     ├── timing.test.js              # ITU ratios, PARIS, and SOS
     ├── tree.test.js                # 75 character/76 prosign-inclusive nodes, 34 leaves, and coordinates
-    └── trivia.test.js              # Runtime trivia calculations
+    ├── trivia.test.js              # Runtime trivia calculations
+    └── wabun.test.js               # Wabun table, normalization, codec, tree and chart references
 ```
 
 ## 💻 Requirements

@@ -100,5 +100,10 @@ export function createAnimator(view) {
     apply(index);
     reduced = previous;
   }
-  return { play, pause, resume, stop, step, get isPlaying() { return playing; } };
+  function reset() {
+    stop();
+    events = [];
+    callbacks = {};
+  }
+  return { play, pause, resume, stop, step, reset, get isPlaying() { return playing; } };
 }

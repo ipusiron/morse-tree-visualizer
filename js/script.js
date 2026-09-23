@@ -11,6 +11,7 @@ import { el, msg, settings } from './utils.js';
 
 import { initEncodeTab } from './encode.js';
 import { initDecodeTab } from './decode.js';
+import { initSystem } from './system.js';
 
 let tableInitialized = false;
 let studyInitialized = false;
@@ -24,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
   settings.notation = lang === 'en' ? 'ascii' : 'ja';
   document.querySelectorAll('[name="notation"]').forEach(input => { input.checked = input.value === settings.notation; });
   applyLanguage(lang);
+  initSystem(location.search);
   document.getElementById('langToggle').addEventListener('click', () => {
     applyLanguage(getLang() === 'ja' ? 'en' : 'ja');
     writeLang(getLang());
@@ -134,6 +136,7 @@ export function switchTab(tabId) {
       decodeInitialized = true;
     }
   }
+  document.dispatchEvent(new Event('tab-activated'));
 }
 
 function applyInput(kind, value) {

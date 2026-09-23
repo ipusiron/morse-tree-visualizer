@@ -492,6 +492,61 @@ Object.assign(DICTIONARIES.en, {
   "footer.close": ")"
 });
 
+Object.assign(MESSAGES, {
+  "system.legend": "符号",
+  "group.kana": "仮名",
+  "group.mark": "濁点・半濁点",
+  "group.symbol": "記号",
+  "wabun.name": "名前",
+  "wabun.print_title": "和文モールス符号表（無線局運用規則 別表第一号）",
+  "wabun.print_note": "仮名48、濁点と半濁点2、数字10、記号5の65件。濁点と半濁点は独立した符号です。",
+  "system.intl": "欧文",
+  "system.wabun": "和文",
+  "wabun.tab.encode": "和文 ⇒ モールス信号",
+  "wabun.tab.encode_short": "和文 ⇒ モールス",
+  "wabun.tab.decode": "モールス信号 ⇒ 和文",
+  "wabun.tab.decode_short": "モールス ⇒ 和文",
+  "wabun.tree.legend": "点灯＝経路、破線の丸＝空き",
+  "wabun.encode.placeholder": "{sample} などを入力",
+  "wabun.decode.placeholder": "-..-. .--.- -.--. ---.-（モールス）",
+  "wabun.unsupported": "和文の表にない文字: {list}",
+  "wabun.standard": "別表第一号",
+  "wabun.dakuten": "濁点",
+  "wabun.handakuten": "半濁点",
+  "wabun.long_vowel": "長音",
+  "wabun.separator": "区切点",
+  "wabun.paragraph": "段落",
+  "wabun.open": "括弧（開き）",
+  "wabun.close": "括弧（閉じ）"
+});
+Object.assign(DICTIONARIES.en, {
+  "system.legend": "Code",
+  "group.kana": "Kana",
+  "group.mark": "Voicing marks",
+  "group.symbol": "Symbols",
+  "wabun.name": "Name",
+  "wabun.print_title": "Wabun Morse code table (Radio Station Operation Regulations, Appended Table 1)",
+  "wabun.print_note": "65 entries: 48 kana, 2 voicing marks, 10 digits, and 5 symbols. Voicing marks have their own codes.",
+  "system.intl": "International",
+  "system.wabun": "Wabun (Japanese)",
+  "wabun.tab.encode": "Wabun text ⇒ Morse",
+  "wabun.tab.encode_short": "Wabun ⇒ Morse",
+  "wabun.tab.decode": "Morse ⇒ Wabun text",
+  "wabun.tab.decode_short": "Morse ⇒ Wabun",
+  "wabun.tree.legend": "Highlight = path; dashed circle = unused",
+  "wabun.encode.placeholder": "Enter kana, for example {sample}",
+  "wabun.decode.placeholder": "For example: -..-. .--.- -.--. ---.-",
+  "wabun.unsupported": "Characters not in the Wabun table: {list}",
+  "wabun.standard": "Appended Table 1",
+  "wabun.dakuten": "dakuten (voiced mark)",
+  "wabun.handakuten": "handakuten (semi-voiced mark)",
+  "wabun.long_vowel": "Long vowel mark",
+  "wabun.separator": "Separator",
+  "wabun.paragraph": "Paragraph",
+  "wabun.open": "Opening parenthesis",
+  "wabun.close": "Closing parenthesis"
+});
+
 let language = 'ja';
 export function getLang() { return language; }
 export function setLang(lang) {

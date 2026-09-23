@@ -38,7 +38,7 @@ test('notation changes render without autoplay and invalidate pending playback',
 
 test('sound defaults off in shared controls and keying while other playback defaults stay unchanged', () => {
   assert.deepEqual(settings, {
-    notation: 'ja', charWpm: 15, overallWpm: 10, frequency: 700, volume: 50, sound: false, lamp: false
+    system: 'intl', notation: 'ja', charWpm: 15, overallWpm: 10, frequency: 700, volume: 50, sound: false, lamp: false
   });
   const utils = readFileSync(new URL('../js/utils.js', import.meta.url), 'utf8');
   assert.match(utils, /if \(input.type === 'checkbox'\) input.checked = settings\[key\]/);

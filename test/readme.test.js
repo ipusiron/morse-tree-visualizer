@@ -4,9 +4,31 @@ import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { encode, decode, farnsworthGaps } from '../js/morseCodec.js';
 import { MORSE_TABLE, PROSIGNS } from '../js/morseMap.js';
 import { TRIVIA_CARDS, formatTrivia } from '../js/trivia.js';
+import { WABUN_TABLE } from '../js/wabunMap.js';
 
 const root = new URL('../', import.meta.url);
 const readme = readFileSync(new URL('README.md', root), 'utf8');
+
+test('both READMEs explain the Wabun source, tool normalization, coverage and separate selection', () => {
+  const english = readFileSync(new URL('README.en.md', root), 'utf8');
+  assert.match(readme, /^## 🇯🇵 和文モールス$/m);
+  assert.match(english, /^## 🇯🇵 Wabun \(Japanese\) Morse$/m);
+  for (const text of [readme, english]) {
+    assert.equal([...text.matchAll(/^## /gm)].length, 25);
+    for (const required of ['https://laws.e-gov.go.jp/law/325M50080000017', '65', '48', '10', '35',
+      '67', '66', '720×920', 'NFKC', 'NFD', 'NFC', 'morse-tree-system', '?code=wabun', '?code=intl']) {
+      assert.ok(text.includes(required), required);
+    }
+  }
+  assert.match(readme, /規則の本文にない、本ツールの扱い/);
+  assert.match(readme, /「。」を「、」へ置き換えません/);
+  assert.match(readme, /ホレ／ラタ/);
+  assert.match(english, /specific to this tool, not prescribed by the regulation/);
+  assert.match(english, /U\+3002 is not replaced with the separator U\+3001/);
+  assert.match(english, /HORE \/ RATA/);
+  const intl = new Map(MORSE_TABLE.map(entry => [entry.code, entry.char]));
+  assert.equal(WABUN_TABLE.filter(entry => intl.has(entry.code) && intl.get(entry.code) !== entry.char).length, 35);
+});
 
 test('README examples and punctuation table agree with the canonical data', () => {
   const examples = [...readme.matchAll(/^\| (encode|decode) \| `([^`]+)` \| `([^`]+)` \|$/gm)];
@@ -36,15 +58,19 @@ test('README metadata and image references are intact', () => {
     'repo_url: "https://github.com/ipusiron/morse-tree-visualizer"',
     'demo_url: "https://ipusiron.github.io/morse-tree-visualizer/"']) assert.ok(yaml.includes(expected));
   const images = [...readme.matchAll(/!\[[^\]]*\]\(([^)]+)\)/g)].map(m => m[1]).filter(p => !p.startsWith('https:'));
-  assert.equal(images.length, 9);
+  assert.equal(images.length, 11);
   images.forEach(path => assert.ok(existsSync(new URL(path, root)), path));
   const pngs = readdirSync(new URL('assets/', root)).filter(f => f.endsWith('.png')).map(f => 'assets/' + f);
   assert.deepEqual(images.sort(), pngs.sort());
-  for (const name of ['screenshot8.png', 'screenshot9.png']) {
+  for (const name of ['screenshot8.png', 'screenshot9.png', 'screenshot10.png', 'screenshot11.png']) {
     const data = readFileSync(new URL('assets/' + name, root));
     assert.deepEqual([...data.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
     assert.deepEqual([data.readUInt32BE(16), data.readUInt32BE(20)], [1280, 1100]);
     assert.ok(data.length <= 300 * 1024, name);
+    if (['screenshot10.png', 'screenshot11.png'].includes(name)) {
+      const caption = readme.split('](assets/' + name + ')\n')[1].split('\n')[0];
+      assert.ok(caption.includes(`1280×1100px、${data.length.toLocaleString('en-US')}バイト。`), name);
+    }
   }
 });
 
@@ -125,7 +151,7 @@ test('English README has every section in order, matching icons and reciprocal l
   assert.deepEqual(en.map(m => m[1]), ja.map(m => m[1]));
   assert.deepEqual(en.map(m => m[2]), [
     'Demo', 'Screenshots', 'Features', 'Usage', 'Interface', 'Use cases', 'Sound and Farnsworth timing',
-    'Learning by keying', 'Prosigns', 'Sharing input', 'Themes', 'Printing (save as PDF)', 'Chart view',
+    'Learning by keying', 'Wabun (Japanese) Morse', 'Prosigns', 'Sharing input', 'Themes', 'Printing (save as PDF)', 'Chart view',
     'Trivia (connections to other fields)', 'Technical details', 'Security', 'Limitations', 'FAQ',
     'References', 'Tests', 'Directory structure', 'Requirements', 'License', 'About this tool'
   ]);
@@ -145,10 +171,10 @@ test('English README matches the Japanese file inventory, commands and external 
   assert.deepEqual(links(english), links(readme));
 });
 
-test('English README references exactly nine real English PNGs with accurate size captions', () => {
+test('English README references exactly eleven real English PNGs with accurate size captions', () => {
   const english = readFileSync(englishReadmePath, 'utf8');
   const images = [...english.matchAll(/!\[[^\]]*\]\(([^)]+)\)/g)].map(m => m[1]).filter(p => !p.startsWith('https:'));
-  const names = Array.from({ length: 9 }, (_, i) => `screenshot${i ? i + 1 : ''}.png`);
+  const names = Array.from({ length: 11 }, (_, i) => `screenshot${i ? i + 1 : ''}.png`);
   assert.deepEqual(images, names.map(name => 'assets/en/' + name));
   assert.deepEqual(readdirSync(new URL('assets/en/', root)).sort(), [...names].sort());
   for (const path of images) {
@@ -202,5 +228,5 @@ test('English README documents every approved trivia title and source, computed 
   assert.ok(english.includes('Sound is off by default.'));
   assert.ok(english.includes('Enabling Sound alone does not create an AudioContext'));
   assert.ok(english.includes('It is silent by default too.'));
-  assert.ok(english.includes('Wabun (Japanese Morse) and PNG export are not supported'));
+  assert.ok(english.includes('PNG export is not supported'));
 });

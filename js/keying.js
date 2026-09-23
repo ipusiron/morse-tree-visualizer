@@ -1,10 +1,21 @@
 import { CODE_TO_CHAR, PROSIGN_BY_CODE, formatCode } from './morseMap.js';
-import { classifyPress, classifyGap, unitMs } from './morseCodec.js';
+import { classifyPress, classifyGap, unitMs, composeWabun } from './morseCodec.js';
+import { WABUN_CODE_TO_CHAR } from './wabunMap.js';
 import { createTreeView } from './treeRenderer.js';
 import { createMorseAudio } from './audio.js';
 import { el, settings } from './utils.js';
 import { t } from './messages.js';
 import { switchTab } from './script.js';
+
+export function keyingCharacter(code, system = settings.system) {
+  if (system === 'wabun') return WABUN_CODE_TO_CHAR.get(code) ?? '?';
+  return CODE_TO_CHAR.get(code) ?? (PROSIGN_BY_CODE.has(code) ? `<${PROSIGN_BY_CODE.get(code).label}>` : '?');
+}
+
+export function keyingText(codes, system = settings.system) {
+  const text = codes.map(code => code === '/' ? ' ' : keyingCharacter(code, system)).join('');
+  return system === 'wabun' ? composeWabun(text) : text;
+}
 
 export function initKeying() {
   const panel = document.getElementById('tab-keying');
@@ -25,7 +36,7 @@ export function initKeying() {
   let generation = 0;
   let timers = [];
   const unit = () => unitMs(Number(speed.value));
-  const character = code => CODE_TO_CHAR.get(code) ?? (PROSIGN_BY_CODE.has(code) ? `<${PROSIGN_BY_CODE.get(code).label}>` : '?');
+  const character = code => keyingCharacter(code);
   const clearTimers = () => { timers.forEach(clearTimeout); timers = []; };
   const later = (fn, ms) => timers.push(setTimeout(fn, ms));
   function render(showPending = true) {
@@ -33,7 +44,7 @@ export function initKeying() {
     codeOutput.replaceChildren(...codes.map(code => el('span', {
       class: code !== '/' && character(code) === '?' ? 'keying-invalid' : ''
     }, (code === '/' ? '/' : formatCode(code, settings.notation)) + ' ')));
-    textOutput.textContent = codes.map(code => code === '/' ? ' ' : character(code)).join('');
+    textOutput.textContent = keyingText(codes);
     document.getElementById('keyingToDecode').disabled = !codes.length && !pending;
   }
   function commit() {
@@ -132,6 +143,8 @@ export function initKeying() {
   document.addEventListener('notation-change', () => render());
   document.addEventListener('tab-switch', cancel);
   document.addEventListener('layout-change', cancel);
+  document.addEventListener('system-change', cancel);
+  document.addEventListener('system-change', () => { upAt = null; render(); });
   document.addEventListener('language-change', () => cancel({ preserveView: true }));
   window.addEventListener('blur', cancel);
   document.addEventListener('visibilitychange', () => { if (document.hidden) cancel(); });

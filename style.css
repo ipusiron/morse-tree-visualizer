@@ -215,6 +215,8 @@
   #printSheet table { width: 100%; border-collapse: collapse; }
   #printSheet td { padding: 0.5mm; border-bottom: 1px solid #cccccc; white-space: nowrap; }
   #printSheet tr { break-inside: avoid; }
+  #printSheet[data-system="wabun"] .print-columns { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #printSheet[data-system="wabun"] td:last-child { white-space: normal; overflow-wrap: anywhere; }
 }
 
 .audio-controls {
@@ -1034,6 +1036,15 @@ svg:not(.show-prosigns) .prosign-extension {
   stroke: var(--hl-stroke);
   stroke-width: 4;
 }
+.tree-node .voicing-mark line, .tree-node .voicing-mark circle {
+  fill: none;
+  stroke: var(--node-text);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.tree-node.highlight .voicing-mark line, .tree-node.highlight .voicing-mark circle {
+  stroke: var(--node-hl-text);
+}
 .direction-label {
   fill: var(--text);
 }
@@ -1046,6 +1057,30 @@ svg:not(.show-prosigns) .prosign-extension {
 }
 .tree-box.chart-box svg {
   height: 808px;
+}
+.tree-box.chart-box svg.wabun {
+  height: 920px;
+}
+.code-settings, .notation-control, .system-control {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+.notation-control, .system-control {
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+}
+.notation-control label, .system-control label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 44px;
+  min-height: 44px;
+  margin: 0;
 }
 svg.chart:not(.show-prosigns) .prosign-only rect {
   width: 28px;

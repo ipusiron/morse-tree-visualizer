@@ -1,4 +1,5 @@
 import { CHAR_TO_CODE, CODE_TO_CHAR, PROSIGN_BY_LABEL, PROSIGN_BY_CODE, NOTATIONS, formatCode } from './morseMap.js';
+import { WABUN_CHAR_TO_CODE, WABUN_CODE_TO_CHAR } from './wabunMap.js';
 
 function requireString(value) {
   if (typeof value !== 'string') throw new TypeError('Expected a string');
@@ -86,6 +87,58 @@ export function decode(input) {
   const invalid = [...new Set(words.flat().filter(item => item.char === null).map(item => item.code))];
   if (invalid.length) return { ok: false, invalid, words, canonical };
   return { ok: true, text: words.map(word => word.map(item => item.char).join('')).join(' '), words, canonical };
+}
+
+export function normalizeWabun(text) {
+  requireString(text);
+  let normalized = text.normalize('NFKC');
+  normalized = [...normalized].map(char => {
+    const cp = char.codePointAt(0);
+    return cp >= 0x3041 && cp <= 0x3096 ? String.fromCodePoint(cp + 0x60) : char;
+  }).join('').normalize('NFD').replace(/\u3099/g, '\u309b').replace(/\u309a/g, '\u309c');
+  const small = '\u30a1\u30a3\u30a5\u30a7\u30a9\u30c3\u30e3\u30e5\u30e7\u30ee\u30f5\u30f6';
+  const full = '\u30a2\u30a4\u30a6\u30a8\u30aa\u30c4\u30e4\u30e6\u30e8\u30ef\u30ab\u30b1';
+  normalized = [...normalized].map(char => small.includes(char) ? full[small.indexOf(char)] : char).join('');
+  return normalized.replace(/\(/g, '\uff08').replace(/\)/g, '\uff09').replace(/\s+/g, ' ').trim();
+}
+
+export function encodeWabun(text, notation = 'ja') {
+  const normalized = normalizeWabun(text);
+  const unsupported = uniqueChars([...normalized].filter(char => char !== ' ' && !WABUN_CHAR_TO_CODE.has(char)));
+  if (unsupported.length) return { ok: false, unsupported };
+  const items = normalized ? normalized.split(' ').map(word =>
+    [...word].map(char => ({ char, code: WABUN_CHAR_TO_CODE.get(char) }))) : [];
+  const n = NOTATIONS[notation];
+  const morse = items.map(word => word.map(item => formatCode(item.code, notation)).join(n.letterGap)).join(n.wordGap);
+  return { ok: true, morse, items };
+}
+
+export function composeWabun(text) {
+  const chars = [];
+  for (const char of text) {
+    if ((char === '\u309b' || char === '\u309c') && chars.length && chars.at(-1) !== ' ') {
+      const combining = char === '\u309b' ? '\u3099' : '\u309a';
+      const composed = (chars.at(-1) + combining).normalize('NFC');
+      if ([...composed].length === 1) {
+        chars[chars.length - 1] = composed;
+        continue;
+      }
+    }
+    chars.push(char);
+  }
+  return chars.join('');
+}
+
+export function decodeWabun(input) {
+  const { canonical, unknown } = normalizeMorse(input);
+  if (unknown.length) return { ok: false, unknown };
+  if (!canonical) return { ok: false, empty: true };
+  const words = canonical.split(' / ').map(word =>
+    word.split(' ').map(code => ({ code, char: WABUN_CODE_TO_CHAR.get(code) ?? null })));
+  const invalid = [...new Set(words.flat().filter(item => item.char === null).map(item => item.code))];
+  if (invalid.length) return { ok: false, invalid, words, canonical };
+  const text = words.map(word => composeWabun(word.map(item => item.char).join(''))).join(' ');
+  return { ok: true, text, words, canonical };
 }
 
 export function pathFor(code) {
