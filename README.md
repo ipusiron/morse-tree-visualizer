@@ -500,6 +500,7 @@ morse-tree-visualizer/              # モールス符号を木の経路として
 │   ├── decode.js                   # 復号と入力支援・リアルタイム追従
 │   ├── encode.js                   # 英文の変換と結果・コピー・再生
 │   ├── frequency.js                # Day018由来の英字出現頻度
+│   ├── i18n.js                     # 初期言語の選択と保存
 │   ├── keying.js                   # 押し離しから符号と文字を確定する打鍵タブ
 │   ├── layout.js                   # 木の見た目の保存と4か所の同期
 │   ├── messages.js                 # 動的な画面文言の日本語辞書
@@ -523,6 +524,7 @@ morse-tree-visualizer/              # モールス符号を木の経路として
     ├── format.test.js              # 行長と行数
     ├── frequency.test.js           # 英字出現頻度の正規化と順位
     ├── html.test.js                # CSP・ARIA・属性とラベル
+    ├── i18n.test.js                # 日英辞書の整合性・初期言語・保存制限
     ├── keying.test.js              # 打鍵の時間境界と符号・文字の確定
     ├── messages.test.js            # 辞書と日本語リテラルの集約
     ├── prosign.test.js             # 手続き符号9件と変換・復号
