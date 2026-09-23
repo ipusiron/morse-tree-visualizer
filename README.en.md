@@ -47,10 +47,10 @@ Encoding, decoding, and hands-on practice help connect the characters, signals, 
 > *The cards on average code length, Huffman coding, and combinations, with their sources. 1280×1100 px, 79,372 bytes.*
 
 ![Wabun paths in the binary tree](assets/en/screenshot10.png)
-> *The four kana of moorusu encoded with all paths highlighted in the binary tree. 1280×1100 px, 83,318 bytes.*
+> *The four kana of moorusu encoded with all paths highlighted in the binary tree. 1280×1100 px, 83,517 bytes.*
 
 ![Wabun paths in Chart view](assets/en/screenshot11.png)
-> *The Wabun paths for moorusu highlighted in Chart view. 1280×1100 px, 57,443 bytes.*
+> *The Wabun paths for moorusu highlighted in Chart view. 1280×1100 px, 57,573 bytes.*
 
 ## ✨ Features
 
