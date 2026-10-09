@@ -180,6 +180,14 @@ They stop any current playback and never start sound.
 
 ## 🎯 Use cases
 
+Ways of using this tool in particular
+
+- Giving one code sequence two readings (making puzzles and cipher quizzes): the same run of dots and dashes is a different character in International and in Wabun Morse. The code for the English "NO", `-. ---`, decodes in Wabun as tare, and `- ---` for "TO" becomes mure. You can write a puzzle with two answers, or one that leads from an English answer to a Japanese hint (35 codes stand for different characters in Wabun and International Morse; say in the puzzle which one to read, or solvers will be stuck)
+- Seeing that one swapped element gives another letter (a class on error detection): across the codes of the 26 letters there are 82 ways to swap a single dot or dash, and 68 of them (82.9%) give the code of another letter. For S, `...`, any single error reads as D, R or U, and the receiver cannot notice. On the tree it means taking the other branch once at one of the forks on the way down. It is an example of why error detection such as parity is needed (the other 14 give codes that are not in the table, so the receiver can notice; errors in the number of dots and dashes are not included)
+- Counting the gap between kana and codes (Wabun practice and information classes): Wabun sends the voiced and semi-voiced marks as a separate code after the kana, and small kana such as ya or tsu as the full-size kana. Ninja is four kana but five codes, `-.-. .-.-. --.-. .. .--` (ni + n + shi + dakuten + ya). When estimating how much to practice or how long sending will take, count codes, not kana
+
+General uses
+
 - Character-to-code practice for beginners and hobby learners
 - Supplementary Morse practice for amateur radio
 - Signal-processing demonstrations in IT and STEM education
