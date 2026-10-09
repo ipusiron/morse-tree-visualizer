@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
-import { encode, decode, farnsworthGaps } from '../js/morseCodec.js';
+import { encode, decode, farnsworthGaps, decodeWabun, encodeWabun } from '../js/morseCodec.js';
 import { MORSE_TABLE, PROSIGNS } from '../js/morseMap.js';
 import { TRIVIA_CARDS, formatTrivia } from '../js/trivia.js';
 import { WABUN_TABLE } from '../js/wabunMap.js';
@@ -229,4 +229,26 @@ test('English README documents every approved trivia title and source, computed 
   assert.ok(english.includes('Enabling Sound alone does not create an AudioContext'));
   assert.ok(english.includes('It is silent by default too.'));
   assert.ok(english.includes('PNG export is not supported'));
+});
+
+test('use-case examples unique to this tool match the codec in both READMEs', () => {
+  const english = readFileSync(new URL('README.en.md', root), 'utf8');
+  const no = [encode('NO').morse, encode('NO', 'ascii').morse];
+  const to = [encode('TO').morse, encode('TO', 'ascii').morse];
+  assert.deepEqual([decodeWabun(no[1]).text, decodeWabun(to[1]).text], ['タレ', 'ムレ']);
+  assert.ok(readme.includes('`' + no[0] + '`を和文で復号すると「タレ」') && readme.includes('`' + to[0] + '`は「ムレ」'));
+  assert.ok(english.includes('`' + no[1] + '`, decodes in Wabun as tare') && english.includes('`' + to[1] + '` for "TO" becomes mure'));
+  const letters = MORSE_TABLE.filter(entry => /^[A-Z]$/.test(entry.char));
+  const byCode = new Map(letters.map(entry => [entry.code, entry.char]));
+  const flips = code => [...code].map((c, i) => code.slice(0, i) + (c === '.' ? '-' : '.') + code.slice(i + 1));
+  const all = letters.flatMap(entry => flips(entry.code));
+  const hit = all.filter(code => byCode.has(code)).length;
+  assert.deepEqual([all.length, hit, (hit / all.length * 100).toFixed(1)], [82, 68, '82.9']);
+  assert.deepEqual(flips('...').map(code => byCode.get(code)).sort(), ['D', 'R', 'U']);
+  assert.ok(readme.includes('82通りあり、そのうち68通り（82.9%）') && readme.includes('残りの14通り'));
+  assert.ok(english.includes('82 ways') && english.includes('68 of them (82.9%)') && english.includes('the other 14'));
+  const ninja = encodeWabun('ニンジャ');
+  assert.equal(ninja.items[0].map(item => item.char).join(''), 'ニンシ゛ヤ');
+  assert.ok(readme.includes('`' + ninja.morse + '`の5符号（ニンシ゛ヤ）'));
+  assert.ok(english.includes('`' + encodeWabun('ニンジャ', 'ascii').morse + '` (ni + n + shi + dakuten + ya)'));
 });
