@@ -65,7 +65,7 @@ Encoding, decoding, and hands-on practice help connect the characters, signals, 
 - International/Wabun code switching, 65 Wabun entries for conversion and study, saved code choice, and `?code=wabun` links
 - Binary tree / Chart / H-tree views, synchronized across four diagrams with a saved preference
 - Choice of the groups shown on the tree (letters, digits, punctuation, and prosigns; kana, voicing marks, digits, and symbols in Wabun), with the tree trimmed to match
-- 16 sourced trivia cards in seven fields, runtime calculations, and Try in the tool actions
+- 17 sourced trivia cards in seven fields, runtime calculations, and Try in the tool actions
 - Input, display, and copying in ASCII `.-` or `・−` notation
 - ITU-timed path playback, pause/resume/stop, and manual forward/backward steps
 - Synchronized sound and tree highlighting, adjustable frequency and volume, and an optional small light
@@ -165,7 +165,7 @@ The tree becomes shallower to match the groups you clear (depth 4 for letters on
 
 ### 🔍 Trivia
 
-Open Trivia and select a field to filter the cards. All returns to all 16 cards.
+Open Trivia and select a field to filter the cards. All returns to all 17 cards.
 Source links open the supporting material.
 Cards with Try in the tool take you to the related tab.
 When a card provides an example, it fills and converts the input without starting sound or playback.
@@ -369,6 +369,7 @@ The H-tree draws the binary tree in a nearly square area. Follow the code from s
 
 The shortest branch is 36 px, so at every depth nodes stay at least 36 px from each other and from other branches.
 In SOS, S goes left → up → left and O goes right → down → right. Letters alone fit a 390 px-wide screen.
+Why the H-tree is known from chip layout (its area grows only as n) is covered by the trivia card The H-tree and chip area.
 
 Show on tree selects which groups of characters the tree carries. The choice is shared by all three layouts and four diagrams, and is saved separately for International and Wabun (key `morse-tree-kinds`).
 
@@ -387,7 +388,7 @@ Show on tree selects which groups of characters the tree carries. The choice is 
 
 ## 🔍 Trivia (connections to other fields)
 
-16 cards in seven fields connect Morse code to other technologies and history.
+17 cards in seven fields connect Morse code to other technologies and history.
 Values such as average code length and the number of prefix relationships are calculated at runtime from the character table and letter frequencies.
 Cards do not include unsourced stories or unverified origin claims.
 The supporting material for every card is also listed under References below.
@@ -399,6 +400,7 @@ The supporting material for every card is also listed under References below.
 | Math | Compared with Huffman coding |
 | Math | 30 patterns up to length 4 |
 | Computing | Walking the tree is a binary search |
+| Computing | The H-tree and chip area |
 | Computing | ASCII: 7 bits, braille: 6 dots, Morse: 1 to 7 elements |
 | Computing | Morse on a phone keyboard |
 | Networks & radio | QRS: send more slowly |
@@ -560,6 +562,8 @@ With only Letters under Show on tree, the H-tree is 353.5×264 px and fits a 390
 
 - [10 Project Gutenberg books (Day018 CipherClimb)](https://github.com/ipusiron/cipherclimb)
 - [D. A. Huffman, A Method for the Construction of Minimum-Redundancy Codes (1952)](https://doi.org/10.1109/JRPROC.1952.273898)
+- [C. E. Leiserson, Area-Efficient Graph Layouts (for VLSI) (FOCS 1980)](https://doi.org/10.1109/SFCS.1980.13)
+- [R. P. Brent and H. T. Kung, On the Area of Binary Tree Layouts (1980)](https://maths-people.anu.edu.au/~brent/pub/pub056.html)
 - [RFC 20](https://www.rfc-editor.org/rfc/rfc20.txt)
 - [Braille Authority of North America, Size and Spacing of Braille Characters](https://www.brailleauthority.org/size-and-spacing-braille-characters)
 - [Google The Keyword, Making Morse code available to more people on Gboard (2018-07-11)](https://blog.google/products-and-platforms/products/search/making-morse-code-available-more-people-gboard/)
@@ -589,7 +593,7 @@ README examples, tables, and image references are also checked.
 | htree.test.js | H-tree coordinates, sizes, agreement with an independent placement, and node/edge spacing |
 | kinds.test.js | Character groups, trimmed depths, hidden nodes, and storage |
 | frequency.test.js | 26 frequencies, normalization, and the top five letters |
-| trivia.test.js | Averages, Huffman coding, prefixes, 16 cards, sources, and formatting |
+| trivia.test.js | Averages, Huffman coding, prefixes, 17 cards, sources, and formatting |
 | timing.test.js | ITU timing, Farnsworth, PARIS, and the SOS tone schedule |
 | messages.test.js | Dictionaries and Japanese literals in JavaScript |
 | html.test.js | CSP, referrer, ARIA, attributes, and labels |
@@ -669,7 +673,7 @@ morse-tree-visualizer/              # Learn Morse code as tree paths
 │   ├── theme.js                    # Light/dark/system themes and storage
 │   ├── theme-early.js              # Apply the saved theme before rendering
 │   ├── treeRenderer.js             # Per-view SVG rendering, highlighting, and following
-│   ├── trivia.js                   # 16 cards, sources, calculations, and body formatting
+│   ├── trivia.js                   # 17 cards, sources, calculations, and body formatting
 │   ├── utils.js                    # Safe DOM creation and shared controls
 │   └── wabunMap.js                 # 65 Wabun entries with romanization and translation keys
 ├── package.json                    # Dependency-free npm test definition

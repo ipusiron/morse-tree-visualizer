@@ -1,7 +1,8 @@
-import { MORSE_TABLE } from './morseMap.js';
-import { buildTree } from './morseTree.js';
+import { MORSE_TABLE, PROSIGNS } from './morseMap.js';
+import { buildTree, layoutHTree } from './morseTree.js';
 import { LETTER_FREQUENCY } from './frequency.js';
 import { getLang } from './messages.js';
+import { layoutVisibleTree } from './kinds.js';
 
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
@@ -104,8 +105,24 @@ export function formatTrivia(values = computeTrivia(), lang = getLang()) {
     digitCount: MORSE_TABLE.filter(entry => entry.kind === 'digit').length,
     digitLength: code('0').length, accentedLength: code('É').length, dollarLength: code('$').length,
     digitCombinations: 2 ** code('0').length
-  });
+  }, layoutValues());
   return formatted;
+}
+
+// 画面と同じ描き方で、英字だけの木の面積とHツリーの枝の長さを出す（Leiserson 1980 の比較を本ツールで確かめる）。
+function layoutValues() {
+  const area = mode => {
+    const [, , width, height] = layoutVisibleTree('intl', ['letter'], MORSE_TABLE, PROSIGNS, mode).box;
+    return width * height;
+  };
+  const { tree } = layoutVisibleTree('intl', ['letter', 'digit', 'punct'], MORSE_TABLE, PROSIGNS, 'htree');
+  const { unit } = layoutHTree(tree);
+  const branch = level => (unit / Math.SQRT2 ** (level - 1)).toFixed(1);
+  return {
+    treeArea: area('tree').toLocaleString('en-US'), htreeArea: area('htree').toLocaleString('en-US'),
+    areaRatio: (area('tree') / area('htree')).toFixed(1),
+    hBranch1: branch(1), hBranch3: branch(3), hBranch5: branch(5)
+  };
 }
 
 export function fillTriviaBody(card, values = formatTrivia(), lang = getLang()) {
@@ -218,6 +235,40 @@ export const TRIVIA_CARDS = [
     ],
     source: { ...ituSource('本ツールの木の生成元'),
       labelEn: "ITU-R M.1677-1 (source of this tool's tree)" }, action: { tab: 'study' }
+  },
+  {
+    id: 'h-tree-area', field: 'computer', title: 'Hツリーと集積回路の面積',
+    titleEn: "The H-tree and chip area",
+    bodyEn: [
+      "On a chip, wires take up area just as components do. Leiserson (1980) used a complete binary tree of n "
+        + "nodes as an example: in the usual layout, each level toward the root halves the number of wires but "
+        + "doubles their length, so every level uses the same amount of wire and the area grows as n log n.",
+      "The so-called H-tree doubles the wire length only every two levels and uses both directions, so its area"
+        + " grows only as n. This tool's H-tree also halves its branches every two levels: {hBranch1}, {hBranch3} "
+        + "and {hBranch5} px at levels 1, 3 and 5. The letters-only tree takes {htreeArea} px² as an H-tree agains"
+        + "t {treeArea} px² as a binary tree, about 1/{areaRatio}.",
+      "In exchange, most leaves end up inside the layout; only on the order of √n reach the edge. LSI chips of"
+        + " the time usually had their I/O pins on the boundary, and Brent and Kung (1980) proved that keeping ev"
+        + "ery leaf on a convex boundary needs area on the order of n log n."
+    ],
+    body: [
+      '集積回路では、配線も素子と同じく面積を取ります。Leiserson（1980）は節がn個の完全二分木を例に、普通の描き方では'
+        + '根に近づくたびに線の数は半分、長さは2倍になって各段の線の量が変わらず、面積がn log nの程度になると説明しました。',
+      'いわゆるHツリーは、線の長さが2倍になるのを2段に1回に抑え、縦と横の両方を使うので、面積はnの程度で済みます。'
+        + '本ツールのHツリーも枝の長さは2段ごとに半分で、1段目{hBranch1}px、3段目{hBranch3}px、5段目{hBranch5}pxです。'
+        + '英字だけの木の面積は、二分木の{treeArea}px²に対してHツリーは{htreeArea}px²で、約{areaRatio}分の1です。',
+      'その代わり、葉の多くは図の内側に入り、外周に出る葉は√nの程度です。当時のLSIでは入出力の端子をチップの外周に置くのが普通で、'
+        + 'BrentとKung（1980）は、葉をすべて凸な外周に並べると面積はn log nの程度が必要になることを示しました。'
+    ],
+    source: {
+      labelEn: "C. E. Leiserson, Area-Efficient Graph Layouts (for VLSI) (FOCS 1980)",
+      label: 'C. E. Leiserson, Area-Efficient Graph Layouts (for VLSI)（FOCS 1980）',
+      url: 'https://doi.org/10.1109/SFCS.1980.13', secondary: {
+      labelEn: "R. P. Brent and H. T. Kung, On the Area of Binary Tree Layouts (1980)",
+      label: 'R. P. Brent, H. T. Kung, On the Area of Binary Tree Layouts（1980）',
+      url: 'https://maths-people.anu.edu.au/~brent/pub/pub056.html'
+    } },
+    action: { tab: 'encode', layout: 'htree', text: 'SOS' }
   },
   {
     id: 'ascii-braille', field: 'computer', title: 'ASCII は7ビット、点字は6点、モールスは1〜7',

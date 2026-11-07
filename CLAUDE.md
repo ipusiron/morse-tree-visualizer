@@ -63,7 +63,7 @@ The application uses ES6 modules with the following architecture:
   - `js/wabunMap.js` - WABUN_TABLE: 65 entries in iroha order, romanization, name keys, and kana samples
   - `js/morseTree.js` - buildTree, completeTo, layoutTree, layoutChart and layoutHTree, generated from MORSE_TABLE
   - `js/frequency.js` - Rounded A-Z frequencies from Day018 CipherClimb's Gutenberg corpus
-  - `js/trivia.js` - DOM-free computeTrivia, text formatting and 16 sourced cards in seven fields
+  - `js/trivia.js` - DOM-free computeTrivia, text formatting and 17 sourced cards in seven fields
   - `js/morseCodec.js` - DOM-free normalization, encode/decode, paths and ITU timing
   - `js/messages.js` - Matching JA/EN dictionaries, setLang/getLang and strict t(key, params)
   - `js/treeRenderer.js` - Independent SVG view instances for encoding, decoding, study and keying
@@ -154,7 +154,9 @@ The application uses ES6 modules with the following architecture:
     A change clears paths and stops all playback (including hidden panels and pending AudioContext work).
     It also cancels keying tones and timers; changing layout never starts sound.
 
-12. **Trivia**: Keep 16 cards in math(3), code(2), crypto(2), computer(3), network(3), history(2), survival(1).
+12. **Trivia**: Keep 17 cards in math(3), code(2), crypto(2), computer(4), network(3), history(2), survival(1).
+    The h-tree-area card cites Leiserson (FOCS 1980, p.270) and Brent-Kung (IPL 1980) only for what those pages say;
+    its sizes and branch lengths come from layoutVisibleTree/layoutHTree at runtime. Do not name an H-tree inventor.
     Every card requires a source label and HTTPS URL; source.secondary holds the second supplied source, if any.
     Do not add unsourced origin stories or folklore. Keep card content and computed formatting in trivia.js;
     general UI labels stay in messages.js. Create article/h3/p/link/button elements with el/textContent.

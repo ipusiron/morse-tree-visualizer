@@ -294,7 +294,7 @@ Object.assign(MESSAGES, {
   "help.keying_press": "キーのボタンかSpaceキーを短く押すとドット、長く押すとダッシュです。入力欄やセレクト上のSpaceは打鍵に使いません。",
   "help.keying_time": "1unitの2倍がドットとダッシュの境界です。離して2unit後に確定待ちを表示し、5unit後に文字、10unit後に語の区切りを確定します。",
   "help.keying_commit": "文字確定時に木は消灯します。「デコードへ送る」で入力した符号を移せます。側音は音量・周波数・音のオン／オフを再生設定と共有します。",
-  "help.trivia_cards": "数学・符号・暗号など7分野の16枚のカードを、分野のボタンで絞り込めます。各カードの「出所」から資料を開けます。",
+  "help.trivia_cards": "数学・符号・暗号など7分野の17枚のカードを、分野のボタンで絞り込めます。各カードの「出所」から資料を開けます。",
   "help.trivia_compute": "平均符号長や組み合わせの数は、文字表と文字頻度から実行時に計算します。「ツールで試す」は入力と変換まで行い、再生は始めません。",
   "help.prosign_share": "📡 手続き符号と共有",
   "help.prosign_input": "<AR>や<SK>の形で入力できます。「表示する文字種」の「手続き符号」をオンにすると、木で別名を確認できます。"
@@ -440,7 +440,7 @@ Object.assign(DICTIONARIES.en, {
       + "character is committed at 5 units, and a word gap at 10 units.",
   "help.keying_commit": "Committing a character clears the tree highlight. Send to decoder transfers the code. Sidetone share"
       + "s playback volume, frequency and the sound switch.",
-  "help.trivia_cards": "Filter 16 cards across 7 fields, including math, codes and cryptography. Open each card's sources to"
+  "help.trivia_cards": "Filter 17 cards across 7 fields, including math, codes and cryptography. Open each card's sources to"
       + " read more.",
   "help.trivia_compute": "Average code lengths and combination counts are calculated from the character table and frequencies "
       + "at runtime. Try it in the tool fills and converts input without starting playback.",
