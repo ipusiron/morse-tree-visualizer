@@ -103,7 +103,9 @@ The application uses ES6 modules with the following architecture:
    SN/SK/KA labels go inside nodes; shared aliases remain small prosign-labels. Rows are not depth labels.
    createTreeView(container, { layout = readLayout() }) exposes setLayout(mode).
    All three layouts share data-code, highlight/current classes and playback; do not fork playback by layout.
-   Keep horizontal following; scroll chart and H-tree nodes vertically only when outside the window viewport.
+   Keep horizontal following. For chart and H-tree, if the diagram fits the window height, scroll the whole diagram
+   into view once (per-node scrolling jittered the page because H-tree paths jump up and down); otherwise scroll
+   individual nodes vertically only when outside the window viewport.
 
 5. **Security**: Render text with textContent and elements with createElement, never innerHTML.
    CSP allows only local scripts/styles and has no unsafe-inline or frame-ancestors directive.

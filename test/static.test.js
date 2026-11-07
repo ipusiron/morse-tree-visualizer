@@ -38,6 +38,14 @@ test('notation changes render without autoplay and invalidate pending playback',
   assert.match(source, /ticket !== generation \|\| host\.closest\('\[hidden\]'\)/);
 });
 
+test('chart and H-tree following scrolls the whole diagram once when it fits the window height', () => {
+  const source = readFileSync(new URL('../js/treeRenderer.js', import.meta.url), 'utf8');
+  const follow = source.slice(source.indexOf('function scrollToCode'), source.indexOf('const onLayout'));
+  assert.match(follow, /if \(box\.height <= window\.innerHeight\) \{\s*if \(box\.top < 0 \|\| box\.bottom > window\.innerHeight\) wrapper\.scrollIntoView/);
+  // 図が収まるときは節ごとの scrollIntoView に進まない。
+  assert.ok(follow.indexOf('return;') < follow.indexOf('group.scrollIntoView'));
+});
+
 test('sound defaults off in shared controls and keying while other playback defaults stay unchanged', () => {
   assert.deepEqual(settings, {
     system: 'intl', notation: 'ja', charWpm: 15, overallWpm: 10, frequency: 700, volume: 50, sound: false, lamp: false

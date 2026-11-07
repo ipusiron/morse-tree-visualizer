@@ -175,6 +175,13 @@ export function createTreeView(container, { layout = readLayout() } = {}) {
       wrapper.scrollTo({ left: Math.max(0, x - wrapper.clientWidth / 2), behavior });
     }
     if (mode !== 'tree') {
+      // 図が画面の高さに収まるなら、図全体を一度だけ画面に入れる。
+      // 節ごとに寄せると、上下に飛ぶHツリーでは再生中にページが小刻みに動く。
+      const box = wrapper.getBoundingClientRect();
+      if (box.height <= window.innerHeight) {
+        if (box.top < 0 || box.bottom > window.innerHeight) wrapper.scrollIntoView({ block: 'nearest', behavior });
+        return;
+      }
       const group = groups.get(code);
       const rect = group.getBoundingClientRect();
       if (rect.top < 0 || rect.bottom > window.innerHeight) {
