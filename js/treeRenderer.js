@@ -1,6 +1,5 @@
 import { PROSIGNS, formatCode } from './morseMap.js';
-import { completeTo, layoutTree, layoutChart, layoutHTree } from './morseTree.js';
-import { KIND_GROUPS, readKinds, writeKinds, buildVisibleTree } from './kinds.js';
+import { KIND_GROUPS, readKinds, writeKinds, layoutVisibleTree } from './kinds.js';
 import { readLayout } from './layout.js';
 import { t } from './messages.js';
 import { el, msg, settings } from './utils.js';
@@ -78,24 +77,10 @@ export function createTreeView(container, { layout = readLayout() } = {}) {
     const table = currentTable();
     const shown = readKinds(system);
     // 表示する文字のうち最も深いものに合わせて木を刈り込み、範囲内の非表示の文字は灰色の点で残す。
-    tree = buildVisibleTree(system, shown, table, wabun ? [] : PROSIGNS);
+    let box;
+    ({ tree, box } = layoutVisibleTree(system, shown, table, wabun ? [] : PROSIGNS, mode));
     svg.classList.toggle('wabun', wabun);
     svg.classList.toggle('show-prosigns', !wabun && shown.includes('prosign'));
-    let box;
-    if (chart) {
-      const { minCol, width, height } = layoutChart(tree);
-      box = [360 + minCol * 64 - 40, 0, width, height];
-    } else {
-      completeTo(tree, Math.min(tree.depth, 5));
-      if (mode === 'htree') {
-        const { width, height } = layoutHTree(tree);
-        box = [0, 0, width, height];
-      } else {
-        // 浅い木は葉の間隔を広げる（深さ4で30pxだと丸どうしが接する）。
-        const { minX, maxX, maxY } = layoutTree(tree, { xStep: tree.depth <= 4 ? 40 : 30 });
-        box = [minX - 70, -30, maxX - minX + 90, maxY + 56];
-      }
-    }
     origin = box[0];
     svg.setAttribute('viewBox', box.join(' '));
     svg.setAttribute('width', box[2]);

@@ -20,44 +20,51 @@ Encoding, decoding, and hands-on practice help connect the characters, signals, 
 ## 📸 Screenshots
 
 ![SOS paths in the encoder](assets/en/screenshot.png)
-> *SOS encoded with the S and O paths highlighted together. The details table is closed. 1280×1100 px, 81,147 bytes.*
+> *SOS encoded with the S and O paths highlighted together. The details table is closed. 1280×1100 px, 83,805 bytes.*
 
 ![LOVE decoded with details](assets/en/screenshot2.png)
-> *The decoded result, details table, and tree paths for the ASCII input `.-.. --- ...- .`. 1280×1100 px, 84,712 bytes.*
+> *The decoded result, details table, and tree paths for the ASCII input `.-.. --- ...- .`. 1280×1100 px, 87,389 bytes.*
 
 ![Correct Q answer in Study](assets/en/screenshot3.png)
-> *Q answered correctly in a code-to-character quiz: Correct 1 / Questions 1 (streak 1). 1280×1100 px, 82,298 bytes.*
+> *Q answered correctly in a code-to-character quiz: Correct 1 / Questions 1 (streak 1). 1280×1100 px, 85,731 bytes.*
 
-![Letters and digits in the table](assets/en/screenshot4.png)
-> *The Letters and Digits groups, with ITU badges and the Name column. 1280×1100 px, 32,201 bytes.*
+![Punctuation and prosigns in the table](assets/en/screenshot4.png)
+> *The Punctuation and Prosigns groups, with ITU and Customary badges and the note on &. 1280×1100 px, 72,304 bytes.*
 
 ![Keying with the final S pending](assets/en/screenshot5.png)
-> *SOS keyed with SO committed and the final S still pending and highlighted. Press durations are also shown. 1280×1100 px, 78,921 bytes.*
+> *SOS keyed with SO committed and the final S still pending and highlighted. Press durations are also shown. 1280×1100 px, 80,853 bytes.*
 
 ![SK details and prosign labels](assets/en/screenshot6.png)
-> *`<SK>` encoded with prosign labels displayed. 1280×1100 px, 86,447 bytes.*
+> *`<SK>` encoded with Prosigns turned on under Show on tree, showing the path and prosign labels. 1280×1100 px, 90,981 bytes.*
 
 ![SOS and sound settings in dark mode](assets/en/screenshot7.png)
-> *The final S path after playing SOS, sound settings, and the light in the dark theme. 1280×1100 px, 81,913 bytes.*
+> *The final S path after playing SOS, sound settings, and the light in the dark theme. 1280×1100 px, 83,343 bytes.*
 
 ![SOS and prosigns in Chart view](assets/en/screenshot8.png)
-> *S and O paths highlighted together in Chart view, with the SN and SK prosigns visible. 1280×1100 px, 53,809 bytes.*
+> *S and O paths highlighted together in Chart view, with the SN and SK prosigns visible. 1280×1100 px, 55,826 bytes.*
 
 ![The three Math trivia cards](assets/en/screenshot9.png)
-> *The cards on average code length, Huffman coding, and combinations, with their sources. 1280×1100 px, 79,372 bytes.*
+> *The cards on average code length, Huffman coding, and combinations, with their sources. 1280×1100 px, 79,385 bytes.*
 
 ![Wabun paths in the binary tree](assets/en/screenshot10.png)
-> *The four kana of moorusu encoded with all paths highlighted in the binary tree. 1280×1100 px, 83,517 bytes.*
+> *The four kana of moorusu encoded with all paths highlighted in the binary tree. 1280×1100 px, 88,201 bytes.*
 
 ![Wabun paths in Chart view](assets/en/screenshot11.png)
-> *The Wabun paths for moorusu highlighted in Chart view. 1280×1100 px, 57,573 bytes.*
+> *The Wabun paths for moorusu highlighted in Chart view. 1280×1100 px, 53,529 bytes.*
+
+![SOS paths in the H-tree](assets/en/screenshot12.png)
+> *The SOS paths highlighted in the H-tree: S goes left, up, left and O goes right, down, right. 1280×1100 px, 86,412 bytes.*
+
+![H-tree showing letters only](assets/en/screenshot13.png)
+> *With only Letters shown, the tree shrinks to depth 4. The ? in QUIZ? is marked Hidden on the tree in the details table and does not light up the tree. 1280×1100 px, 68,845 bytes.*
 
 ## ✨ Features
 
 - Six tabs: Text ⇒ Morse, Morse ⇒ Text, Study, Morse Table, Keying, and Trivia
 - Japanese/English interface switching, saved language choice, and `?lang=ja` / `?lang=en` links
 - International/Wabun code switching, 65 Wabun entries for conversion and study, saved code choice, and `?code=wabun` links
-- Binary tree / Chart views, synchronized across four diagrams with a saved preference
+- Binary tree / Chart / H-tree views, synchronized across four diagrams with a saved preference
+- Choice of the groups shown on the tree (letters, digits, punctuation, and prosigns; kana, voicing marks, digits, and symbols in Wabun), with the tree trimmed to match
 - 16 sourced trivia cards in seven fields, runtime calculations, and Try in the tool actions
 - Input, display, and copying in ASCII `.-` or `・−` notation
 - ITU-timed path playback, pause/resume/stop, and manual forward/backward steps
@@ -148,10 +155,13 @@ Reduced motion highlights all paths at once regardless of WPM, so use manual ste
 
 ### 🧭 Layout
 
-Choose Binary tree or Chart in the Layout controls above the diagram.
+Choose Binary tree, Chart, or H-tree in the Tree layout controls above the diagram.
 The choice applies to all four diagrams and is remembered for the next visit.
 Switching still works within the page when storage is blocked.
 Changing the layout clears highlights and stops playback; press Play to listen again.
+
+Use Show on tree next to it to choose which characters the tree carries. Letters, Digits, and Punctuation are on and Prosigns is off by default. Wabun offers Kana, Voicing marks, Digits, and Symbols.
+The tree becomes shallower to match the groups you clear (depth 4 for letters only, depth 5 for letters and digits). The choice is shared by all four diagrams and saved separately for International and Wabun. At least one group stays on.
 
 ### 🔍 Trivia
 
@@ -185,6 +195,7 @@ Ways of using this tool in particular
 - Giving one code sequence two readings (making puzzles and cipher quizzes): the same run of dots and dashes is a different character in International and in Wabun Morse. The code for the English "NO", `-. ---`, decodes in Wabun as tare, and `- ---` for "TO" becomes mure. You can write a puzzle with two answers, or one that leads from an English answer to a Japanese hint (35 codes stand for different characters in Wabun and International Morse; say in the puzzle which one to read, or solvers will be stuck)
 - Seeing that one swapped element gives another letter (a class on error detection): across the codes of the 26 letters there are 82 ways to swap a single dot or dash, and 68 of them (82.9%) give the code of another letter. For S, `...`, any single error reads as D, R or U, and the receiver cannot notice. On the tree it means taking the other branch once at one of the forks on the way down. It is an example of why error detection such as parity is needed (the other 14 give codes that are not in the table, so the receiver can notice; errors in the number of dots and dashes are not included)
 - Counting the gap between kana and codes (Wabun practice and information classes): Wabun sends the voiced and semi-voiced marks as a separate code after the kana, and small kana such as ya or tsu as the full-size kana. Ninja is four kana but five codes, `-.-. .-.-. --.-. .. .--` (ni + n + shi + dakuten + ya). When estimating how much to practice or how long sending will take, count codes, not kana
+- Comparing diagram sizes when only the drawing changes (data structures and graph drawing classes): the 31-node letters-only tree is 690×342 px as a binary tree and 353.5×264 px as an H-tree, so the H-tree uses about 1/2.5 of the area. For the 76-node depth-6 tree the sizes are 1080×470 px and 760.8×552 px, and the gap narrows to about 1/1.2. The width of the binary tree depends on the number of leaves, whereas the size of the H-tree depends only on the depth and also reserves room for positions without characters. The numbers show how alternating sideways and vertical branches changes the use of space (the sizes are for this tool's drawing; other node sizes or margins give other numbers)
 
 General uses
 
@@ -264,7 +275,7 @@ Thus `.-.. ..` becomes ga, whereas `.-.-. ..` remains n followed by a separate d
 
 The HORE / RATA switching signals are not added to this 65-entry character table.
 The tool switches code systems through the Code control; interpreting switching signals within a transmission is outside its scope.
-International prosigns and the Show prosigns control are unavailable in Wabun.
+International prosigns are unavailable in Wabun, and Show on tree offers four groups: kana, voicing marks, digits, and symbols.
 
 The Wabun binary tree has 67 nodes and 33 leaves; its chart has 66 nodes at 720×920 px (11 columns × 16 rows).
 Voicing marks use SVG shapes (two short diagonal strokes for dakuten and a ring for handakuten) and descriptive titles.
@@ -291,7 +302,8 @@ These prosigns apply when International is selected.
 The single-sign SOS used here is marked customary because it is not in ITU-R M.1677-1.
 `SOS` consists of three characters; `<SOS>` is one uninterrupted nine-element signal.
 HH and SOS are outside the depth-6 tree and appear in the text and details table.
-Enable Show prosigns to display AR, SK, BT, KA, SN, K, and AS labels in the tree.
+Turn on Prosigns under Show on tree to display AR, SK, BT, KA, SN, K, and AS labels in the tree.
+When it is off, prosign-only nodes such as SK, SN, and KA become gray dots that show their names only while a path passes through them.
 When a code is shared with a character, decoding prefers the character: `.-.-.` becomes `+`, and `.-...` becomes `&`.
 
 ## 🔗 Sharing input
@@ -339,11 +351,39 @@ Follow the code from start in the center.
 
 A downward child is placed on the shallowest row where its subtree and vertical connector do not collide with other nodes.
 Row numbers are not code lengths.
-The International layout is 11 columns × 14 rows, 720×808 px, with 64 visible nodes when prosigns are hidden and 66 when shown.
-Hiding SN and SK does not move the other nodes.
+By default the International layout is 11 columns × 14 rows, 720×808 px, with 66 nodes; when prosigns are not shown, SK, SN, and KA become gray dots.
+Showing fewer groups lays the chart out again with only the nodes down to that depth (27 nodes for letters only).
 KA uses a node on a punctuation path; AR, BT, AS, and K share nodes with characters.
 Small dashed nodes are empty; yellow dashed nodes are customary codes.
 On narrow screens, scroll horizontally inside the diagram container.
+
+## 🌳 H-tree and groups shown on the tree
+
+The H-tree draws the binary tree in a nearly square area. Follow the code from start in the center.
+
+| Position | Meaning |
+|---|---|
+| Elements 1, 3, and 5 | Move sideways: left = dot, right = dash |
+| Elements 2, 4, and 6 | Move vertically: up = dot, down = dash |
+| Branch length | Shrinks by about 0.71 (1/√2) at each level |
+
+The shortest branch is 36 px, so at every depth nodes stay at least 36 px from each other and from other branches.
+In SOS, S goes left → up → left and O goes right → down → right. Letters alone fit a 390 px-wide screen.
+
+Show on tree selects which groups of characters the tree carries. The choice is shared by all three layouts and four diagrams, and is saved separately for International and Wabun (key `morse-tree-kinds`).
+
+| Groups shown | Tree depth | Binary tree | H-tree |
+|---|---|---|---|
+| Letters only | 4 | 690×342 px | 353.5×264 px |
+| Letters and digits | 5 | 1020×406 px | 552×353.5 px |
+| Letters, digits, and punctuation (default) | 6 | 1080×470 px | 760.8×552 px |
+
+- The tree is trimmed to the deepest character still shown
+- Hidden characters within that depth stay as gray dots and return to full size with their label only while a path passes through them
+- Hidden characters beyond that depth do not light up the tree during playback; the details table marks them Hidden on the tree
+- É is a letter in ITU-R M.1677-1 but has five elements, so, as in the Study categories, it is grouped with punctuation
+- At least one group stays shown; clearing the last one restores the check and explains why
+- Changing the groups clears highlights and stops playback and keying
 
 ## 🔍 Trivia (connections to other fields)
 
@@ -378,9 +418,9 @@ The supporting material for every card is also listed under References below.
 `MORSE_TABLE` is the International character source: 27 letters (A–Z and É), 10 digits, and 18 punctuation characters (13 ITU + five customary), for 55 characters total.
 Wabun has 65 entries in `WABUN_TABLE`; `currentTable()` returns the selected table.
 It contains 50 ITU and five customary characters.
-The binary tree is generated from this table, filling empty nodes through depth 5.
+The binary tree is generated from this table, filling empty nodes through depth 5 (or through the trimmed depth when fewer groups are shown).
 With prosigns included, it has 76 nodes through depth 6, 34 leaves, and 13 depth-6 nodes.
-Leaves are placed from left to right at 30 px intervals, and each parent's x coordinate is the mean of its existing children's x coordinates.
+Leaves are placed from left to right at 30 px intervals (40 px for trees of depth 4 or less), and each parent's x coordinate is the mean of its existing children's x coordinates.
 
 Left branches are dots; right branches are dashes.
 Dashed circles are empty nodes, and yellow dashed borders mark customary codes.
@@ -412,14 +452,16 @@ Encoding, decoding, and the details table support it, but it does not light the 
 Enter `&` as a character or `<AS>` as a prosign.
 `É` (accented e) is the ITU character `..-..`.
 
-### Chart layout and trivia calculations
+### Chart and H-tree layouts and trivia calculations
 
-`layoutTree` generates binary-tree coordinates; `layoutChart` generates chart coordinates.
-The chart does not use `completeTo`; International always lays out all 66 nodes, including prosigns.
+`layoutTree` generates binary-tree coordinates, `layoutChart` chart coordinates, and `layoutHTree` H-tree coordinates.
+The chart does not use `completeTo`; by default International lays out all 66 nodes, including prosigns.
+`buildVisibleTree` (in `kinds.js`) sets the tree depth from the groups shown, trims the tree, and marks hidden characters within that depth with `hiddenKind`.
+`layoutVisibleTree` returns the coordinates and diagram frame for each layout, so the page and the size table above use the same calculation.
 It memoizes subtree shapes and cells crossed by vertical connectors, placing the horizontal child first and the downward child on the shallowest collision-free row.
 Columns range from −5 to 5 and rows from 0 to 13, with `x=360+col×64` and `y=40+row×56`.
-Both layouts use the same `data-code` values for highlighting, playback, keying, and quizzes.
-The saved setting is `morse-tree-layout`.
+All three layouts use the same `data-code` values for highlighting, playback, keying, and quizzes.
+The saved settings are `morse-tree-layout` (layout) and `morse-tree-kinds` (groups shown on the tree).
 
 `computeTrivia` calculates element counts and time costs for 26 letters, prefix relationships, codes in use by length, entropy, and binary Huffman code length.
 Time cost is the sum of dots (1 unit), dashes (3 units), and element gaps (1 unit), excluding character gaps.
@@ -505,8 +547,9 @@ Press Decode or Enter to update the decoded result.
 
 ### Wide diagrams on a phone
 
-To keep characters legible, the binary tree is 1080×470 px; the chart is 720×808 px for International or 720×920 px for Wabun.
+To keep characters legible, by default the binary tree is 1080×470 px (1050×470 px for Wabun); the chart is 720×808 px for International or 720×920 px for Wabun; and the H-tree is 760.8×552 px.
 Scroll inside the diagram container rather than scrolling the whole page horizontally.
+With only Letters under Show on tree, the H-tree is 353.5×264 px and fits a 390 px-wide screen.
 
 ## 🔗 References
 
@@ -543,6 +586,8 @@ README examples, tables, and image references are also checked.
 | table.test.js | 55 characters, ITU/customary classification, uniqueness, and order |
 | tree.test.js | 75 character-only nodes, 76 with prosigns, 34 leaves, and coordinates |
 | chart.test.js | All 66 chart-node coordinates, collisions, vertical connector cells, and storage |
+| htree.test.js | H-tree coordinates, sizes, agreement with an independent placement, and node/edge spacing |
+| kinds.test.js | Character groups, trimmed depths, hidden nodes, and storage |
 | frequency.test.js | 26 frequencies, normalization, and the top five letters |
 | trivia.test.js | Averages, Huffman coding, prefixes, 16 cards, sources, and formatting |
 | timing.test.js | ITU timing, Farnsworth, PARIS, and the SOS tone schedule |
@@ -558,7 +603,7 @@ README examples, tables, and image references are also checked.
 | theme.test.js | Storage failures and theme variable sets |
 | static.test.js | Print CSS and prohibited network APIs |
 | wabun.test.js | All 65 Wabun entries, conversion, decoding, 67 binary nodes, and all 66 chart coordinates |
-| system.test.js | Code choice/storage, silent switching, four diagrams, quiz categories, 65 table/print rows, keying, and sharing |
+| system.test.js | Code choice/storage, silent switching, four diagrams with shared groups, quiz categories, 65 table/print rows, keying, and sharing |
 
 ## 📁 Directory structure
 
@@ -578,14 +623,16 @@ morse-tree-visualizer/              # Learn Morse code as tree paths
 │   │   ├── screenshot.png          # SOS result with S and O paths highlighted
 │   │   ├── screenshot2.png         # LOVE decoding result and details
 │   │   ├── screenshot3.png         # Correct Q answer and score
-│   │   ├── screenshot4.png         # Letters and digits in the reference table
+│   │   ├── screenshot4.png         # Punctuation and prosigns in the reference table
 │   │   ├── screenshot5.png         # Keying: SO committed and final S pending
 │   │   ├── screenshot6.png         # SK details and prosign labels
 │   │   ├── screenshot7.png         # Dark-theme SOS and sound settings
 │   │   ├── screenshot8.png         # Chart with SOS and prosigns
 │   │   ├── screenshot9.png         # Trivia filtered to three Math cards
 │   │   ├── screenshot10.png        # Wabun moorusu highlighted in the binary tree
-│   │   └── screenshot11.png        # Wabun moorusu highlighted in Chart view
+│   │   ├── screenshot11.png        # Wabun moorusu highlighted in Chart view
+│   │   ├── screenshot12.png        # SOS highlighted in the H-tree
+│   │   └── screenshot13.png        # Letters-only H-tree and the hidden-group note
 │   ├── screenshot.png              # SOS result with S and O paths highlighted
 │   ├── screenshot2.png             # LOVE decoding result and details
 │   ├── screenshot3.png             # Correct Q answer and score
@@ -596,7 +643,9 @@ morse-tree-visualizer/              # Learn Morse code as tree paths
 │   ├── screenshot8.png             # Chart with SOS and prosigns
 │   ├── screenshot9.png             # Trivia filtered to three Math cards
 │   ├── screenshot10.png            # Wabun moorusu highlighted in the binary tree
-│   └── screenshot11.png            # Wabun moorusu highlighted in Chart view
+│   ├── screenshot11.png            # Wabun moorusu highlighted in Chart view
+│   ├── screenshot12.png            # SOS highlighted in the H-tree
+│   └── screenshot13.png            # Letters-only H-tree and the hidden-group note
 ├── index.html                      # Six tabs, Help, and CSP markup
 ├── js/                             # JavaScript ES modules
 │   ├── animator.js                 # Element playback, pause, and manual steps

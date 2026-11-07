@@ -1,4 +1,4 @@
-import { buildTree } from './morseTree.js';
+import { buildTree, completeTo, layoutTree, layoutChart, layoutHTree } from './morseTree.js';
 
 // 木に表示する文字種。4つの木で共通にし、符号（欧文／和文）ごとに保存する。
 export const KIND_GROUPS = {
@@ -58,4 +58,21 @@ export function buildVisibleTree(system, shown, table, prosigns = []) {
   for (const node of tree.nodes.values()) node.hiddenKind = node.depth > 0 && !node.shown && Boolean(node.char || node.prosign);
   tree.depth = depth;
   return tree;
+}
+
+// 見た目ごとに座標を決め、図の枠（viewBox の x, y, 幅, 高さ）を返す。画面とREADMEの寸法の表が同じ計算を使う。
+export function layoutVisibleTree(system, shown, table, prosigns, mode) {
+  const tree = buildVisibleTree(system, shown, table, prosigns);
+  if (mode === 'chart') {
+    const { minCol, width, height } = layoutChart(tree);
+    return { tree, box: [360 + minCol * 64 - 40, 0, width, height] };
+  }
+  completeTo(tree, Math.min(tree.depth, 5));
+  if (mode === 'htree') {
+    const { width, height } = layoutHTree(tree);
+    return { tree, box: [0, 0, width, height] };
+  }
+  // 浅い木は葉の間隔を広げる（深さ4で30pxだと丸どうしが接する）。
+  const { minX, maxX, maxY } = layoutTree(tree, { xStep: tree.depth <= 4 ? 40 : 30 });
+  return { tree, box: [minX - 70, -30, maxX - minX + 90, maxY + 56] };
 }
