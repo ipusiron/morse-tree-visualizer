@@ -1,6 +1,7 @@
 import { MORSE_TABLE, PROSIGNS, formatCode } from './morseMap.js';
 import { pathFor, normalizeMorse, normalizeWabun } from './morseCodec.js';
 import { currentTable } from './system.js';
+import { kindOf } from './kinds.js';
 import { createTreeView } from './treeRenderer.js';
 import { createAnimator } from './animator.js';
 import { t } from './messages.js';
@@ -9,7 +10,7 @@ import { bindTabKeys } from './script.js';
 import { setMessage } from './i18n.js';
 
 export function quizPool(kinds, system = settings.system) {
-  return currentTable(system).filter(e => kinds.includes(system === 'intl' && e.char === 'É' ? 'punct' : e.kind));
+  return currentTable(system).filter(e => kinds.includes(kindOf(e, system)));
 }
 
 export function normalizeQuizCharacter(value, system = settings.system) {

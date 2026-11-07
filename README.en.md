@@ -606,6 +606,7 @@ morse-tree-visualizer/              # Learn Morse code as tree paths
 │   ├── frequency.js                # Letter frequencies from Day018
 │   ├── i18n.js                     # Initial language, storage, and UI translation
 │   ├── keying.js                   # Press/release classification and keying tab
+│   ├── kinds.js                    # Shown character groups and depth trimming
 │   ├── layout.js                   # Layout storage and synchronization of four views
 │   ├── messages.js                 # Japanese and English UI dictionaries
 │   ├── morseCodec.js               # Normalization, conversion, paths, and ITU timing
@@ -631,8 +632,10 @@ morse-tree-visualizer/              # Learn Morse code as tree paths
     ├── format.test.js              # Line lengths and counts
     ├── frequency.test.js           # Letter-frequency normalization and rankings
     ├── html.test.js                # CSP, ARIA, attributes, and labels
+    ├── htree.test.js               # H-tree coordinates, sizes, and node/edge spacing
     ├── i18n.test.js                # JA/EN consistency, initial language, and blocked storage
     ├── keying.test.js              # Timing boundaries and committing codes/characters
+    ├── kinds.test.js               # Groups, depths, hidden nodes, and storage
     ├── messages.test.js            # Dictionaries and centralized Japanese literals
     ├── prosign.test.js             # Nine prosigns, encoding, and decoding
     ├── readme.test.js              # JA/EN tables, examples, sections, images, inventory, and YAML
