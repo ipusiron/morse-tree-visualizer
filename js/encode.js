@@ -44,5 +44,7 @@ export function initEncodeTab() {
   startButton.addEventListener('click', () => convert());
   startButton.addEventListener('convert-input', () => convert(false));
   document.addEventListener('notation-change', () => { if (rendered) convert(false); });
+  // 詳細表の「木で非表示の文字種」を、表示する文字種の変更に合わせて描き直す。
+  document.addEventListener('kinds-change', () => { if (rendered) convert(false); });
   bindSystemConversion(document.getElementById('tab-encode'), convert);
 }

@@ -1,13 +1,27 @@
 import { PROSIGNS, formatCode } from './morseMap.js';
-import { buildTree, completeTo, layoutTree, layoutChart } from './morseTree.js';
+import { completeTo, layoutTree, layoutChart, layoutHTree } from './morseTree.js';
+import { KIND_GROUPS, readKinds, writeKinds, buildVisibleTree } from './kinds.js';
 import { readLayout } from './layout.js';
 import { t } from './messages.js';
-import { settings } from './utils.js';
+import { el, msg, settings } from './utils.js';
 import { currentTable } from './system.js';
+import { setMessage } from './i18n.js';
+
+const KIND_LABELS = { letter: 'group.letter', digit: 'group.digit', punct: 'group.punct_e', prosign: 'group.prosign',
+  kana: 'group.kana', mark: 'group.mark', symbol: 'group.symbol' };
+const LEGENDS = { chart: 'chart.legend', htree: 'htree.legend' };
+
+// 4つの木で共通の設定なので、変更は文書全体のイベントで知らせる。
+export function changeKinds(list, system = settings.system) {
+  if (!writeKinds(system, list)) return false;
+  document.dispatchEvent(new CustomEvent('kinds-change', { detail: { system } }));
+  return true;
+}
 
 export function createTreeView(container, { layout = readLayout() } = {}) {
   let tree;
   let mode;
+  let origin = 0;
   const groups = new Map();
   const edges = new Map();
   const make = (name, attributes = {}, text = '') => {
@@ -22,64 +36,95 @@ export function createTreeView(container, { layout = readLayout() } = {}) {
   const wrapper = container.closest('.tree-scroll-wrapper') || container;
   wrapper.classList.add('tree-scroll-wrapper');
   const controls = wrapper.previousElementSibling;
-  const label = document.createElement('label');
-  label.className = 'check-control';
-  const toggle = document.createElement('input');
-  toggle.type = 'checkbox';
-  toggle.className = 'prosign-toggle';
-  const toggleText = document.createElement('span');
-  toggleText.dataset.i18n = 'prosign.show';
-  toggleText.textContent = t('prosign.show');
-  label.append(toggle, toggleText);
-  if (controls?.classList.contains('tree-controls')) controls.append(label); else wrapper.before(label);
-  const legend = document.createElement('p');
-  legend.className = 'chart-legend';
-  legend.dataset.i18n = 'chart.legend';
-  legend.textContent = t('chart.legend');
+  const kindControl = el('fieldset', { class: 'kind-control' });
+  if (controls?.classList.contains('tree-controls')) controls.append(kindControl); else wrapper.before(kindControl);
+  const legend = el('p', { class: 'chart-legend' });
   wrapper.before(legend);
-  toggle.addEventListener('change', () => svg.classList.toggle('show-prosigns', toggle.checked));
+
+  function buildKindControl() {
+    const shown = readKinds(settings.system);
+    const status = el('span', { class: 'kind-status', role: 'status' });
+    const labels = KIND_GROUPS[settings.system].map(kind => {
+      const input = el('input', { type: 'checkbox', value: kind });
+      input.value = kind;
+      input.checked = shown.includes(kind);
+      input.addEventListener('change', () => {
+        const next = boxes.filter(box => box.checked).map(box => box.value);
+        // 文字種を1つも選ばない状態は作らない。外したチェックを戻して理由を表示する。
+        if (!next.length) {
+          input.checked = true;
+          setMessage(status, 'kinds.need_one');
+          return;
+        }
+        setMessage(status, null);
+        changeKinds(next);
+      });
+      return el('label', { class: 'check-control' }, [input, msg('span', KIND_LABELS[kind])]);
+    });
+    const boxes = labels.map(label => label.querySelector('input'));
+    kindControl.replaceChildren(msg('legend', 'kinds.legend'), ...labels, status);
+  }
+  function syncKindControl() {
+    const shown = readKinds(settings.system);
+    kindControl.querySelectorAll('input').forEach(input => { input.checked = shown.includes(input.value); });
+    setMessage(kindControl.querySelector('.kind-status'), null);
+  }
 
   function setLayout(next) {
-    mode = next === 'chart' ? 'chart' : 'tree';
+    mode = next === 'chart' || next === 'htree' ? next : 'tree';
     const chart = mode === 'chart';
-    const wabun = settings.system === 'wabun';
+    const system = settings.system;
+    const wabun = system === 'wabun';
     const table = currentTable();
-    // Always pack all prosign paths; hiding them must never move the other nodes.
-    tree = buildTree(table, 6, wabun ? [] : PROSIGNS);
-    label.hidden = wabun;
+    const shown = readKinds(system);
+    // 表示する文字のうち最も深いものに合わせて木を刈り込み、範囲内の非表示の文字は灰色の点で残す。
+    tree = buildVisibleTree(system, shown, table, wabun ? [] : PROSIGNS);
     svg.classList.toggle('wabun', wabun);
-    let width = 1080;
-    let height = 470;
-    if (chart) ({ width, height } = layoutChart(tree));
-    else { completeTo(tree); layoutTree(tree); }
-    svg.setAttribute('viewBox', chart ? `0 0 ${width} ${height}` : '-50 -30 1080 470');
-    svg.setAttribute('width', width);
-    svg.setAttribute('height', height);
-    svg.setAttribute('aria-label', t(chart ? 'chart.label' : 'tree.label'));
-    svg.setAttribute('data-i18n-aria-label', chart ? 'chart.label' : 'tree.label');
+    svg.classList.toggle('show-prosigns', !wabun && shown.includes('prosign'));
+    let box;
+    if (chart) {
+      const { minCol, width, height } = layoutChart(tree);
+      box = [360 + minCol * 64 - 40, 0, width, height];
+    } else {
+      completeTo(tree, Math.min(tree.depth, 5));
+      if (mode === 'htree') {
+        const { width, height } = layoutHTree(tree);
+        box = [0, 0, width, height];
+      } else {
+        // 浅い木は葉の間隔を広げる（深さ4で30pxだと丸どうしが接する）。
+        const { minX, maxX, maxY } = layoutTree(tree, { xStep: tree.depth <= 4 ? 40 : 30 });
+        box = [minX - 70, -30, maxX - minX + 90, maxY + 56];
+      }
+    }
+    origin = box[0];
+    svg.setAttribute('viewBox', box.join(' '));
+    svg.setAttribute('width', box[2]);
+    svg.setAttribute('height', box[3]);
+    const labelKey = mode + '.label';
+    svg.setAttribute('aria-label', t(labelKey));
+    svg.setAttribute('data-i18n-aria-label', labelKey);
     svg.classList.toggle('chart', chart);
+    svg.classList.toggle('htree', mode === 'htree');
     container.classList.toggle('chart-box', chart);
-    legend.hidden = !chart;
+    legend.hidden = !LEGENDS[mode];
+    if (LEGENDS[mode]) setMessage(legend, LEGENDS[mode]);
     groups.clear();
     edges.clear();
     const lines = make('g');
     const nodes = make('g');
     svg.replaceChildren(lines, nodes);
-    const extension = node => node.prosign && !node.char && (node.depth > 5 || (chart && node.prosign === 'SN'));
     for (const n of tree.nodes.values()) {
       for (const child of [n.left, n.right].filter(Boolean)) {
         const line = make('line', { x1: n.x, y1: n.y, x2: child.x, y2: child.y, 'data-code': child.code });
-        if (extension(child)) line.classList.add('prosign-extension');
         edges.set(child.code, line);
         lines.append(line);
       }
       const entry = table.find(e => e.code === n.code);
       const empty = !n.char && !n.prosign && n.depth !== 0;
-      const group = make('g', { class: 'tree-node' + (empty ? ' empty' : '') + (!wabun && entry && !entry.itu ? ' custom' : ''),
-        'data-code': n.code });
+      const group = make('g', { class: 'tree-node' + (empty ? ' empty' : '') + (!wabun && entry && !entry.itu ? ' custom' : '')
+        + (n.hiddenKind ? ' hidden-kind' : ''), 'data-code': n.code });
       const inside = chart && n.prosign && !n.char;
       if (n.prosign && !n.char) group.classList.add('prosign-only');
-      if (extension(n)) group.classList.add('prosign-extension');
       if (chart && n.shape === 'rect') {
         const w = empty ? 28 : 48;
         const h = empty ? 18 : 30;
@@ -109,12 +154,12 @@ export function createTreeView(container, { layout = readLayout() } = {}) {
       for (const [x, key] of [[220, 'chart.dir_dash'], [500, 'chart.dir_dot']]) {
         svg.append(make('text', { x, y: 16, class: 'direction-label', 'text-anchor': 'middle', 'data-i18n': key }, t(key)));
       }
-    } else {
+    } else if (mode === 'tree') {
       for (const [side, key] of [['left', 'tree.dir_dot'], ['right', 'tree.dir_dash']]) {
         svg.append(make('text', { x: tree.root[side].x, y: -12, class: 'direction-label',
           'text-anchor': 'middle', 'data-i18n': key }, t(key)));
       }
-      for (let depth = 1; depth <= 6; depth++) {
+      for (let depth = 1; depth <= tree.depth; depth++) {
         svg.append(make('text', { x: 0, y: 30 + depth * 64 + 4, class: 'depth-label', 'text-anchor': 'end', 'font-size': 11,
           'data-i18n': 'tree.depth', 'data-i18n-params': JSON.stringify({ n: depth }) },
           t('tree.depth', { n: depth })));
@@ -140,11 +185,11 @@ export function createTreeView(container, { layout = readLayout() } = {}) {
     const n = tree.nodes.get(code);
     if (!n) return;
     const behavior = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
-    const x = n.x + (mode === 'tree' ? 50 : 0);
+    const x = n.x - origin;
     if (x < wrapper.scrollLeft + 24 || x > wrapper.scrollLeft + wrapper.clientWidth - 24) {
       wrapper.scrollTo({ left: Math.max(0, x - wrapper.clientWidth / 2), behavior });
     }
-    if (mode === 'chart') {
+    if (mode !== 'tree') {
       const group = groups.get(code);
       const rect = group.getBoundingClientRect();
       if (rect.top < 0 || rect.bottom > window.innerHeight) {
@@ -153,7 +198,8 @@ export function createTreeView(container, { layout = readLayout() } = {}) {
     }
   }
   const onLayout = event => setLayout(event.detail.layout);
-  const onSystem = () => setLayout(mode);
+  const onSystem = () => { buildKindControl(); setLayout(mode); };
+  const onKinds = () => { syncKindControl(); setLayout(mode); };
   function nodeTitle(node) {
     const entry = currentTable().find(e => e.code === node.code);
     const name = settings.system === 'wabun' && entry?.name ? ' ' + t(entry.name) : '';
@@ -166,15 +212,20 @@ export function createTreeView(container, { layout = readLayout() } = {}) {
   };
   document.addEventListener('layout-change', onLayout);
   document.addEventListener('system-change', onSystem);
+  document.addEventListener('kinds-change', onKinds);
   document.addEventListener('language-change', onLanguage);
   document.addEventListener('notation-change', onLanguage);
+  buildKindControl();
   setLayout(layout);
-  return { svg, highlight, clear, setCurrent, scrollToCode, setLayout, destroy() {
+  // 木に描かれている符号か（刈り込みで外れた文字は、再生しても木を光らせない）。
+  const has = code => groups.has(code);
+  return { svg, highlight, clear, setCurrent, scrollToCode, setLayout, has, destroy() {
     document.removeEventListener('layout-change', onLayout);
     document.removeEventListener('system-change', onSystem);
+    document.removeEventListener('kinds-change', onKinds);
     document.removeEventListener('language-change', onLanguage);
     document.removeEventListener('notation-change', onLanguage);
-    label.remove();
+    kindControl.remove();
     legend.remove();
     svg.remove();
   } };

@@ -79,6 +79,7 @@ export function initDecodeTab() {
     if (rendered) convert(false);
   }
   document.addEventListener('notation-change', updateNotation);
+  document.addEventListener('kinds-change', () => { if (rendered) convert(false); });
   updateNotation();
   bindSystemConversion(document.getElementById('tab-decode'), convert);
 }

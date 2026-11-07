@@ -11,8 +11,10 @@ test('print sheet is dedicated and application adds no network clients or unsafe
   assert.match(css, /body > \*:not\(#printSheet\)/);
   assert.match(css, /#printSheet\[hidden\]/);
   assert.match(css, /#printSheet td\s*\{\s*padding: 0\.5mm/);
-  assert.match(css, /svg:not\(\.show-prosigns\) \.prosign-extension\s*\{\s*display: none/);
-  assert.match(css, /svg:not\(\.show-prosigns\) \.tree-node\.prosign-only circle\s*\{\s*r: 8px/);
+  // 非表示の文字種は灰色の点にし、経路が通るときだけ元の大きさと文字に戻す。
+  assert.match(css, /\.tree-node\.hidden-kind:not\(\.highlight\) circle\s*\{\s*r: 4px;\s*fill: var\(--node-hidden\)/);
+  assert.match(css, /\.tree-node\.hidden-kind:not\(\.highlight\) text,\s*\.tree-node\.hidden-kind:not\(\.highlight\) \.voicing-mark\s*\{\s*display: none/);
+  assert.doesNotMatch(css, /prosign-extension|svg:not\(\.show-prosigns\) \.tree-node/);
   assert.match(css, /grid-template-columns: repeat\(auto-fit, minmax\(min\(100%, 32rem\), 1fr\)\)/);
   assert.match(css, /\.morse-table-group\s*\{[^}]*overflow-x: auto/);
   assert.match(css, /\.morse-table td\s*\{[^}]*overflow-wrap: normal/);

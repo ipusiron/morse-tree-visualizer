@@ -5,6 +5,7 @@ import { createMorseAudio } from './audio.js';
 import { formatShare } from './share.js';
 import { messageAttrs, setMessage } from './i18n.js';
 import { currentTable } from './system.js';
+import { readKinds, kindOf } from './kinds.js';
 
 export function el(tag, attrs = {}, children = []) {
   const node = document.createElement(tag);
@@ -78,6 +79,7 @@ export function renderResult(container, words, output, mode) {
   table.append(el('thead', {}, head));
   const body = el('tbody');
   const rows = [];
+  const shown = readKinds(settings.system);
   words.forEach((word, wi) => {
     if (wi) body.append(el('tr', { class: 'word-gap' }, [msg('td', 'table.word_gap'), el('td', { colspan: 3 }, '/')]));
     word.forEach(({ char, code, prosign }) => {
@@ -91,6 +93,10 @@ export function renderResult(container, words, output, mode) {
       if (code.length > 6) {
         if (notes.length) notes.push(' / ');
         notes.push(msg('span', 'tree.outside', { n: code.length }));
+      } else if (!(prosign ? shown.includes('prosign') : shown.includes(kindOf(entry, settings.system))
+        || (alias && shown.includes('prosign')))) {
+        if (notes.length) notes.push(' / ');
+        notes.push(msg('span', 'tree.hidden_kind'));
       }
       const row = el('tr', { 'data-char': char }, [el('td', {}, char), el('td', {}, formatCode(code, settings.notation)),
         msg('td', wabun ? 'wabun.standard' : prosign ? 'group.prosign' : entry.itu ? 'table.itu' : 'table.custom'),
@@ -222,6 +228,7 @@ export function bindPlayback(host, animator, getCanonical, getRows = () => []) {
   host.querySelector('[data-action="stop"]').addEventListener('click', stopPlayback);
   document.addEventListener('notation-change', stopPlayback);
   document.addEventListener('layout-change', stopPlayback);
+  document.addEventListener('kinds-change', stopPlayback);
   document.addEventListener('system-change', () => { stopPlayback(); animator.reset(); audio.stop(); });
   document.addEventListener('language-change', () => {
     generation++;

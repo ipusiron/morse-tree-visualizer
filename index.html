@@ -86,6 +86,7 @@
             <legend data-i18n="layout.legend">木の見た目</legend>
             <label><input type="radio" name="layout-keying" value="tree" checked><span data-i18n="layout.tree">二分木</span></label>
             <label><input type="radio" name="layout-keying" value="chart"><span data-i18n="layout.chart">チャート</span></label>
+            <label><input type="radio" name="layout-keying" value="htree"><span data-i18n="layout.htree">Hツリー</span></label>
           </fieldset>
         </div>
         <div class="tree-scroll-wrapper"><div id="tree-container-keying"></div></div>
@@ -115,12 +116,13 @@
             <option>5</option><option>10</option><option>12</option><option selected>15</option><option>18</option><option>20</option><option>25</option>
           </select>
         </div>
-        <p class="tree-legend" data-i18n="tree.legend">点灯＝経路、破線の丸＝空き、黄色の破線＝慣用符号</p>
+        <p class="tree-legend" data-i18n="tree.legend">点灯＝経路、破線の丸＝空き、黄色の破線＝慣用符号、灰色の点＝非表示の文字種</p>
         <div class="tree-controls">
           <fieldset class="layout-control">
             <legend data-i18n="layout.legend">木の見た目</legend>
             <label><input type="radio" name="layout-encode" value="tree" checked><span data-i18n="layout.tree">二分木</span></label>
             <label><input type="radio" name="layout-encode" value="chart"><span data-i18n="layout.chart">チャート</span></label>
+            <label><input type="radio" name="layout-encode" value="htree"><span data-i18n="layout.htree">Hツリー</span></label>
           </fieldset>
         </div>
         <div class="tree-scroll-wrapper">
@@ -163,12 +165,13 @@
             <option>5</option><option>10</option><option>12</option><option selected>15</option><option>18</option><option>20</option><option>25</option>
           </select>
         </div>
-        <p class="tree-legend" data-i18n="tree.legend">点灯＝経路、破線の丸＝空き、黄色の破線＝慣用符号</p>
+        <p class="tree-legend" data-i18n="tree.legend">点灯＝経路、破線の丸＝空き、黄色の破線＝慣用符号、灰色の点＝非表示の文字種</p>
         <div class="tree-controls">
           <fieldset class="layout-control">
             <legend data-i18n="layout.legend">木の見た目</legend>
             <label><input type="radio" name="layout-decode" value="tree" checked><span data-i18n="layout.tree">二分木</span></label>
             <label><input type="radio" name="layout-decode" value="chart"><span data-i18n="layout.chart">チャート</span></label>
+            <label><input type="radio" name="layout-decode" value="htree"><span data-i18n="layout.htree">Hツリー</span></label>
           </fieldset>
         </div>
         <div class="tree-scroll-wrapper">
@@ -242,12 +245,13 @@
         </div>
 
         <!-- モールスツリー共通 -->
-        <p class="tree-legend" data-i18n="tree.legend">点灯＝経路、破線の丸＝空き、黄色の破線＝慣用符号</p>
+        <p class="tree-legend" data-i18n="tree.legend">点灯＝経路、破線の丸＝空き、黄色の破線＝慣用符号、灰色の点＝非表示の文字種</p>
         <div class="tree-controls">
           <fieldset class="layout-control">
             <legend data-i18n="layout.legend">木の見た目</legend>
             <label><input type="radio" name="layout-study" value="tree" checked><span data-i18n="layout.tree">二分木</span></label>
             <label><input type="radio" name="layout-study" value="chart"><span data-i18n="layout.chart">チャート</span></label>
+            <label><input type="radio" name="layout-study" value="htree"><span data-i18n="layout.htree">Hツリー</span></label>
           </fieldset>
         </div>
         <div class="tree-scroll-wrapper">
@@ -343,7 +347,7 @@
           <p data-i18n="help.trivia_compute">平均符号長や組み合わせの数は、文字表と文字頻度から実行時に計算します。「ツールで試す」は入力と変換まで行い、再生は始めません。</p>
 
           <h3 data-i18n="help.prosign_share">📡 手続き符号と共有</h3>
-          <p data-i18n="help.prosign_input">&lt;AR&gt;や&lt;SK&gt;の形で入力できます。木の「手続き符号を表示」で別名を確認できます。HHとSOSは木の外で、SOSは慣用です。</p>
+          <p data-i18n="help.prosign_input">&lt;AR&gt;や&lt;SK&gt;の形で入力できます。「表示する文字種」の「手続き符号」をオンにすると、木で別名を確認できます。HHとSOSは木の外で、SOSは慣用です。</p>
           <p data-i18n="help.share">共有URLには入力した平文・符号が含まれます。共有したい場合だけ使ってください。上限は1,000字です。</p>
 
           <h3 data-i18n="help.audio">🔊 音・速度・ランプ</h3>
@@ -351,14 +355,16 @@
           <p data-i18n="help.light">音は既定でオフです。「🔊 音」をオンにしてから再生してください。ランプも既定でオフです。WCAG 2.3.1の点滅への配慮として40px角に抑え、動きを減らす設定では表示しません。</p>
 
           <h3 data-i18n="help.tree">🌳 モールスツリーの見方</h3>
-          <p data-i18n="help.layout">「木の見た目」で二分木とチャートを切り替えられます。4つの木の設定は共通で、切り替えると点灯と再生を停止します。</p>
+          <p data-i18n="help.layout">「木の見た目」で二分木・チャート・Hツリーを切り替えられます。「表示する文字種」とともに4つの木で共通の設定で、切り替えると点灯と再生を停止します。</p>
           <p data-i18n="help.chart">チャートは左がダッシュ側、右がドット側です。丸はドット、長方形はダッシュを表し、下へ進むと反対の符号を追加します。</p>
-          <p data-i18n="help.chart_count">チャートの手続き符号を隠すと64節、表示すると66節が見えます。以下は二分木の読み方です。</p>
+          <p data-i18n="help.htree">Hツリーは中央のstartから、1・3・5番目の符号は左右（左＝ドット、右＝ダッシュ）、2・4・6番目は上下（上＝ドット、下＝ダッシュ）へ進みます。枝は1段ごとに約0.71倍（1/√2）に短くなるので、深さ6でも節どうしが重なりません。</p>
+          <p data-i18n="help.kinds">「表示する文字種」を外すと、表示する文字のうち最も深いものに合わせて木が浅くなります（英字だけなら深さ4）。非表示の文字は詳細表に「木で非表示の文字種」と出ます。木の範囲に入るものは灰色の点で残り、経路が通るときだけ文字を表示します。範囲の外のものは木が光りません。ÉはITUでは英字ですが5符号なので、記号に入れています。少なくとも1つの文字種は表示します。</p>
+          <p data-i18n="help.chart_count">チャートは66節です。手続き符号を表示しないときは、SK・SN・KAの3つが灰色の点になります。以下は二分木の読み方です。</p>
           <ul>
             <li><strong data-i18n="help.left">左の枝</strong><span data-i18n="help.left_note">：・（ドット）を表す</span></li>
             <li><strong data-i18n="help.right">右の枝</strong><span data-i18n="help.right_note">：−（ダッシュ）を表す</span></li>
             <li><strong data-i18n="help.root">ルートから葉</strong><span data-i18n="help.root_note">：符号化プロセスを表示</span></li>
-            <li><strong data-i18n="help.highlight">点灯</strong><span data-i18n="help.highlight_note">：経路。破線の丸は空き、黄色の破線は慣用符号</span></li>
+            <li><strong data-i18n="help.highlight">点灯</strong><span data-i18n="help.highlight_note">：経路。破線の丸は空き、黄色の破線は慣用符号、灰色の点は非表示の文字種</span></li>
             <li data-i18n="help.dollar">$は7符号で木の外。詳細表には表示されますが、木は光りません</li>
           </ul>
 

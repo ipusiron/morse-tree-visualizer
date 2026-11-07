@@ -13,11 +13,12 @@ export function createAnimator(view) {
     const e = events[i];
     if (!e) return;
     if (!reduced && e.code !== undefined) {
-      // A seven-symbol character stays outside the tree for its entire duration.
+      // A character that is not drawn (seven symbols, or a hidden kind trimmed from the tree)
+      // stays outside the tree for its entire duration.
       const rest = events.slice(i).findIndex(next => next.type === 'letterGap' || next.type === 'wordGap');
       const end = rest < 0 ? events.length : i + rest;
       const last = events.slice(i, end).filter(next => next.code !== undefined).at(-1);
-      if (last.code.length <= 6) {
+      if (view.has ? view.has(last.code) : last.code.length <= 6) {
         view.highlight(e.code);
         view.setCurrent(e.code);
         view.scrollToCode(e.code);

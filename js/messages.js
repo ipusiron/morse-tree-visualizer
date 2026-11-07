@@ -28,7 +28,6 @@ export const MESSAGES = {
   'print.date': '生成日 {date}',
   'print.note': '慣用はITUの文字表にない符号です。SOSは1符号として使う慣用の手続き符号です。',
   'group.prosign': '手続き符号',
-  'prosign.show': '手続き符号を表示',
   'prosign.alias': '手続き符号{label}と同じ符号',
   'prosign.unknown': '未対応の手続き符号です: <{label}>',
   'prosign.AR': '送信終了（＋と同じ符号）',
@@ -134,7 +133,6 @@ export const DICTIONARIES = { ja: MESSAGES, en: {
   'print.date': 'Generated {date}',
   'print.note': 'Customary codes are not in the ITU character table. SOS as a single prosign is customary.',
   'group.prosign': 'Prosigns',
-  'prosign.show': 'Show prosigns',
   'prosign.alias': 'Same code as prosign {label}',
   'prosign.unknown': 'Unsupported prosign: <{label}>',
   'prosign.AR': 'End of transmission (same code as +)',
@@ -245,7 +243,7 @@ Object.assign(MESSAGES, {
   "encode.button": "エンコード＆表示",
   "share.button": "共有URLをコピー",
   "wpm.char": "文字速度（WPM）",
-  "tree.legend": "点灯＝経路、破線の丸＝空き、黄色の破線＝慣用符号",
+  "tree.legend": "点灯＝経路、破線の丸＝空き、黄色の破線＝慣用符号、灰色の点＝非表示の文字種",
   "decode.label": "モールス入力：",
   "decode.placeholder": ".- ... または ・− ・・・（語の区切りは / ）",
   "decode.button": "デコード",
@@ -299,16 +297,23 @@ Object.assign(MESSAGES, {
   "help.trivia_cards": "数学・符号・暗号など7分野の16枚のカードを、分野のボタンで絞り込めます。各カードの「出所」から資料を開けます。",
   "help.trivia_compute": "平均符号長や組み合わせの数は、文字表と文字頻度から実行時に計算します。「ツールで試す」は入力と変換まで行い、再生は始めません。",
   "help.prosign_share": "📡 手続き符号と共有",
-  "help.prosign_input": "<AR>や<SK>の形で入力できます。木の「手続き符号を表示」で別名を確認できます。HHとSOSは木の外で、SOSは慣用です。",
+  "help.prosign_input": "<AR>や<SK>の形で入力できます。「表示する文字種」の「手続き符号」をオンにすると、木で別名を確認できます。"
+      + "HHとSOSは木の外で、SOSは慣用です。",
   "help.share": "共有URLには入力した平文・符号が含まれます。共有したい場合だけ使ってください。上限は1,000字です。",
   "help.audio": "🔊 音・速度・ランプ",
   "help.farnsworth": "文字速度は符号自体の速さ、全体速度は文字間・語間を含む速さです。全体速度を下げると、考える間隔を長くできます。",
   "help.light": "音は既定でオフです。「🔊 音」をオンにしてから再生してください。ランプも既定でオフです。"
       + "WCAG 2.3.1の点滅への配慮として40px角に抑え、動きを減らす設定では表示しません。",
   "help.tree": "🌳 モールスツリーの見方",
-  "help.layout": "「木の見た目」で二分木とチャートを切り替えられます。4つの木の設定は共通で、切り替えると点灯と再生を停止します。",
+  "help.layout": "「木の見た目」で二分木・チャート・Hツリーを切り替えられます。「表示する文字種」とともに4つの木で共通の設定で、"
+      + "切り替えると点灯と再生を停止します。",
   "help.chart": "チャートは左がダッシュ側、右がドット側です。丸はドット、長方形はダッシュを表し、下へ進むと反対の符号を追加します。",
-  "help.chart_count": "チャートの手続き符号を隠すと64節、表示すると66節が見えます。以下は二分木の読み方です。",
+  "help.htree": "Hツリーは中央のstartから、1・3・5番目の符号は左右（左＝ドット、右＝ダッシュ）、2・4・6番目は上下（上＝ドット、"
+      + "下＝ダッシュ）へ進みます。枝は1段ごとに約0.71倍（1/√2）に短くなるので、深さ6でも節どうしが重なりません。",
+  "help.kinds": "「表示する文字種」を外すと、表示する文字のうち最も深いものに合わせて木が浅くなります（英字だけなら深さ4）。"
+      + "非表示の文字は詳細表に「木で非表示の文字種」と出ます。木の範囲に入るものは灰色の点で残り、経路が通るときだけ文字を表示します。"
+      + "範囲の外のものは木が光りません。ÉはITUでは英字ですが5符号なので、記号に入れています。少なくとも1つの文字種は表示します。",
+  "help.chart_count": "チャートは66節です。手続き符号を表示しないときは、SK・SN・KAの3つが灰色の点になります。以下は二分木の読み方です。",
   "help.left": "左の枝",
   "help.left_note": "：・（ドット）を表す",
   "help.right": "右の枝",
@@ -316,7 +321,7 @@ Object.assign(MESSAGES, {
   "help.root": "ルートから葉",
   "help.root_note": "：符号化プロセスを表示",
   "help.highlight": "点灯",
-  "help.highlight_note": "：経路。破線の丸は空き、黄色の破線は慣用符号",
+  "help.highlight_note": "：経路。破線の丸は空き、黄色の破線は慣用符号、灰色の点は非表示の文字種",
   "help.dollar": "$は7符号で木の外。詳細表には表示されますが、木は光りません",
   "help.practice": "💡 効果的な使い方",
   "help.practice_table": "一覧表で全体把握",
@@ -377,7 +382,7 @@ Object.assign(DICTIONARIES.en, {
   "encode.button": "Encode & show",
   "share.button": "Copy share URL",
   "wpm.char": "Character speed (WPM)",
-  "tree.legend": "Highlight = path; dashed circle = empty; yellow dashed border = customary code",
+  "tree.legend": "Highlight = path; dashed circle = empty; yellow dashed border = customary code; gray dot = hidden group",
   "decode.label": "Morse input:",
   "decode.placeholder": "Enter .- ... (separate words with /)",
   "decode.button": "Decode",
@@ -440,8 +445,8 @@ Object.assign(DICTIONARIES.en, {
   "help.trivia_compute": "Average code lengths and combination counts are calculated from the character table and frequencies "
       + "at runtime. Try it in the tool fills and converts input without starting playback.",
   "help.prosign_share": "📡 Prosigns and sharing",
-  "help.prosign_input": "Enter prosigns as <AR> or <SK>. Show prosigns displays aliases on the tree. HH and SOS lie outside t"
-      + "he tree; SOS is customary.",
+  "help.prosign_input": "Enter prosigns as <AR> or <SK>. Turn on Prosigns under Show on tree to see aliases on the tree. "
+      + "HH and SOS lie outside the tree; SOS is customary.",
   "help.share": "Share URLs contain the text or code you entered. Use them only when you intend to share that input. "
       + "The limit is 1,000 characters.",
   "help.audio": "🔊 Sound, speed and light",
@@ -450,12 +455,19 @@ Object.assign(DICTIONARIES.en, {
   "help.light": "Sound is off by default. Enable Sound before playback. The light is also off by default. "
       + "To address flashing under WCAG 2.3.1, it is limited to a 40px square and hidden when reduced motion is enabled.",
   "help.tree": "🌳 Reading the Morse tree",
-  "help.layout": "Tree layout switches between Binary tree and Chart. The choice is shared by all four trees. Changing"
-      + " layout clears highlights and stops playback.",
+  "help.layout": "Tree layout switches between Binary tree, Chart and H-tree. The layout and the groups in Show on tree "
+      + "are shared by all four trees. Changing either clears highlights and stops playback.",
   "help.chart": "The chart places dashes to the left and dots to the right. Circles represent dots and rectangles rep"
       + "resent dashes. Moving downward adds the opposite symbol.",
-  "help.chart_count": "The chart shows 64 nodes with prosigns hidden or 66 with them shown. The following instructions desc"
-      + "ribe the binary tree.",
+  "help.htree": "The H-tree starts at the center. Elements 1, 3 and 5 move sideways (left = dot, right = dash); "
+      + "elements 2, 4 and 6 move vertically (up = dot, down = dash). Each level shortens the branch by about 0.71 (1/√2), "
+      + "so nodes never overlap, even at depth 6.",
+  "help.kinds": "Clearing a group in Show on tree trims the tree to the deepest character still shown (depth 4 for letters only). "
+      + "Hidden characters are marked Hidden on the tree in the details table. Those within the trimmed depth stay as gray dots "
+      + "and show their label only while a path passes through them; those beyond it do not light up the tree. "
+      + "É is a letter in ITU-R M.1677-1 but has five elements, so it is grouped with punctuation. At least one group stays shown.",
+  "help.chart_count": "The chart has 66 nodes. When prosigns are not shown, SK, SN and KA appear as gray dots. "
+      + "The following instructions describe the binary tree.",
   "help.left": "Left branch",
   "help.left_note": ": a dot",
   "help.right": "Right branch",
@@ -463,7 +475,8 @@ Object.assign(DICTIONARIES.en, {
   "help.root": "Root to leaf",
   "help.root_note": ": follows the encoding process",
   "help.highlight": "Highlight",
-  "help.highlight_note": ": the path. Dashed circles are empty nodes; yellow dashed borders indicate customary codes.",
+  "help.highlight_note": ": the path. Dashed circles are empty nodes; yellow dashed borders indicate customary codes; "
+      + "gray dots are hidden groups.",
   "help.dollar": "$ has 7 elements and lies outside the tree. It appears in the details table but does not light up th"
       + "e tree.",
   "help.practice": "💡 Practice tips",
@@ -506,7 +519,7 @@ Object.assign(MESSAGES, {
   "wabun.tab.encode_short": "和文 ⇒ モールス",
   "wabun.tab.decode": "モールス信号 ⇒ 和文",
   "wabun.tab.decode_short": "モールス ⇒ 和文",
-  "wabun.tree.legend": "点灯＝経路、破線の丸＝空き",
+  "wabun.tree.legend": "点灯＝経路、破線の丸＝空き、灰色の点＝非表示の文字種",
   "wabun.encode.placeholder": "{sample} などを入力",
   "wabun.decode.placeholder": "-..-. .--.- -.--. ---.-（モールス）",
   "wabun.unsupported": "和文の表にない文字: {list}",
@@ -533,7 +546,7 @@ Object.assign(DICTIONARIES.en, {
   "wabun.tab.encode_short": "Wabun ⇒ Morse",
   "wabun.tab.decode": "Morse ⇒ Wabun text",
   "wabun.tab.decode_short": "Morse ⇒ Wabun",
-  "wabun.tree.legend": "Highlight = path; dashed circle = unused",
+  "wabun.tree.legend": "Highlight = path; dashed circle = unused; gray dot = hidden group",
   "wabun.encode.placeholder": "Enter kana, for example {sample}",
   "wabun.decode.placeholder": "For example: -..-. .--.- -.--. ---.-",
   "wabun.unsupported": "Characters not in the Wabun table: {list}",
@@ -545,6 +558,27 @@ Object.assign(DICTIONARIES.en, {
   "wabun.paragraph": "Paragraph",
   "wabun.open": "Opening parenthesis",
   "wabun.close": "Closing parenthesis"
+});
+
+// Hツリーと、木に表示する文字種の切り替え。
+Object.assign(MESSAGES, {
+  "layout.htree": "Hツリー",
+  "htree.legend": "左・上＝ドット、右・下＝ダッシュ。1・3・5番目の符号は左右、2・4・6番目は上下へ進む",
+  "htree.label": "モールスのHツリー。中央から左右と上下へ交互に進み、左と上がドット、右と下がダッシュです。",
+  "kinds.legend": "表示する文字種",
+  "kinds.need_one": "少なくとも1つの文字種を表示します",
+  "group.punct_e": "記号（Éを含む）",
+  "tree.hidden_kind": "木で非表示の文字種"
+});
+Object.assign(DICTIONARIES.en, {
+  "layout.htree": "H-tree",
+  "htree.legend": "Left/up = dot, right/down = dash. Elements 1, 3 and 5 move sideways; 2, 4 and 6 move vertically",
+  "htree.label": "Morse H-tree. Steps alternate between horizontal and vertical from the center; "
+      + "left and up are dots, right and down are dashes.",
+  "kinds.legend": "Show on tree",
+  "kinds.need_one": "Keep at least one group shown",
+  "group.punct_e": "Punctuation (incl. É)",
+  "tree.hidden_kind": "Hidden on the tree"
 });
 
 let language = 'ja';

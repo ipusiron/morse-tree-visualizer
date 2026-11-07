@@ -5,10 +5,10 @@ import { initialSystem, readSystem, writeSystem, currentTable, initSystem, chang
   encodeCurrent, decodeCurrent, bindSystemConversion } from '../js/system.js';
 import { MORSE_TABLE } from '../js/morseMap.js';
 import { WABUN_TABLE, WABUN_SAMPLES } from '../js/wabunMap.js';
-import { settings, el } from '../js/utils.js';
+import { settings, el, renderResult } from '../js/utils.js';
 import { DICTIONARIES, setLang } from '../js/messages.js';
 import { applyLanguage } from '../js/i18n.js';
-import { createTreeView } from '../js/treeRenderer.js';
+import { createTreeView, changeKinds } from '../js/treeRenderer.js';
 import { createAnimator } from '../js/animator.js';
 import { tableGroups, initMorseTable } from '../js/table.js';
 import { formatShare, parseShare } from '../js/share.js';
@@ -323,7 +323,8 @@ test('all four tree views rebuild to 67 binary or 66 chart nodes with no Wabun p
     changeSystem('wabun');
     for (const view of views) {
       assert.equal(view.svg.querySelectorAll('.tree-node').length, 67);
-      assert.equal(view.svg.getAttribute('viewBox'), '-50 -30 1080 470');
+      // 和文の二分木は葉が33個なので、内容に合わせた幅は 32×30＋90＝1050。
+      assert.equal(view.svg.getAttribute('viewBox'), '-50 -30 1050 470');
       assert.equal(view.svg.querySelectorAll('.custom').length, 0);
       assert.equal(view.svg.querySelectorAll('.prosign-only').length, 0);
       for (const code of ['..', '..--.']) {
@@ -336,13 +337,70 @@ test('all four tree views rebuild to 67 binary or 66 chart nodes with no Wabun p
       assert.equal(view.svg.querySelectorAll('.tree-node').length, 66);
       assert.equal(view.svg.getAttribute('viewBox'), '0 0 720 920');
     }
-    assert.ok(dom.doc.querySelectorAll('.check-control').every(node => node.hidden));
+    const kindState = () => dom.doc.querySelectorAll('.kind-control').map(control =>
+      control.querySelectorAll('input').map(input => input.value + ':' + input.checked).join(' '));
+    assert.deepEqual(kindState(), Array(4).fill('kana:true mark:true digit:true symbol:true'));
     applyLanguage('en');
     assert.ok(views.every(view => view.svg.textContent.includes('dakuten (voiced mark)')));
     changeSystem('intl');
-    assert.ok(dom.doc.querySelectorAll('.check-control').every(node => !node.hidden));
+    assert.deepEqual(kindState(), Array(4).fill('letter:true digit:true punct:true prosign:false'));
     for (const view of views) assert.equal(view.svg.getAttribute('viewBox'), '0 0 720 808');
   } finally { views.forEach(view => view.destroy()); dom.restore(); }
+});
+
+test('H-tree and shown groups are shared by all four views, trim the tree, mark hidden rows and keep one group', () => {
+  const dom = installDOM();
+  const views = [];
+  const count = (view, selector) => view.svg.querySelectorAll(selector).length;
+  try {
+    for (let i = 0; i < 4; i++) {
+      const host = el('div');
+      dom.doc.body.append(el('div', {}, host));
+      views.push(createTreeView(host, { layout: 'htree' }));
+    }
+    const controls = dom.doc.querySelectorAll('.kind-control');
+    const toggle = (control, kind) => {
+      const input = control.querySelectorAll('input').find(node => node.value === kind);
+      input.checked = !input.checked;
+      input.dispatchEvent(new Event('change'));
+    };
+    for (const view of views) {
+      assert.deepEqual([count(view, '.tree-node'), count(view, '.hidden-kind'), view.svg.getAttribute('viewBox')],
+        [76, 3, '0 0 760.8 552']);
+      assert.ok(view.svg.classList.contains('htree'));
+      assert.equal(count(view, '.depth-label'), 0);
+    }
+    toggle(controls[0], 'digit');
+    toggle(controls[0], 'punct');
+    for (const [i, view] of views.entries()) {
+      assert.deepEqual([count(view, '.tree-node'), count(view, '.hidden-kind'), view.svg.getAttribute('viewBox')],
+        [31, 0, '0 0 353.5 264']);
+      assert.deepEqual(controls[i].querySelectorAll('input').map(input => input.checked), [true, false, false, false]);
+    }
+    assert.deepEqual(['--.-', '..--..', '.----', '..-..'].map(code => views[1].has(code)), [true, false, false, false]);
+    // 最後の1つを外しても戻り、理由を表示する。
+    toggle(controls[2], 'letter');
+    assert.deepEqual(controls[2].querySelectorAll('input').map(input => input.checked), [true, false, false, false]);
+    assert.equal(controls[2].querySelector('.kind-status').textContent, '少なくとも1つの文字種を表示します');
+    assert.equal(count(views[2], '.tree-node'), 31);
+    views[2].setLayout('tree');
+    assert.deepEqual([views[2].svg.getAttribute('viewBox'), count(views[2], '.depth-label')], ['-50 -30 690 342', 4]);
+    views[3].setLayout('chart');
+    assert.deepEqual([count(views[3], '.tree-node'), count(views[3], '.hidden-kind')], [27, 0]);
+    // 非表示の文字種は詳細表に注記し、木の範囲の内外を問わない。
+    const rows = renderResult(el('div'), [[{ char: 'Q', code: '--.-' }, { char: 'É', code: '..-..' }, { char: '?', code: '..--..' },
+      { char: '$', code: '...-..-' }]], '', 'encode');
+    assert.deepEqual(rows.map(row => row.children[3].textContent), ['', '木で非表示の文字種', '木で非表示の文字種', '木の外（7符号）']);
+    toggle(controls[1], 'prosign');
+    assert.ok(views.every(view => view.svg.classList.contains('show-prosigns')));
+    assert.deepEqual([count(views[0], '.tree-node'), views[0].svg.getAttribute('viewBox')], [76, '0 0 760.8 552']);
+    assert.equal(views[0].svg.querySelectorAll('.tree-node').find(node => node.dataset.code === '...-.-').classList
+      .contains('hidden-kind'), false);
+  } finally {
+    changeKinds(['letter', 'digit', 'punct'], 'intl');
+    views.forEach(view => view.destroy());
+    dom.restore();
+  }
 });
 
 test('Wabun voicing nodes use SVG strokes and a ring in both layouts, retaining translated titles and highlight state', () => {

@@ -1,7 +1,7 @@
 import { t } from './messages.js';
 
 let sessionLayout;
-const valid = value => value === 'chart' ? 'chart' : 'tree';
+const valid = value => value === 'chart' || value === 'htree' ? value : 'tree';
 
 export function readLayout() {
   if (sessionLayout !== undefined) return sessionLayout;
