@@ -103,7 +103,7 @@ hub: true
 - 欧文／和文の符号切り替え、和文65件の変換と学習、符号の保存と`?code=wabun`での指定
 - 二分木／チャート／Hツリーの表示切り替え、4つの木の同期と設定の保存
 - 木に載せる文字種（英字・数字・記号・手続き符号、和文は仮名・濁点と半濁点・数字・記号）の選択と、それに合わせた木の刈り込み
-- 出所つきの雑学16枚、7分野での絞り込み、実行時の数値計算と「ツールで試す」
+- 出所つきの雑学17枚、7分野での絞り込み、実行時の数値計算と「ツールで試す」
 - ASCIIの`.-`と`・−`の入力・表示・コピー
 - ITUタイミングに沿った経路再生、一時停止・再開・停止・前後の手動ステップ
 - 音と木の点灯の同期、周波数・音量・小さなランプの選択
@@ -192,7 +192,7 @@ Esc、もう一度のクリック・タップ、または説明の外をクリ�
 
 ### 🔍 雑学
 
-「雑学」タブを開き、分野のボタンでカードを絞り込みます。「すべて」で16枚に戻せます。
+「雑学」タブを開き、分野のボタンでカードを絞り込みます。「すべて」で17枚に戻せます。
 「出所」のリンクで根拠となる資料を開けます。「ツールで試す」があるカードでは、関連するタブへ移動します。
 例がある場合は入力と変換まで行い、音や再生は始めません。
 
@@ -375,6 +375,7 @@ Hツリーは、二分木を正方形に近い領域へ収める描き方です�
 
 最も短い枝を36pxにそろえるので、どの深さでも節どうし、節とほかの枝は36px以上離れます。
 SOSのSは左→上→左、Oは右→下→右と進みます。英字だけなら幅390pxの画面にも収まります。
+Hツリーが集積回路の配置で知られる理由（面積がnの程度で済む）は、雑学タブの「Hツリーと集積回路の面積」にまとめています。
 
 「表示する文字種」は、木に載せる文字の種類です。3つの見た目と4つの木に共通で、欧文と和文で別々に保存します（設定キーは`morse-tree-kinds`）。
 
@@ -393,7 +394,7 @@ SOSのSは左→上→左、Oは右→下→右と進みます。英字だけな
 
 ## 🔍 雑学（他の分野とのつながり）
 
-7分野16枚のカードから、モールスとほかの技術・歴史の関係を学べます。
+7分野17枚のカードから、モールスとほかの技術・歴史の関係を学べます。
 平均符号長や接頭関係の数などは、文字表と文字頻度から実行時に計算しています。
 出所のない話や、資料で確認できない由来・俗説は載せない方針です。各カードの資料は下の「参考」にもまとめています。
 
@@ -404,6 +405,7 @@ SOSのSは左→上→左、Oは右→下→右と進みます。英字だけな
 | 数学 | ハフマン符号と比べる |
 | 数学 | 長さ4までで 30 通り |
 | コンピューター | 木を下りる＝二分探索 |
+| コンピューター | Hツリーと集積回路の面積 |
 | コンピューター | ASCII は7ビット、点字は6点、モールスは1〜7 |
 | コンピューター | スマホのキーボードでもモールス |
 | ネットワーク・通信 | QRS＝もっとゆっくり送って |
@@ -550,6 +552,8 @@ meta CSPではクリックジャッキングを防げません。`frame-ancestor
 
 - [Project Gutenberg 10作品（Day018 CipherClimb）](https://github.com/ipusiron/cipherclimb)
 - [D. A. Huffman, A Method for the Construction of Minimum-Redundancy Codes（1952）](https://doi.org/10.1109/JRPROC.1952.273898)
+- [C. E. Leiserson, Area-Efficient Graph Layouts (for VLSI)（FOCS 1980）](https://doi.org/10.1109/SFCS.1980.13)
+- [R. P. Brent, H. T. Kung, On the Area of Binary Tree Layouts（1980）](https://maths-people.anu.edu.au/~brent/pub/pub056.html)
 - [RFC 20](https://www.rfc-editor.org/rfc/rfc20.txt)
 - [Braille Authority of North America, Size and Spacing of Braille Characters](https://www.brailleauthority.org/size-and-spacing-braille-characters)
 - [Google The Keyword, Making Morse code available to more people on Gboard（2018-07-11）](https://blog.google/products-and-platforms/products/search/making-morse-code-available-more-people-gboard/)
@@ -578,7 +582,7 @@ GitHub Actionsもpushとpull_requestで同じテストを実行します。READM
 | htree.test.js | Hツリーの座標・寸法・独立した置き方との一致・節と枝の間隔 |
 | kinds.test.js | 文字種の分け方・刈り込みの深さ・非表示の節・保存 |
 | frequency.test.js | 出現頻度26個・正規化と上位5文字 |
-| trivia.test.js | 平均値・ハフマン・接頭関係・16カード・出所・文字列の整形 |
+| trivia.test.js | 平均値・ハフマン・接頭関係・17カード・出所・文字列の整形 |
 | timing.test.js | ITU時間比・Farnsworth・PARIS・SOSの音の予定表 |
 | messages.test.js | 辞書とJS内の日本語リテラル |
 | html.test.js | CSP・referrer・ARIA・属性とラベル |
@@ -658,7 +662,7 @@ morse-tree-visualizer/              # モールス符号を木の経路として
 │   ├── theme.js                    # ライト・ダーク・システム連動と保存
 │   ├── theme-early.js              # 描画前に保存済みテーマを反映
 │   ├── treeRenderer.js             # 木ごとのSVG描画と点灯・追従
-│   ├── trivia.js                   # 雑学16枚・出所・数値計算と本文の整形
+│   ├── trivia.js                   # 雑学17枚・出所・数値計算と本文の整形
 │   ├── utils.js                    # 安全なDOM生成と共通制御
 │   └── wabunMap.js                 # 和文65件とローマ字・翻訳キーの定義
 ├── package.json                    # 依存なしのnpm test定義

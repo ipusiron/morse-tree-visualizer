@@ -371,9 +371,9 @@ test('all trivia cards switch in place without resetting the selected field, lin
     const cards = grid.querySelectorAll('article');
     const links = grid.querySelectorAll('a');
     const buttons = grid.querySelectorAll('button');
-    assert.equal(cards.length, 16);
-    assert.equal(links.length, 20);
-    assert.equal(buttons.length, 14);
+    assert.equal(cards.length, 17);
+    assert.equal(links.length, 22);
+    assert.equal(buttons.length, 15);
     chips[1].dispatchEvent(new Event('click'));
     dom.doc.activeElement = chips[1];
     grid.scrollTop = 85;
