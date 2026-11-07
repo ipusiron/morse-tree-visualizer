@@ -3,7 +3,7 @@ import { createAnimator } from './animator.js';
 import { normalizeMorse } from './morseCodec.js';
 import { encodeCurrent as encode, decodeCurrent as decode, bindSystemConversion } from './system.js';
 import { NOTATIONS } from './morseMap.js';
-import { settings, describeChars, renderResult, bindPlayback, bindShareButton } from './utils.js';
+import { settings, describeChars, renderResult, bindPlayback, bindShareButton, bindConvertHint } from './utils.js';
 import { setMessage } from './i18n.js';
 
 export function initDecodeTab() {
@@ -19,6 +19,7 @@ export function initDecodeTab() {
   let rendered = false;
   const run = bindPlayback(document.getElementById('decode-playback'), animator, () => canonical, () => rows);
   bindShareButton(document.getElementById('decodeShare'), morseInput, 'morse');
+  const markConverted = bindConvertHint(morseInput, errorDiv, document.getElementById('decodeHint'), 'decode.hint');
 
   function follow() {
     animator.stop();
@@ -50,6 +51,7 @@ export function initDecodeTab() {
     animator.stop();
     rendered = true;
     canonical = '';
+    markConverted();
     setMessage(errorDiv, null);
     resultDiv.replaceChildren();
     const result = decode(morseInput.value);

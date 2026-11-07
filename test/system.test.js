@@ -5,9 +5,9 @@ import { initialSystem, readSystem, writeSystem, currentTable, initSystem, chang
   encodeCurrent, decodeCurrent, bindSystemConversion } from '../js/system.js';
 import { MORSE_TABLE } from '../js/morseMap.js';
 import { WABUN_TABLE, WABUN_SAMPLES } from '../js/wabunMap.js';
-import { settings, el, renderResult } from '../js/utils.js';
+import { settings, el, renderResult, bindConvertHint } from '../js/utils.js';
 import { DICTIONARIES, setLang } from '../js/messages.js';
-import { applyLanguage } from '../js/i18n.js';
+import { applyLanguage, setMessage } from '../js/i18n.js';
 import { createTreeView, changeKinds } from '../js/treeRenderer.js';
 import { createAnimator } from '../js/animator.js';
 import { tableGroups, initMorseTable } from '../js/table.js';
@@ -459,6 +459,44 @@ test('Wabun voicing nodes use SVG strokes and a ring in both layouts, retaining 
       assert.equal(letter.querySelector('text').textContent, 'I');
     }
   } finally { views.forEach(view => view.destroy()); dom.restore(); }
+});
+
+test('editing after an error clears it and asks to press the convert button until the input is converted', () => {
+  const dom = installDOM();
+  try {
+    const input = el('textarea');
+    const error = el('div');
+    const hint = el('p');
+    dom.doc.body.append(input, error, hint);
+    const markConverted = bindConvertHint(input, error, hint, 'encode.hint');
+    const type = (value, options = {}) => {
+      input.value = value;
+      const event = new Event('input');
+      if (options.composing) Object.defineProperty(event, 'isComposing', { value: true });
+      input.dispatchEvent(event);
+    };
+    // 空のまま押した → エラー。入力するとエラーが消えて、押すように促す。
+    markConverted();
+    setMessage(error, 'error.empty_text');
+    type('hello');
+    assert.deepEqual([error.textContent, hint.textContent], ['', '「エンコード＆表示」を押すと、入力した文字を変換します。']);
+    // 変換すると案内は消える。変換した入力に戻したときも出さない。
+    markConverted();
+    assert.equal(hint.textContent, '');
+    type('hello!');
+    assert.notEqual(hint.textContent, '');
+    type('hello');
+    assert.equal(hint.textContent, '');
+    // 空白だけ・日本語入力の途中では出さない。
+    type('   ');
+    assert.equal(hint.textContent, '');
+    type('こん', { composing: true });
+    assert.equal(hint.textContent, '');
+    input.dispatchEvent(new Event('compositionend'));
+    assert.notEqual(hint.textContent, '');
+    applyLanguage('en');
+    assert.equal(hint.textContent, 'Press Encode & show to convert the text you entered.');
+  } finally { dom.restore(); }
 });
 
 test('voicing strokes override node and edge styles with an unfilled 2px line and the normal or highlighted text color', () => {

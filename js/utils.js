@@ -44,6 +44,23 @@ export function bindShareButton(button, input, kind) {
   update();
 }
 
+// 入力を変えたあとは前のエラーと結果が古いままなので、エラーを消して変換ボタンを押すように促す。
+// 戻り値は変換したときに呼ぶ関数で、変換した入力を覚えて案内を消す。
+export function bindConvertHint(input, error, hint, key) {
+  let converted = null;
+  const update = event => {
+    if (event?.isComposing) return;
+    setMessage(error, null);
+    setMessage(hint, input.value.trim() && input.value !== converted ? key : null);
+  };
+  input.addEventListener('input', update);
+  input.addEventListener('compositionend', update);
+  return () => {
+    converted = input.value;
+    setMessage(hint, null);
+  };
+}
+
 export async function copyText(text, status) {
   try {
     if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');

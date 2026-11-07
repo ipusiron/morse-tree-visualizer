@@ -1219,6 +1219,18 @@ summary:hover {
 .wpm-tooltip span {
   margin-top: 0.4rem;
 }
+/* 入力を変えたあと、変換ボタンを押すように促す（エラーとは別の見た目にする）。 */
+.convert-hint {
+  margin: 0.5rem 0 0;
+  padding: 0.5rem 0.75rem;
+  color: var(--text);
+  background-color: var(--details-bg);
+  border-left: 4px solid var(--primary);
+  border-radius: 4px;
+}
+.convert-hint:empty {
+  display: none;
+}
 .error-message:empty {
   display: none;
 }
