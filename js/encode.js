@@ -1,7 +1,7 @@
 import { createTreeView } from './treeRenderer.js';
 import { createAnimator } from './animator.js';
 import { encodeCurrent as encode, bindSystemConversion } from './system.js';
-import { settings, bindSettings, describeChars, renderResult, bindPlayback } from './utils.js';
+import { settings, bindSettings, describeChars, renderResult, bindPlayback, bindConvertHint } from './utils.js';
 import { bindShareButton } from './utils.js';
 import { setMessage } from './i18n.js';
 
@@ -19,10 +19,12 @@ export function initEncodeTab() {
   const run = bindPlayback(document.getElementById('encode-playback'), animator, () => canonical, () => rows);
   bindSettings();
   bindShareButton(document.getElementById('encodeShare'), inputText, 'text');
+  const markConverted = bindConvertHint(inputText, errorDiv, document.getElementById('encodeHint'), 'encode.hint');
 
   function convert(autoplay = true) {
     animator.stop();
     rendered = true;
+    markConverted();
     setMessage(errorDiv, null);
     resultDiv.replaceChildren();
     canonical = '';

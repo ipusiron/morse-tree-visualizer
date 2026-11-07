@@ -581,6 +581,16 @@ Object.assign(DICTIONARIES.en, {
   "tree.hidden_kind": "Hidden on the tree"
 });
 
+// 入力を変えたあと、変換ボタンを押すように促す。
+Object.assign(MESSAGES, {
+  "encode.hint": "「エンコード＆表示」を押すと、入力した文字を変換します。",
+  "decode.hint": "「デコード」を押すかEnterキーで、入力した符号を変換します。"
+});
+Object.assign(DICTIONARIES.en, {
+  "encode.hint": "Press Encode & show to convert the text you entered.",
+  "decode.hint": "Press Decode or Enter to convert the code you entered."
+});
+
 let language = 'ja';
 export function getLang() { return language; }
 export function setLang(lang) {
