@@ -5,6 +5,7 @@ import { encode, decode, farnsworthGaps, decodeWabun, encodeWabun } from '../js/
 import { MORSE_TABLE, PROSIGNS } from '../js/morseMap.js';
 import { TRIVIA_CARDS, formatTrivia } from '../js/trivia.js';
 import { WABUN_TABLE } from '../js/wabunMap.js';
+import { layoutVisibleTree } from '../js/kinds.js';
 
 const root = new URL('../', import.meta.url);
 const readme = readFileSync(new URL('README.md', root), 'utf8');
@@ -14,7 +15,7 @@ test('both READMEs explain the Wabun source, tool normalization, coverage and se
   assert.match(readme, /^## 🇯🇵 和文モールス$/m);
   assert.match(english, /^## 🇯🇵 Wabun \(Japanese\) Morse$/m);
   for (const text of [readme, english]) {
-    assert.equal([...text.matchAll(/^## /gm)].length, 25);
+    assert.equal([...text.matchAll(/^## /gm)].length, 26);
     for (const required of ['https://laws.e-gov.go.jp/law/325M50080000017', '65', '48', '10', '35',
       '67', '66', '720×920', 'NFKC', 'NFD', 'NFC', 'morse-tree-system', '?code=wabun', '?code=intl']) {
       assert.ok(text.includes(required), required);
@@ -58,24 +59,27 @@ test('README metadata and image references are intact', () => {
     'repo_url: "https://github.com/ipusiron/morse-tree-visualizer"',
     'demo_url: "https://ipusiron.github.io/morse-tree-visualizer/"']) assert.ok(yaml.includes(expected));
   const images = [...readme.matchAll(/!\[[^\]]*\]\(([^)]+)\)/g)].map(m => m[1]).filter(p => !p.startsWith('https:'));
-  assert.equal(images.length, 11);
+  assert.equal(images.length, 13);
   images.forEach(path => assert.ok(existsSync(new URL(path, root)), path));
   const pngs = readdirSync(new URL('assets/', root)).filter(f => f.endsWith('.png')).map(f => 'assets/' + f);
   assert.deepEqual(images.sort(), pngs.sort());
-  for (const name of ['screenshot8.png', 'screenshot9.png', 'screenshot10.png', 'screenshot11.png']) {
-    const data = readFileSync(new URL('assets/' + name, root));
+  for (const path of pngs) {
+    const data = readFileSync(new URL(path, root));
     assert.deepEqual([...data.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
     assert.deepEqual([data.readUInt32BE(16), data.readUInt32BE(20)], [1280, 1100]);
-    assert.ok(data.length <= 300 * 1024, name);
-    if (['screenshot10.png', 'screenshot11.png'].includes(name)) {
-      const caption = readme.split('](assets/' + name + ')\n')[1].split('\n')[0];
-      assert.ok(caption.includes(`1280×1100px、${data.length.toLocaleString('en-US')}バイト。`), name);
-    }
+    assert.ok(data.length <= 300 * 1024, path);
+  }
+  for (let n = 8; n <= 13; n++) {
+    const name = `screenshot${n}.png`;
+    const data = readFileSync(new URL('assets/' + name, root));
+    const caption = readme.split('](assets/' + name + ')\n')[1].split('\n')[0];
+    assert.ok(caption.includes(`1280×1100px、${data.length.toLocaleString('en-US')}バイト。`), name);
   }
 });
 
-test('README explains both layouts and all sourced cards with the computed values', () => {
+test('README explains all three layouts and all sourced cards with the computed values', () => {
   assert.ok(readme.includes('## 🧭 チャート型の見た目'));
+  assert.ok(readme.includes('## 🌳 Hツリーと表示する文字種'));
   assert.ok(readme.includes('## 🔍 雑学（他の分野とのつながり）'));
   for (const card of TRIVIA_CARDS) {
     assert.ok(readme.includes(card.title), card.id);
@@ -86,7 +90,8 @@ test('README explains both layouts and all sourced cards with the computed value
     'savingPct', 'reassignedUnits', 'reassignedSavingPct', 'entropyBits', 'huffmanBits']) {
     assert.ok(readme.includes(values[key]), key);
   }
-  for (const text of ['66ノード', '64ノード', '11列×14段', '720×808px', 'layoutChart', 'computeTrivia', '5,141,270']) {
+  for (const text of ['66ノード', '27ノード', '11列×14段', '720×808px', 'layoutChart', 'layoutHTree', 'layoutVisibleTree',
+    'morse-tree-kinds', 'computeTrivia', '5,141,270']) {
     assert.ok(readme.includes(text), text);
   }
 });
@@ -152,7 +157,7 @@ test('English README has every section in order, matching icons and reciprocal l
   assert.deepEqual(en.map(m => m[2]), [
     'Demo', 'Screenshots', 'Features', 'Usage', 'Interface', 'Use cases', 'Sound and Farnsworth timing',
     'Learning by keying', 'Wabun (Japanese) Morse', 'Prosigns', 'Sharing input', 'Themes', 'Printing (save as PDF)', 'Chart view',
-    'Trivia (connections to other fields)', 'Technical details', 'Security', 'Limitations', 'FAQ',
+    'H-tree and groups shown on the tree', 'Trivia (connections to other fields)', 'Technical details', 'Security', 'Limitations', 'FAQ',
     'References', 'Tests', 'Directory structure', 'Requirements', 'License', 'About this tool'
   ]);
 });
@@ -171,10 +176,10 @@ test('English README matches the Japanese file inventory, commands and external 
   assert.deepEqual(links(english), links(readme));
 });
 
-test('English README references exactly eleven real English PNGs with accurate size captions', () => {
+test('English README references exactly thirteen real English PNGs with accurate size captions', () => {
   const english = readFileSync(englishReadmePath, 'utf8');
   const images = [...english.matchAll(/!\[[^\]]*\]\(([^)]+)\)/g)].map(m => m[1]).filter(p => !p.startsWith('https:'));
-  const names = Array.from({ length: 11 }, (_, i) => `screenshot${i ? i + 1 : ''}.png`);
+  const names = Array.from({ length: 13 }, (_, i) => `screenshot${i ? i + 1 : ''}.png`);
   assert.deepEqual(images, names.map(name => 'assets/en/' + name));
   assert.deepEqual(readdirSync(new URL('assets/en/', root)).sort(), [...names].sort());
   for (const path of images) {
@@ -229,6 +234,33 @@ test('English README documents every approved trivia title and source, computed 
   assert.ok(english.includes('Enabling Sound alone does not create an AudioContext'));
   assert.ok(english.includes('It is silent by default too.'));
   assert.ok(english.includes('PNG export is not supported'));
+});
+
+test('H-tree size tables and the size comparison use case match layoutVisibleTree in both READMEs', () => {
+  const english = readFileSync(new URL('README.en.md', root), 'utf8');
+  const size = (shown, mode) => {
+    const { tree, box } = layoutVisibleTree('intl', shown, MORSE_TABLE, PROSIGNS, mode);
+    return { depth: tree.depth, nodes: tree.nodes.size, width: box[2], height: box[3], area: box[2] * box[3] };
+  };
+  const groups = [['letter'], ['letter', 'digit'], ['letter', 'digit', 'punct']];
+  const ja = [...readme.matchAll(/^\| (英字[^|]*) \| (\d) \| ([\d.]+)×([\d.]+)px \| ([\d.]+)×([\d.]+)px \|$/gm)];
+  const en = [...english.matchAll(/^\| (Letters[^|]*) \| (\d) \| ([\d.]+)×([\d.]+) px \| ([\d.]+)×([\d.]+) px \|$/gm)];
+  for (const rows of [ja, en]) {
+    assert.equal(rows.length, 3);
+    rows.forEach((row, i) => {
+      const binary = size(groups[i], 'tree');
+      const h = size(groups[i], 'htree');
+      assert.deepEqual(row.slice(2).map(Number), [binary.depth, binary.width, binary.height, h.width, h.height], row[1]);
+    });
+  }
+  const letters = [size(['letter'], 'tree'), size(['letter'], 'htree')];
+  const full = [size(groups[2], 'tree'), size(groups[2], 'htree')];
+  assert.deepEqual([letters[0].nodes, full[0].nodes, size(['letter'], 'chart').nodes], [31, 76, 27]);
+  assert.deepEqual([(letters[0].area / letters[1].area).toFixed(1), (full[0].area / full[1].area).toFixed(1)], ['2.5', '1.2']);
+  assert.ok(readme.includes('英字だけの31節の木は、二分木だと690×342px、Hツリーだと353.5×264pxで、面積はHツリーが約2.5分の1'));
+  assert.ok(readme.includes('深さ6の76節では1080×470pxと760.8×552pxで、差は約1.2分の1'));
+  assert.ok(english.includes('31-node letters-only tree is 690×342 px as a binary tree and 353.5×264 px as an H-tree'));
+  assert.ok(english.includes('about 1/2.5 of the area') && english.includes('1080×470 px and 760.8×552 px') && english.includes('about 1/1.2'));
 });
 
 test('use-case examples unique to this tool match the codec in both READMEs', () => {

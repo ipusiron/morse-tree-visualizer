@@ -33,6 +33,9 @@ Phase four-a adds JA/EN dictionaries, language selection/storage, state-preservi
 English trivia/print formatting and matching Japanese/English README content, trees and image references.
 Phase four-b adds the full 65-entry Wabun table, normalization/decoding, 67-node binary and 66-node chart references,
 code selection/storage, silent switching, Wabun study, table/print rows, keying composition, and shared URLs.
+The H-tree work adds H-tree geometry (checked against an independent placement, 36 px node/edge spacing),
+shown-group classification/trimming/storage, the shared Show on tree controls, hidden-group notes,
+and README size tables recomputed with layoutVisibleTree.
 
 ## Architecture
 
@@ -50,13 +53,15 @@ The application uses ES6 modules with the following architecture:
   - `js/share.js` - Pure bounded URL parsing/formatting; text and morse are mutually exclusive
   - `js/theme.js` - Light/dark/system choice and guarded localStorage access
   - `js/theme-early.js` - Synchronous classic head script applying saved light/dark before the stylesheet; guarded storage, root attribute only
-  - `js/layout.js` - Shared tree/chart choice, guarded storage and layout-change events
+  - `js/layout.js` - Shared tree/chart/htree choice, guarded storage and layout-change events
+  - `js/kinds.js` - DOM-free shown groups (É counts as punct), guarded per-system storage, buildVisibleTree trimming
+    and layoutVisibleTree (coordinates plus viewBox for each layout)
   - `js/i18n.js` - Initial language, guarded storage, data-i18n updates and language-change events
   - `js/system.js` - Code selection/storage, current table/codec, and silent system-change reconversion
 - **Data & Visualization**:
   - `js/morseMap.js` - MORSE_TABLE: 55 characters (ITU 50 + customary 5); PROSIGNS: 9 (ITU 8 + customary SOS)
   - `js/wabunMap.js` - WABUN_TABLE: 65 entries in iroha order, romanization, name keys, and kana samples
-  - `js/morseTree.js` - buildTree, completeTo, layoutTree and layoutChart, generated from MORSE_TABLE
+  - `js/morseTree.js` - buildTree, completeTo, layoutTree, layoutChart and layoutHTree, generated from MORSE_TABLE
   - `js/frequency.js` - Rounded A-Z frequencies from Day018 CipherClimb's Gutenberg corpus
   - `js/trivia.js` - DOM-free computeTrivia, text formatting and 16 sourced cards in seven fields
   - `js/morseCodec.js` - DOM-free normalization, encode/decode, paths and ITU timing
@@ -79,14 +84,17 @@ The application uses ES6 modules with the following architecture:
 4. **SVG Tree Rendering**: Each view uses ASCII `data-code` attributes. Depth five is complete;
    depth six includes valid table and prosign paths. There are 76 nodes, 34 leaves and 13 depth-six nodes.
    The character-only tree remains 75 nodes for compatibility. `$`, HH and SOS are outside the tree.
-   Prosign labels can be toggled; SK adds one node without moving existing coordinates.
-   When off, SN/KA retain the old empty-node appearance and SK plus its edge are hidden (all 76 groups remain in the DOM).
-   The SVG stays 1080 by 470 pixels;
+   Show on tree (letter/digit/punct/prosign; kana/mark/digit/symbol in Wabun) is shared by all four views.
+   buildVisibleTree trims the tree to the deepest shown code (letters only = depth 4, 31 nodes) and marks
+   hidden characters inside that depth as hiddenKind: gray dots that regain size and label only while highlighted.
+   Characters beyond the trimmed depth are not drawn; the animator skips them via view.has(code), like `$`.
+   The SVG size comes from layoutVisibleTree's viewBox (default binary 1080x470, Wabun 1050x470, H-tree 760.8x552);
    only the tree wrapper scrolls horizontally. Empty/customary nodes have distinct dashed borders.
 
-   Chart mode uses layoutChart(buildTree(MORSE_TABLE, 6, PROSIGNS)), without completeTo.
-   Always pack all 66 nodes; toggling prosigns only hides SN/SK and their edges, leaving 64 visible nodes.
-   Packing a character-only 64-node tree moves 26 nodes, so never repack for the toggle.
+   Chart mode uses layoutChart on the trimmed tree, without completeTo. By default it packs all 66 nodes;
+   with prosigns not shown, SK/SN/KA are gray dots. Fewer groups repack the chart (letters only = 27 nodes).
+   H-tree mode (layoutHTree): odd elements move sideways, even elements vertically; left/up = dot.
+   Branches shrink by 1/sqrt(2) per level and the shortest is 36 px, so nodes and edges stay 36 px apart.
    Root is (col=0,row=0), dash subtree left and dot subtree right. Continue the same symbol horizontally;
    the opposite symbol goes down to the shallowest collision-free row, counting vertical connector cells.
    Memoize subtree shapes. Columns -5..5 and rows 0..13 map to x=360+64*col, y=40+56*row.
@@ -94,8 +102,8 @@ The application uses ES6 modules with the following architecture:
    Empty nodes use r=8 or 28x18 with dashed borders. The root retains the binary tree's start circle.
    SN/SK/KA labels go inside nodes; shared aliases remain small prosign-labels. Rows are not depth labels.
    createTreeView(container, { layout = readLayout() }) exposes setLayout(mode).
-   Both layouts share data-code, highlight/current classes and playback; do not fork playback by layout.
-   Keep horizontal following; scroll chart nodes vertically only when outside the window viewport.
+   All three layouts share data-code, highlight/current classes and playback; do not fork playback by layout.
+   Keep horizontal following; scroll chart and H-tree nodes vertically only when outside the window viewport.
 
 5. **Security**: Render text with textContent and elements with createElement, never innerHTML.
    CSP allows only local scripts/styles and has no unsafe-inline or frame-ancestors directive.
@@ -137,7 +145,10 @@ The application uses ES6 modules with the following architecture:
     Print CSS always restores light colors; compact cells fit A4 portrait on one page in Chromium.
     The browser print dialog provides PDF output.
 
-11. **Shared layout**: morse-tree-layout accepts tree/chart, defaults to tree and catches storage exceptions.
+11. **Shared layout**: morse-tree-layout accepts tree/chart/htree, defaults to tree and catches storage exceptions.
+    morse-tree-kinds stores shown groups per code system as JSON; invalid or empty lists fall back to the defaults.
+    The last checked group cannot be cleared (the check is restored with a status message).
+    A kinds-change stops playback and keying and re-renders conversion results with the Hidden on the tree note.
     Keep the latest choice in memory too, so lazily initialized views agree when storage is blocked.
     Four independently named radio groups update together via layout-change.
     A change clears paths and stops all playback (including hidden panels and pending AudioContext work).

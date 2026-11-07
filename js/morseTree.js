@@ -59,6 +59,31 @@ export function layoutTree(tree, { xStep = 30, yStep = 64, x0 = 20, y0 = 30 } = 
   return { leaves, minX, maxX, maxY, width: maxX - minX, height: maxY - y0 };
 }
 
+// Hツリー: 奇数番目の符号は左右、偶数番目は上下に進み、枝は1段ごとに1/√2倍になる。
+// 最短の枝をminEdgeにそろえるので、どの深さでも節どうし・節と他の枝はminEdge以上離れる。
+export function layoutHTree(tree, { minEdge = 36, margin = 24 } = {}) {
+  const depth = Math.max(...[...tree.nodes.values()].map(n => n.depth));
+  const unit = minEdge * Math.SQRT2 ** (depth - 1);
+  const reach = first => {
+    let sum = 0;
+    for (let d = first; d <= depth; d += 2) sum += unit / Math.SQRT2 ** (d - 1);
+    return sum;
+  };
+  const half = { x: reach(1), y: reach(2) };
+  const round = value => Math.round(value * 10) / 10;
+  function visit(node, x, y) {
+    node.x = round(margin + half.x + x);
+    node.y = round(margin + half.y + y);
+    const length = unit / Math.SQRT2 ** node.depth;
+    const horizontal = node.depth % 2 === 0;
+    for (const [child, sign] of [[node.left, -1], [node.right, 1]]) {
+      if (child) visit(child, x + (horizontal ? sign * length : 0), y + (horizontal ? 0 : sign * length));
+    }
+  }
+  visit(tree.root, 0, 0);
+  return { depth, unit, width: round(2 * (half.x + margin)), height: round(2 * (half.y + margin)) };
+}
+
 export function layoutChart(tree, { xStep = 64, yStep = 56, ox = 360, oy = 40 } = {}) {
   const key = (x, y) => x + ',' + y;
   const shapes = new Map();

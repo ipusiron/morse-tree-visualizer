@@ -143,6 +143,7 @@ export function initKeying() {
   document.addEventListener('notation-change', () => render());
   document.addEventListener('tab-switch', cancel);
   document.addEventListener('layout-change', cancel);
+  document.addEventListener('kinds-change', cancel);
   document.addEventListener('system-change', cancel);
   document.addEventListener('system-change', () => { upAt = null; render(); });
   document.addEventListener('language-change', () => cancel({ preserveView: true }));

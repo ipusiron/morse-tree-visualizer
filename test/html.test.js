@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-test('four independently named layout controls have legends and both modes', () => {
+test('four independently named layout controls have legends and all three modes', () => {
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
   const controls = [...html.matchAll(/<fieldset class="layout-control">([\s\S]*?)<\/fieldset>/g)].map(m => m[1]);
   assert.equal(controls.length, 4);
@@ -10,8 +10,9 @@ test('four independently named layout controls have legends and both modes', () 
   for (const control of controls) {
     assert.match(control, /<legend(?:\sdata-i18n(?:-[a-z-]+)?="[^"]*")*>木の見た目<\/legend>/);
     const inputs = [...control.matchAll(/<input type="radio" name="([^"]+)" value="([^"]+)"/g)];
-    assert.deepEqual(inputs.map(m => m[2]), ['tree', 'chart']);
-    assert.equal(inputs[0][1], inputs[1][1]);
+    assert.deepEqual(inputs.map(m => m[2]), ['tree', 'chart', 'htree']);
+    assert.equal(new Set(inputs.map(m => m[1])).size, 1);
+    assert.match(control, /<span data-i18n="layout\.htree">Hツリー<\/span>/);
     names.add(inputs[0][1]);
   }
   assert.equal(names.size, 4);
@@ -69,7 +70,9 @@ test('conversion forms share a stacked layout and tree border belongs to the scr
   const box = css.match(/\.tree-box\s*\{([^}]+)\}/)[1];
   const wrapper = css.match(/\.tree-scroll-wrapper\s*\{([^}]+)\}/)[1];
   assert.doesNotMatch(box, /border:/);
-  assert.match(box, /width: 1080px/);
+  // 木の大きさは表示する文字種と見た目で変わるので、箱はSVGの幅に合わせる。
+  assert.match(box, /width: max-content/);
+  assert.doesNotMatch(css.match(/\.tree-box svg\s*\{([^}]+)\}/)[1], /^\s*(width|height):/m);
   assert.match(box, /margin-inline: auto/);
   assert.match(wrapper, /border: 1px solid/);
   assert.match(wrapper, /overflow-x: auto/);

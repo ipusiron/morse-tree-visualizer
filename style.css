@@ -24,6 +24,7 @@
   --node-hl-fill: #ffe082;
   --hl-stroke: #e65100;
   --node-empty-stroke: #c3c9d1;
+  --node-hidden: #6b7684;
   --node-custom-stroke: #8a6d00;
   --current-stroke: #bf360c;
   --line-stroke: #b5bcc6;
@@ -72,6 +73,7 @@
   --node-hl-fill: #ffe082;
   --hl-stroke: #ff8a50;
   --node-empty-stroke: #5c6470;
+  --node-hidden: #a3adb9;
   --node-custom-stroke: #d4b24c;
   --current-stroke: #ffab76;
   --line-stroke: #6b7480;
@@ -121,6 +123,7 @@
     --node-hl-fill: #ffe082;
     --hl-stroke: #ff8a50;
     --node-empty-stroke: #5c6470;
+    --node-hidden: #a3adb9;
     --node-custom-stroke: #d4b24c;
     --current-stroke: #ffab76;
     --line-stroke: #6b7480;
@@ -180,6 +183,7 @@
   --node-hl-fill: #ffe082;
   --hl-stroke: #e65100;
   --node-empty-stroke: #c3c9d1;
+  --node-hidden: #6b7684;
   --node-custom-stroke: #8a6d00;
   --current-stroke: #bf360c;
   --line-stroke: #b5bcc6;
@@ -279,6 +283,11 @@
 }
 
 .show-prosigns .prosign-label {
+  display: block;
+}
+
+/* 手続き符号を表示していなくても、手続き符号だけの節に経路が通ったら名前を出す。 */
+.tree-node.prosign-only.highlight .prosign-label {
   display: block;
 }
 
@@ -969,9 +978,9 @@ summary:hover {
 .subtab-content.active {
   display: block;
 }
-/* 木は固定サイズの独立したSVGとして描く。 */
+/* 木は独立したSVGとして描き、大きさは表示する文字種と見た目から決まる（SVGのwidth・height属性）。 */
 .tree-box {
-  width: 1080px;
+  width: max-content;
   margin-inline: auto;
 }
 .tree-scroll-wrapper {
@@ -987,8 +996,6 @@ summary:hover {
 .tree-box svg {
   display: block;
   max-width: none;
-  width: 1080px;
-  height: 470px;
 }
 .tree-node circle, .tree-node rect {
   fill: var(--node-fill);
@@ -1001,18 +1008,6 @@ summary:hover {
   fill: var(--paper);
   stroke: var(--node-empty-stroke);
   stroke-dasharray: 3 2;
-}
-svg:not(.show-prosigns) .tree-node.prosign-only circle {
-  r: 8px;
-  stroke-dasharray: 3 2;
-}
-svg:not(.show-prosigns) .tree-node.prosign-only:not(.highlight) circle,
-svg:not(.show-prosigns) .tree-node.prosign-only:not(.highlight) rect {
-  fill: var(--paper);
-  stroke: var(--node-empty-stroke);
-}
-svg:not(.show-prosigns) .prosign-extension {
-  display: none;
 }
 .tree-node.custom circle, .tree-node.custom rect {
   fill: var(--node-custom-fill);
@@ -1027,6 +1022,23 @@ svg:not(.show-prosigns) .prosign-extension {
 .tree-node.current circle, .tree-node.current rect {
   stroke: var(--current-stroke);
   stroke-width: 4;
+}
+/* 非表示の文字種は灰色の点にし、経路が通るときだけ元の大きさと文字に戻す。 */
+.tree-node.hidden-kind:not(.highlight) circle {
+  r: 4px;
+  fill: var(--node-hidden);
+  stroke: none;
+}
+.tree-node.hidden-kind:not(.highlight) rect {
+  width: 8px;
+  height: 8px;
+  transform: translate(20px, 11px);
+  fill: var(--node-hidden);
+  stroke: none;
+}
+.tree-node.hidden-kind:not(.highlight) text,
+.tree-node.hidden-kind:not(.highlight) .voicing-mark {
+  display: none;
 }
 .tree-box line {
   stroke: var(--line-stroke);
@@ -1052,15 +1064,6 @@ svg:not(.show-prosigns) .prosign-extension {
   fill: var(--depth-text);
 }
 
-.tree-box.chart-box, .tree-box.chart-box svg {
-  width: 720px;
-}
-.tree-box.chart-box svg {
-  height: 808px;
-}
-.tree-box.chart-box svg.wabun {
-  height: 920px;
-}
 .code-settings, .notation-control, .system-control {
   display: flex;
   flex-wrap: wrap;
@@ -1082,16 +1085,7 @@ svg:not(.show-prosigns) .prosign-extension {
   min-height: 44px;
   margin: 0;
 }
-svg.chart:not(.show-prosigns) .prosign-only rect {
-  width: 28px;
-  height: 18px;
-  transform: translate(10px, 6px);
-  stroke-dasharray: 3 2;
-}
-svg:not(.show-prosigns) .chart-prosign {
-  display: none;
-}
-.tree-controls, .layout-control {
+.tree-controls, .layout-control, .kind-control {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -1101,7 +1095,7 @@ svg:not(.show-prosigns) .chart-prosign {
 .tree-controls {
   margin-top: 1rem;
 }
-.layout-control {
+.layout-control, .kind-control {
   margin: 0;
   padding: 0.25rem 0.5rem;
   border: 1px solid var(--border);
